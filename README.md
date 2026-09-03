@@ -31,14 +31,14 @@
 结构（PC 端真实产品 DOM 实测） assets/c1-shell.html       产品壳、顶栏、导航
                               assets/c2-table-form.html  表格、字段、表单、业务视图
                               assets/c3-page-detail.html 详情页、弹窗、工作台部件、门户
-结构（手机端，按官方截图仿写） assets/c4-mobile.html      手机壳、卡片视图、表单卡片、企微会话
+结构（手机端 H5 真实 DOM 实测）  assets/c4-mobile.html      手机壳、三槽卡片、记录页、流程任务、工作台、企微会话
         ↓
 骨架样式（尺寸布局，无颜色）   assets/base.css
         ↓
 皮肤（纯色彩 token）          assets/skins/*.css         8 套
 ```
 
-配套：`assets/icons.svg`（图标雪碧图）、`assets/fit.js`（画布自适应）、`scripts/extract_templates.py`（按需提取结构模板）、`scripts/build.py`（确定性组装单文件 HTML）、`scripts/check.py`（静态检查）。
+配套：`assets/icons.svg`（图标雪碧图）、`assets/fit.js`（画布自适应）、`scripts/extract_templates.py`（按需提取结构模板）、`scripts/expand.py`（把片段里的 `<hb-*>` 宏展开成组件 HTML，语法见 `references/macros.md`）、`scripts/build.py`（确定性组装单文件 HTML，组装前自动展开宏）、`scripts/check.py`（静态检查）。
 
 ## 皮肤
 
@@ -66,6 +66,7 @@ python3 scripts/check.py 图.html
 
 ## 文档
 
+- `references/macros.md` — 重复块的宏语法（壳层、表格行、图表、手机卡片等）
 - `references/canvas/` — 画布规范（按用途分产品设计/营销）、验证与导出、SVG 嵌报告
 - `references/skin/` — 皮肤选型（routing）与制作（custom-skin）
 - `references/principles/` — 设计判据（视觉四原则、交互三原则、看板数据故事、图表选型、防千篇一律等 8 份）

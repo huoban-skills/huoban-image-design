@@ -914,17 +914,17 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .flow-foot { flex: none; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink-65); border-top: 1px solid var(--line); background: var(--card-bg); }
 
 /* ══════════════════ 手机端（H5 / 企业微信内打开）══════════════════
-   来源说明：该形态未做 DOM 实测采集，是按产品手机端官方截图与实际演示就近仿写的骨架，
-   尺寸与字级沿用产品级别（顶栏 48、页签 46、工具栏 46、字段行 38、主按钮 44），色彩全走皮肤 token。
-   将来拿到真实手机端 DOM 后，以实测值覆盖本节，不要再往上叠补丁。
-   结构见 assets/c4-mobile.html。除 .duo/.conn/.step 外，所有规则都收在 .phone 内，避免与 PC 组件同名冲突。 */
+   来源：2026-09-03 app.huoban.com 安卓 UA、375×812 视口实测 H5 真实 DOM（计算样式）。
+   壳 375 宽＝真实逻辑像素，尺寸不缩放。类名是本 skill 自定义（产品是 RN Web 哈希类名）。
+   结构见 assets/c4-mobile.html。除 .duo/.conn/.step 外，所有规则都收在 .phone 内。
+   会话形态（.chat/.msg/.wmenu）是微信端样式，未实测。 */
 
-/* 手机壳：默认高度自适应（表单类）；双屏对照或需要内容自然切断时给固定高度 */
-.phone { width: 432px; margin: 0 auto; flex: none; display: flex; flex-direction: column;
-  background: var(--page-bg); border: 1px solid var(--line); border-radius: 34px; overflow: hidden; box-shadow: var(--shadow-window); }
-.phone.h-fix { height: 830px; }
+/* 手机壳：默认高度自适应；双屏对照或需要内容自然切断时固定 812 */
+.phone { width: 375px; margin: 0 auto; flex: none; display: flex; flex-direction: column; position: relative;
+  background: var(--page-bg); border: 1px solid var(--line); border-radius: 34px; overflow: hidden; box-shadow: var(--shadow-window); font-size: 14px; }
+.phone.h-fix { height: 812px; }
 .duo { display: flex; align-items: center; justify-content: center; }
-.duo .phone { height: 830px; margin: 0; }   /* 清掉单屏的 margin auto，否则在 flex 行里会把两屏推开 */
+.duo .phone { height: 812px; margin: 0; }   /* 清掉单屏的 margin auto，否则在 flex 行里会把两屏推开 */
 
 /* 双屏之间的中缝流程说明 */
 .conn { width: 216px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 0 8px; text-align: center; }
@@ -933,79 +933,176 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .step { font-size: 15px; color: var(--ink-85); line-height: 1.75; font-weight: 500; }
 .step b { display: block; color: var(--accent); font-size: 14px; margin-bottom: 3px; }
 
-/* 顶栏（微信/企微内页标题栏） */
-.phone .wxbar { height: 48px; flex: none; background: var(--card-bg); border-bottom: 1px solid var(--line);
-  display: flex; align-items: center; gap: 8px; padding: 0 14px; font-size: 15px; font-weight: 600; color: var(--ink-85); }
-.phone .wxbar .bk { display: inline-flex; color: var(--ink-65); }
+/* 顶栏 44：返回 18 ＋ 标题 16/500 居中 */
+.phone .wxbar { height: 44px; flex: none; background: var(--card-bg); display: flex; align-items: center; padding: 0 14px; font-size: 16px; font-weight: 500; color: var(--ink-85); }
+.phone .wxbar .bk { display: inline-flex; color: var(--ink-85); width: 18px; }
 .phone .wxbar .bk .ico { width: 18px; height: 18px; }
 .phone .wxbar .tt { flex: 1; text-align: center; }
-.phone .wxbar .dots { position: static; display: inline; color: var(--ink-45); font-size: 17px; letter-spacing: 3px; }   /* 覆盖轮播圆点的 .dots，别删这两条 */
+.phone .wxbar .dots { position: static; display: inline; width: 18px; text-align: right; color: var(--ink-45); font-size: 15px; letter-spacing: 2px; }   /* 覆盖轮播圆点的 .dots，别删 */
 
-/* 页签 / 工具栏 / 数据来源说明（列表页三件套） */
-.phone .tabs2 { height: 46px; flex: none; display: flex; gap: 26px; align-items: stretch; background: var(--card-bg); padding: 0 16px; border-bottom: 1px solid var(--line); }
-.phone .tabs2 span { display: inline-flex; align-items: center; font-size: 15px; color: var(--ink-65); }
-.phone .tabs2 .on { color: var(--primary); font-weight: 700; box-shadow: inset 0 -2.5px 0 var(--primary); }
-.phone .tbar { height: 46px; flex: none; display: flex; align-items: center; gap: 20px; background: var(--card-bg); padding: 0 16px; border-bottom: 1px solid var(--line); color: var(--ink-65); }
-.phone .tbar .ico { width: 17px; height: 17px; }
-.phone .tbar .sp { flex: 1; }
-.phone .tbar .plus { color: var(--primary); }
-.phone .pscroll { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-.phone .srcnote { font-size: 12.5px; color: var(--ink-45); padding: 12px 14px 2px; flex: none; }
-.phone .srcnote b { color: var(--primary); font-weight: 400; }
+/* 工作区首页：页签行 42 ＋ 搜索 40 ＋ 分组列表 */
+.phone .stabs { height: 42px; flex: none; display: flex; gap: 24px; align-items: stretch; background: var(--card-bg); padding: 0 12px; border-bottom: 0.5px solid var(--line); overflow: hidden; white-space: nowrap; }
+.phone .stabs span { display: inline-flex; align-items: center; font-size: 15px; color: var(--ink-85); position: relative; }
+.phone .stabs .on { color: var(--primary); font-weight: 500; }
+.phone .stabs .on::after { content: ""; position: absolute; left: 0; bottom: 7px; width: 30px; height: 2px; border-radius: 2px; background: var(--primary); }
+.phone .ssearch { margin: 12px 16px 0; height: 40px; border-radius: 6px; background: rgba(0,0,0,.04); display: flex; align-items: center; gap: 8px; padding: 0 12px; color: var(--ink-25); font-size: 15px; }
+.phone .ssearch .ico { width: 16px; height: 16px; color: var(--ink-45); }
+.phone .sfold { margin: 12px 16px 0; background: var(--card-bg); border: 0.5px solid rgba(0,0,0,.04); border-radius: 6px; overflow: hidden; }
+.phone .sfh { height: 50px; display: flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 500; color: var(--ink-85); }
+.phone .sfh .r { margin-left: auto; color: var(--ink-45); }
+.phone .sfr { height: 50px; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 15px; color: var(--ink-85); border-top: 0.5px solid var(--line); }
+.phone .sfr .ico { width: 18px; height: 18px; color: var(--ink-45); }
+.phone .sfr.sub { padding-left: 40px; }
 
-/* 官方卡片视图：标题＋副标题＋两列字段＋线框胶囊操作按钮（＋可选右侧图片位） */
-.phone .ocard { background: var(--card-bg); border-radius: 10px; margin: 10px 12px 0; padding: 14px; display: flex; gap: 12px; flex: none; }
+/* 列表页三件套：视图条 48 ＋ 卡片列表 ＋ 底部工具栏 56 */
+.phone .vbar { height: 48px; flex: none; display: flex; align-items: center; gap: 6px; background: var(--card-bg); padding: 0 8px; box-shadow: 0 0.5px 0 rgba(0,0,0,.08); }
+.phone .vbtn { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 6px; border-radius: 6px; font-size: 15px; color: var(--ink-85); }
+.phone .vbtn .ico { width: 16px; height: 16px; color: var(--ink-85); }
+.phone .vbtn small { font-size: 13px; color: var(--ink-45); }
+.phone .vbtn .dd { font-size: 10px; color: var(--ink-45); }
+.phone .vbar .sp, .phone .pfilter .sp { flex: 1; }
+.phone .vic { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-65); }
+.phone .vic .ico { width: 20px; height: 20px; }
+.phone .vic.on { background: var(--primary-08); color: var(--primary); }
+.phone .plist { flex: 1; min-height: 0; overflow: hidden; background: var(--field-bg); padding: 12px 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+/* 三槽卡片（列表页默认卡片形态） */
+.phone .ocard { background: var(--card-bg); border-radius: 6px; padding: 13px; display: flex; gap: 12px; margin-bottom: 8px; }
 .phone .ocard .obody { flex: 1; min-width: 0; }
-.phone .ocard .ot { font-size: 15.5px; font-weight: 700; color: var(--ink-85); }
-.phone .ocard .os { font-size: 12.5px; color: var(--ink-45); margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.phone .ocard .ofr { display: flex; margin-top: 12px; }
-.phone .ocard .ofi { flex: 1; min-width: 0; }
-.phone .ocard .ofi + .ofi { border-left: 1px solid var(--line); padding-left: 14px; }
-.phone .ocard .ofl { font-size: 12px; color: var(--ink-45); margin-bottom: 6px; }
-.phone .ocard .ofv { font-size: 14px; color: var(--ink-85); font-weight: 600; }
-.phone .ocard .obtn { margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 14px;
-  border: 1.5px solid var(--primary); border-radius: 100px; color: var(--primary); font-size: 13px; font-weight: 600; }
-.phone .ocard .obtn .ico { width: 13px; height: 13px; }
-.phone .ocard .oimg { width: 84px; height: 84px; border-radius: 8px; background: var(--field-bg); display: flex; align-items: center; justify-content: center; flex: none; color: var(--ink-25); }
+.phone .ocard .ot { font-size: 14px; font-weight: 500; color: var(--ink-85); line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone .ocard .os { font-size: 12px; color: var(--ink-45); line-height: 16px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone .slots { display: flex; margin-top: 8px; }
+.phone .slot { flex: 1; min-width: 0; }
+.phone .slot + .slot { border-left: 1px solid var(--line); padding-left: 6px; }
+.phone .sl { font-size: 12px; color: var(--ink-45); line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone .sv { font-size: 12px; color: var(--ink-85); line-height: 16px; margin-top: 2px; min-height: 16px; white-space: nowrap; overflow: hidden; }
+.phone .sv .tag { height: 20px; border-radius: 10px; padding: 0 6px; font-size: 12px; }
+.phone .sv .tag:not([class*="c-"]) { background: var(--tag-bg); color: var(--ink-85); }
+.phone .sv .tag[class*="c-"] { height: 24px; border-radius: 100px; padding: 0 4px; font-size: 15px; }
+.phone .ocard .oimg { width: 106px; height: 90px; border-radius: 4px; background: rgba(0,0,0,.02); flex: none; overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--ink-25); }
+.phone .ocard .oimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .phone .ocard .oimg .ico { width: 30px; height: 30px; }
-.phone .ocard .oimg svg { width: 72px; height: 72px; }
-.phone .ocard .oimg img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; display: block; }
+.phone .obtn { margin-top: 12px; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 11px; border-radius: 14px; background: var(--primary); color: #fff; font-size: 14px; }
+.phone .obtn .ico { width: 14px; height: 14px; }
 
-/* 表单卡片：字段行上下堆叠，一屏一组，是 PC 标准表单在手机上的形态 */
-.phone .pbody { padding: 12px 12px 16px; display: flex; flex-direction: column; gap: 12px; }
-.phone .fcard { background: var(--card-bg); border: 1px solid var(--line); border-radius: 10px; padding: 2px 14px; }
-.phone .mf { padding: 10px 0 12px; border-top: 1px solid var(--line); }
-.phone .mf:first-child { border-top: none; }
-.phone .mf .fl { font-size: 12.5px; color: var(--ink-45); }
-.phone .mf .fv2 { margin-top: 6px; min-height: 38px; border: 1px solid var(--line); border-radius: 6px; background: var(--card-bg);
-  display: flex; align-items: center; padding: 0 10px; font-size: 14px; color: var(--ink-85); gap: 8px; }
-.phone .mf .fv2.ro { background: var(--field-bg); color: var(--ink-65); }   /* 只读态：关联带出、自动结出 */
-.phone .mf .fv2 .dd { margin-left: auto; color: var(--ink-45); font-size: 10px; }
-.phone .mf .fv2 .hl { color: var(--primary); font-weight: 700; }
-.phone .mf .fv2 .rmk { margin-left: auto; font-size: 12px; color: var(--ink-45); font-weight: 400; }
-.phone .up2 { display: flex; gap: 12px; margin-top: 8px; }
-.phone .upbox { width: 100px; height: 100px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; font-size: 11.5px; text-align: center; }
-.phone .upbox .ico { width: 22px; height: 22px; }
-.phone .upbox.done { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--line); }
-.phone .upbox.todo { border: 1.5px dashed var(--ink-25); color: var(--ink-45); background: var(--field-bg); }
+/* 悬浮新建 ＋ 分页 */
+.phone .fab { position: absolute; right: 12px; bottom: 110px; width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; }
+.phone .fab .ico { width: 22px; height: 22px; }
+.phone .mpager { height: 56px; flex: none; background: var(--card-bg); display: flex; align-items: center; gap: 4px; padding: 0 16px; color: var(--ink-45); font-size: 14px; }
+.phone .mpager .pg { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; }
+.phone .mpager .pg.on { background: var(--primary-08); color: var(--primary); }
+.phone .mpager .pp { margin-left: 12px; color: var(--ink-65); }
 
-/* 表单底部：主按钮＋提交后果说明 */
-.phone .pbtn { height: 44px; flex: none; border-radius: 8px; background: var(--primary); color: #fff; font-size: 15px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center; gap: 7px; }
-.phone .pbtn .ico { width: 16px; height: 16px; }
-.phone .hint { font-size: 12px; color: var(--ink-45); text-align: center; }
+/* 底部 56 高栏：列表工具栏 / 记录操作条 / 应用页签栏 共用 */
+.phone .mtool, .phone .apptab { height: 56px; flex: none; background: var(--card-bg); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; }
+.phone .mtool span, .phone .apptab span { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: var(--ink-65); }
+.phone .mtool .ico, .phone .apptab .ico { width: 22px; height: 22px; }
+.phone .mtool .dis { color: var(--ink-25); }
+.phone .apptab { border-top: 0.5px solid rgba(0,0,0,.12); }
+.phone .apptab .on { color: var(--primary); }
 
-/* 审批流程条（手机上代替 PC 的流程页签） */
-.phone .apv { background: var(--card-bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
-.phone .apv-h { font-size: 12.5px; color: var(--ink-45); margin-bottom: 8px; }
-.phone .apv-r { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: 13.5px; color: var(--ink-85); }
-.phone .apv-d { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.phone .apv-d.done { background: var(--c-green); }
-.phone .apv-d.cur { background: var(--c-orange); }
-.phone .apv-n { flex: 1; min-width: 0; }
-.phone .apv-t { font-size: 12px; color: var(--ink-45); flex: none; }
+/* 记录页（详情 / 编辑 / 新建 / 任务办理共用） */
+.phone .rec { flex: 1; min-height: 0; overflow: hidden; background: var(--card-bg); padding: 16px; }
+.phone .rtitle { font-size: 17px; font-weight: 500; color: var(--ink-85); line-height: 27px; }
+.phone .rqr { margin-top: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--primary); }
+.phone .rqr .ico { width: 16px; height: 16px; }
+.phone .rsec { margin: 16px 8px; text-align: center; font-size: 15px; font-weight: 700; color: var(--ink-85); line-height: 20px; }
+.phone .fld { margin-top: 19px; }
+.phone .rsec + .fld, .phone .rqr + .fld { margin-top: 16px; }
+.phone .fld .fl { font-size: 15px; color: var(--ink-65); line-height: 16px; padding-left: 10px; }
+.phone .fld .fv { margin-top: 6px; min-height: 40px; border-radius: 6px; background: var(--field-bg); padding: 10px; font-size: 15px; color: var(--ink-85); line-height: 20px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.phone .fv.edit { background: var(--card-bg); border: 1px solid var(--line); padding: 9px 10px; }
+.phone .fv .ph { color: var(--ink-25); }
+.phone .fv .dd { margin-left: auto; color: var(--ink-45); font-size: 10px; }
+.phone .fv .unit { margin-left: auto; color: var(--ink-45); }
+.phone .fld.hl { background: var(--field-hl, #A5F2E5); border-radius: 6px; padding: 6px 1px 1px; margin-top: 13px; }
+.phone .fld.hl .fv { background: rgba(255,255,255,.65); }
+.phone .fld.hl .fv.edit { background: rgba(255,255,255,.65); border: 0; }
+.phone .fv.opts { padding: 8px 10px; gap: 8px; }
+.phone .fv .opt { padding: 0 4px; color: var(--ink-65); }
+.phone .fv .tag { height: 24px; border-radius: 100px; padding: 0 4px; font-size: 15px; }
+.phone .fv .mem { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px 0 2px; border-radius: 100px; background: var(--tag-bg); }
+.phone .fv .mem .av { width: 20px; height: 20px; font-size: 11px; }
+.phone .fv.rel { display: block; padding: 10px 10px 8px; }
+.phone .fv.rel .r1 { display: flex; align-items: center; gap: 8px; line-height: 20px; }
+.phone .fv.rel .r1 .ico { width: 16px; height: 16px; color: var(--ink-45); }
+.phone .fv.rel .r2 { margin: 9px 0 0 26px; padding-top: 9px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-45); line-height: 16px; }
+.phone .fv.img { display: block; padding: 0; }
+.phone .fv.img .thumbs { padding: 10px; display: flex; gap: 8px; }
+.phone .fv.img .th { width: 78px; height: 78px; border-radius: 6px; background: rgba(0,0,0,.04); overflow: hidden; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-25); position: relative; }
+.phone .fv.img .th img { width: 100%; height: 100%; object-fit: cover; }
+.phone .fv.img .up { height: 40px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--ink-65); }
+.phone .fv.img .up .ico { width: 16px; height: 16px; }
 
-/* 会话流：企业微信待办推送 / 公众号图文消息 */
+/* 子表页签容器 */
+.phone .stab { margin-top: 19px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.phone .stab-hd { height: 40px; display: flex; align-items: center; gap: 20px; padding: 0 10px; background: var(--card-bg); font-size: 13px; color: var(--ink-85); }
+.phone .stab-hd .on { color: var(--primary); font-weight: 500; }
+.phone .stab-bd { background: var(--field-bg); padding: 12px 12px 4px; }
+
+/* 表单保存条 57 */
+.phone .fbar { height: 57px; flex: none; background: var(--card-bg); border-top: 1px solid var(--line); display: flex; align-items: center; gap: 16px; padding: 8px 16px; }
+.phone .fbar .sq { width: 40px; height: 40px; flex: none; border-radius: 6px; background: rgba(0,0,0,.04); display: inline-flex; align-items: center; justify-content: center; color: var(--ink-65); }
+.phone .fbar .sq .ico { width: 18px; height: 18px; }
+.phone .fbar .b { flex: 1; height: 40px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; padding: 0; }
+.phone .fbar .b.cancel { background: rgba(0,0,0,.04); color: var(--ink-65); }
+.phone .fbar .b.save { background: var(--primary); color: #fff; }
+
+/* 任务办理：耗时条 ＋ 底部 100 高办理区 */
+.phone .elapsed { height: 24px; flex: none; background: var(--card-bg); padding: 0 16px 8px; font-size: 13px; color: var(--ink-65); box-shadow: 0 1px 0 rgba(0,0,0,.04); display: flex; align-items: center; }
+.phone .taskbar { height: 100px; flex: none; background: var(--page-bg); border-top: 1px solid var(--line); padding: 8px 16px; }
+.phone .taskbar .th { display: flex; align-items: center; gap: 8px; height: 36px; }
+.phone .taskbar .av { width: 24px; height: 24px; font-size: 12px; background: var(--primary); }
+.phone .taskbar .tn { font-size: 15px; color: var(--ink-85); line-height: 20px; }
+.phone .taskbar .tn small { display: block; font-size: 13px; color: var(--ink-45); line-height: 16px; }
+.phone .taskbar .more { margin-left: auto; color: var(--ink-45); }
+.phone .taskbar .more .ico { width: 20px; height: 20px; }
+.phone .taskbar .tb { display: flex; gap: 8px; margin-top: 8px; }
+.phone .taskbar .b { height: 40px; padding: 0 11px; border-radius: 6px; font-size: 15px; }
+.phone .taskbar .b.solid { background: var(--primary); color: #fff; }
+
+/* 流程任务列表（企业级「流程」页签） */
+.phone .ptabs { height: 48px; flex: none; background: var(--card-bg); display: flex; align-items: center; box-shadow: inset 0 -0.5px 0 rgba(0,0,0,.08); }
+.phone .ptabs span { padding: 0 12px; font-size: 15px; color: var(--ink-65); position: relative; height: 48px; display: inline-flex; align-items: center; }
+.phone .ptabs .on { color: var(--primary); font-weight: 500; }
+.phone .ptabs .on::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 28px; height: 2px; margin-left: -14px; background: var(--primary); }
+.phone .ptabs .dot { position: absolute; top: 14px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--c-red); }
+.phone .pfilter { height: 48px; flex: none; background: var(--card-bg); display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; box-shadow: inset 0 -0.5px 0 rgba(0,0,0,.08); }
+.phone .pfilter .cnt { font-size: 13px; color: var(--ink-45); }
+.phone .pfilter .b.text { height: 32px; padding: 0 11px; font-size: 14px; color: var(--ink-65); }
+.phone .pcard { background: var(--card-bg); border: 0.5px solid var(--line); border-radius: 6px; box-shadow: 0 2px 3px rgba(0,0,0,.02); padding: 16px; margin-bottom: 8px; }
+.phone .pcard .ph { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.phone .pcard .av { width: 24px; height: 24px; font-size: 12px; background: var(--primary); }
+.phone .pcard .who { color: var(--ink-65); }
+.phone .pcard .when { color: var(--ink-45); }
+.phone .pcard .src { margin-left: auto; color: var(--ink-45); }
+.phone .pcard .src .ico { width: 18px; height: 18px; }
+.phone .pcard .pt { margin-top: 11px; font-size: 15px; color: var(--ink-85); line-height: 24px; }
+.phone .pcard .pn { margin-top: 3px; font-size: 13px; color: var(--ink-65); line-height: 20px; }
+.phone .pcard .pa { display: flex; justify-content: flex-end; margin-top: 14px; }
+.phone .pcard .b.line { height: 40px; padding: 0 11px; border-radius: 6px; border: 1px solid var(--primary); color: var(--primary); font-size: 15px; background: transparent; }
+.phone .pcard .b .dd { font-size: 10px; margin-left: 6px; }
+
+/* 自定义页面（工作台） */
+.phone .wpage { flex: 1; min-height: 0; overflow: hidden; background: var(--card-bg); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.phone .wcard { background: var(--card-bg); border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); overflow: hidden; }
+.phone .wban { height: 80px; border-radius: 9px; background: var(--banner-bg); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 500; color: rgba(255,255,255,.85); box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+.phone .wsc { display: grid; grid-template-columns: 1fr 1fr; row-gap: 44px; padding: 22px 0 22px 60px; }
+.phone .wsc span { display: flex; align-items: center; gap: 8px; font-size: 16px; color: var(--ink-85); line-height: 16px; }
+.phone .wsc .ico { width: 18px; height: 18px; color: var(--primary); }
+.phone .wtabs { height: 40px; display: flex; align-items: stretch; gap: 20px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.phone .wtabs span { display: inline-flex; align-items: center; font-size: 16px; color: var(--ink-65); position: relative; }
+.phone .wtabs .on { color: var(--ink-85); font-weight: 500; }
+.phone .wtabs .on::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--primary); }
+.phone .wsub { margin: 20px; background: #F7F7F7; border-radius: 9px; min-height: 300px; }
+.phone .wsh { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-85); box-shadow: 0 0 0 1px rgba(0,0,0,.04); border-radius: 9px 9px 0 0; }
+.phone .wsh .chips { margin-left: auto; display: inline-flex; gap: 4px; }
+.phone .chip { height: 24px; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 400; color: var(--ink-85); line-height: 16px; }
+.phone .chip.on { color: var(--primary); background: var(--primary-08); }
+.phone .wempty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 60px 0 40px; font-size: 14px; color: var(--ink-45); }
+.phone .wempty i { width: 60px; height: 60px; border-radius: 50%; background: rgba(0,0,0,.04); }
+
+/* 会话流：企业微信待办推送 / 公众号图文消息（微信端样式，未实测） */
 .phone .chat { flex: 1; padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
 .phone .mtime { align-self: center; font-size: 11px; color: var(--ink-25); }
 .phone .msg { max-width: 88%; background: var(--card-bg); border-radius: 10px; padding: 13px 14px; }
@@ -1016,6 +1113,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .msg .kv span:first-child { color: var(--ink-45); flex: none; width: 60px; }
 .phone .msg .ml { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--primary);
   display: flex; justify-content: space-between; align-items: center; }
+.phone .msg .ml .ico { width: 13px; height: 13px; }
 
 /* 公众号底部菜单栏（仅公众号会话形态用，企业微信会话没有这一条） */
 .phone .wmenu { height: 50px; flex: none; background: var(--card-bg); border-top: 1px solid var(--line); display: flex; align-items: stretch; }
@@ -1025,45 +1123,3 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .wmenu .mi:last-child { border-right: none; }
 .phone .wmenu .mi.hot { color: var(--primary); font-weight: 700; }
 .phone .tapdot { position: absolute; top: 4px; right: 10px; width: 18px; height: 18px; border-radius: 50%; background: var(--c-orange); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-
-/* 首页/门户型手机页：横幅卡、分节标题、缩略图行卡 */
-.phone .hcard { background: var(--banner-bg); border-radius: 10px; padding: 14px 16px; color: #fff; }
-.phone .hcard .st { font-size: 12px; opacity: .72; }
-.phone .hcard .nm { font-size: 17px; font-weight: 700; margin-top: 3px; }
-.phone .hcard .sub { font-size: 12px; opacity: .85; margin-top: 6px; }
-.phone .sec { font-size: 13px; color: var(--ink-45); display: flex; justify-content: space-between; align-items: center; padding: 0 2px; }
-.phone .mcard { background: var(--card-bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; gap: 12px; align-items: center; }
-.phone .mcard.off { opacity: .55; }
-.phone .mthumb { width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex: none; }
-.phone .mthumb .ico { width: 24px; height: 24px; }
-.phone .minfo { flex: 1; min-width: 0; }
-.phone .minfo b { font-size: 14.5px; color: var(--ink-85); display: block; }
-.phone .minfo .sp { font-size: 12px; color: var(--ink-45); margin-top: 3px; }
-.phone .mnum { text-align: right; flex: none; }
-.phone .mnum .stk { font-size: 13.5px; font-weight: 700; color: var(--ink-85); }
-.phone .mnum .awd { font-size: 12px; color: var(--c-orange); margin-top: 4px; font-weight: 600; }
-
-/* 手机端统计卡与明细/榜单列表 */
-.phone .stats2 { display: flex; gap: 12px; }
-.phone .scard { flex: 1; background: var(--card-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
-.phone .scard .lb { font-size: 12px; color: var(--ink-45); }
-.phone .scard .vv { font-size: 24px; font-weight: 700; color: var(--ink-85); margin-top: 4px; font-variant-numeric: tabular-nums; }
-.phone .scard .vv small { font-size: 13px; font-weight: 400; color: var(--ink-45); }
-.phone .scard.gold .vv { color: var(--c-orange); }
-.phone .lcard { background: var(--card-bg); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.phone .lrow { display: flex; align-items: center; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--ink-65); gap: 10px; }
-.phone .lrow:first-child { border-top: none; }
-.phone .lrow.lhead { background: var(--field-bg); color: var(--ink-45); font-size: 12px; padding: 8px 14px; }
-.phone .lrow.sum { font-weight: 700; color: var(--ink-85); background: var(--field-bg); }
-.phone .lrow.merow { background: var(--primary-08); }        /* 当前用户所在行 */
-.phone .lrow .c1 { flex: 1; min-width: 0; }
-.phone .lrow .c2 { width: 44px; text-align: right; flex: none; }
-.phone .lrow .c3 { width: 64px; text-align: right; flex: none; }
-.phone .lrow .c4 { width: 72px; text-align: right; flex: none; font-variant-numeric: tabular-nums; }
-.phone .lrow .nm2 { font-weight: 600; color: var(--ink-85); font-size: 13.5px; }
-.phone .lrow .st2 { font-size: 11.5px; color: var(--ink-45); margin-top: 1px; }
-.phone .rk { width: 24px; height: 24px; border-radius: 50%; background: var(--tag-bg); color: var(--ink-65); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
-.phone .rk.g1 { background: var(--c-orange); color: #fff; }
-.phone .rk.g2, .phone .rk.g3 { background: color-mix(in srgb, var(--c-orange) 18%, transparent); color: var(--c-orange); }
-.phone .amt { font-weight: 700; color: var(--ink-85); font-variant-numeric: tabular-nums; }
-.phone .amt.top { color: var(--c-orange); }

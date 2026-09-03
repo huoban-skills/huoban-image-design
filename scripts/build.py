@@ -11,13 +11,15 @@
 
 - --skin：皮肤名（assets/skins/ 下的文件名，不带 .css）或一个 css 文件路径（自定义皮肤）。
 - --content：<body> 里的页面内容，即 <div class="stage">…</div> 整段（浮层、标注都在其中）。
+  片段里的 <hb-*> 宏（壳层、表格行、卡片、图表等重复块，见 references/macros.md）先由 expand.py 展开。
 - --extra-style：本图补充样式，可省略。自动加“/* ── 本图布局 ── */”分隔头供 check.py 识别。
 - --fullbleed：产品设计类加此开关（body 加 class="fullbleed"）；营销类不加。
 
-拼接顺序固定：皮肤 css → base.css → 本图补充样式 → icons.svg（body 开头）→ 内容 → fit.js（body 末尾）。
+拼接顺序固定：宏展开 → 皮肤 css → base.css → 本图补充样式 → icons.svg（body 开头）→ 内容 → fit.js（body 末尾）。
 改过 base.css 或皮肤后重跑本脚本即可重拼既有图（图里嵌的是拼装时的快照）。
 """
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -65,10 +67,18 @@ def main():
         return 1
 
     content = Path(a.content).read_text(encoding="utf-8").strip()
+    if "<hb-" in content:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from expand import expand, ExpandError
+        try:
+            content = expand(content)
+        except ExpandError as e:
+            sys.stderr.write(f"宏展开失败：{e}\n")
+            return 1
     if '<template' in content:
         sys.stderr.write("内容里还有 <template> 标签：模板要去壳后放进 .stage，template 元素浏览器不渲染\n")
         return 1
-    if 'class="stage"' not in content:
+    if not re.search(r'class="stage[\s"]', content):
         sys.stderr.write('内容里没有 class="stage"：<body> 内容必须包在 <div class="stage"> 里\n')
         return 1
 

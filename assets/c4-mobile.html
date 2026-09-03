@@ -1,9 +1,10 @@
 <!--
 伙伴云界面示意图 · 结构 4：手机端（H5 / 企业微信内打开）
 
-⚠ 来源与可信度：本文件的结构**不是 DOM 实测采集**，是按产品手机端官方截图与实际演示就近仿写的骨架，
-   拿到真实手机端 DOM 后以实测值覆盖本文件与 base.css 的手机端一节，不要往上叠补丁。
-   PC 端的 c1～c3 仍是实测真相源，两者不要混着改。
+来源：2026-09-03 在 app.huoban.com 以安卓 UA、375×812 视口实测 H5 真实 DOM（工作区「库存管理」），
+   所有 data-measured 数值来自计算样式。手机端是 React Native Web ＋ antd-mobile，类名无语义，
+   本文件的类名是本 skill 自定义的，尺寸与层次是实测的。主色随工作区主题变（实测企业为 #6647FF）。
+   企业微信/公众号会话（第三节）不是伙伴云界面，按微信端样式仿写，未实测。
 
 本文件是架构与组件目录，不含业务示例：
 1. data-architecture 表示整屏形态；data-component 表示可重复组件。
@@ -11,30 +12,30 @@
 3. 尺寸、颜色与状态外观由 base.css 的「手机端」一节和 skins/*.css 提供；
    除 .duo/.conn/.step 外所有类都收在 .phone 作用域内，与 PC 组件同名不冲突。
 4. 手机图不套 PC 产品壳（不要 .window / 左侧导航 / 一级顶栏），手机壳本身就是画布内容。
-5. .stage 宽度按屏数在本图补充样式里给：单屏 520，双屏 1100；高度按内容实测回填。
-   手机竖图嵌进报告时要限宽居中（约 360px），否则会被版心拉得巨大。
+5. 手机壳 375 宽＝真实逻辑像素，不要缩放尺寸。.stage 宽度按屏数在本图补充样式里给：单屏 520，双屏 1100；
+   高度按内容实测回填。手机竖图嵌进报告时要限宽居中（约 360px），否则会被版心拉得巨大。
+6. 重复块优先写宏（references/macros.md 手机端一节），宏没覆盖的才照本文件手写。
 -->
 
 <!-- ══════════ 一、整屏架构 ══════════ -->
 
 <template data-architecture="手机单屏"
-          data-measured="壳 432 宽、圆角 34、1px 边、page-bg 底；高度自适应内容。顶栏 48 高白底下边线；内容区 padding 12">
+          data-measured="壳 375 宽（真实视口）、圆角 34、1px 边；页底 page-bg；高度自适应内容，也可 .h-fix 固定 812。顶栏 44 高白底">
   <div class="stage"><!-- 本图补充样式里 .stage{width:520px} -->
     <div class="phone">
       <!-- 组件：手机顶栏 -->
-      <div class="pbody">
-        <!-- 内容组件按需堆叠：表单卡片 / 统计卡 / 明细列表 / 主按钮 -->
-      </div>
+      <!-- 页面主体按形态选：列表页三件套 / 记录页 / 流程列表 / 工作台 / 会话 -->
+      <!-- 组件：底部条（按页面：列表工具栏 / 记录操作条 / 表单保存条 / 任务办理区 / 应用页签栏） -->
     </div>
   </div>
 </template>
 
 <template data-architecture="手机双屏对照" data-use="讲「从哪来 → 到哪去」的两步流程时用；单纯展示一个页面不要凑两屏"
-          data-measured="两个 432 宽手机固定高 830，中缝 216 宽放流程说明；.duo 横向居中对齐"
-          data-note="内容比 830 高时，末条记录被壳底边自然切断是对的（真实截图就这样）；但不要切在字的中腰，调条数或壳高让它切在行间">
+          data-measured="两个 375 宽手机固定高 812，中缝 216 宽放流程说明；.duo 横向居中对齐"
+          data-note="内容比 812 高时，末条记录被壳底边自然切断是对的（真实截图就这样）；但不要切在字的中腰，调条数让它切在行间">
   <div class="stage"><!-- 本图补充样式里 .stage{width:1100px} -->
     <div class="duo">
-      <div class="phone"><!-- 左屏：来源页，如会话待办、公众号消息 --></div>
+      <div class="phone"><!-- 左屏：来源页，如会话待办、流程列表 --></div>
       <div class="conn">
         <div class="step"><b><!-- 步骤标题 --></b><!-- 一句说明 --></div>
         <div class="bigarr"><svg class="ico"><use href="#i-arrow-right"/></svg></div>
@@ -48,98 +49,176 @@
 <!-- ══════════ 二、壳内通用组件 ══════════ -->
 
 <template data-component="手机顶栏" data-group="手机端"
-          data-measured="48 高、白底、下边线；返回箭头 18＋居中标题 15/600＋右侧三点">
+          data-measured="44 高白底无边线；返回箭头 18 见方在 x14；标题 16/500 ink-85 居中（列表页/记录页显示表名，任务页显示流程名）">
   <div class="wxbar">
     <span class="bk"><svg class="ico"><use href="#i-prev"/></svg></span>
-    <span class="tt"><!-- 页面名或企业名·应用名 --></span>
+    <span class="tt"><!-- 表名 / 流程名 / 企业名·应用名 --></span>
     <span class="dots">···</span>
   </div>
 </template>
 
-<template data-component="手机视图页签＋工具栏" data-group="手机端"
-          data-measured="页签行 46 高、gap 26、选中项主色 700＋2.5px 下划线；工具栏 46 高、图标 17、gap 20，右侧新建为主色加号"
-          data-note="工具栏图标按该页真实可用的能力放，不要凑满；扫码等能力没确认就不要画">
-  <div class="tabs2">
-    <span class="on"><!-- 当前视图 --></span>
-    <span><!-- 其他视图 --></span>
+<template data-component="手机工作区首页" data-group="手机端"
+          data-measured="页签行 42 高白底下边线 0.5px：项 15/400 ink-85 间距 24，选中 15/500 主色＋底部 30×2 主色条；搜索框 x16 343×40 底 rgba(0,0,0,.04) r6，页签下 12；分组列表白卡 r6 边 0.5px，行 50 高 pad-left 12，文件夹图标＋名称(数量)"
+          data-note="页签行内容依次：表格 / 流程 / 页面 / 动态 / 各页面名（横向可滚）">
+  <div class="stabs">
+    <span class="on">表格</span><span>流程</span><span>页面</span><span>动态</span><span><!-- 页面名 --></span>
   </div>
-  <div class="tbar">
-    <svg class="ico"><use href="#i-group"/></svg>
-    <svg class="ico"><use href="#i-filter"/></svg>
-    <svg class="ico"><use href="#i-sort"/></svg>
+  <div class="ssearch"><svg class="ico"><use href="#i-search"/></svg>搜索</div>
+  <div class="sfold">
+    <div class="sfh">全部表格<span class="r"><svg class="ico"><use href="#i-plus"/></svg></span></div>
+    <div class="sfr"><svg class="ico"><use href="#i-folder"/></svg><!-- 分组名(数量) --></div>
+    <div class="sfr sub"><svg class="ico"><use href="#i-grid-s"/></svg><!-- 展开后的表名 --></div>
+  </div>
+</template>
+
+<template data-component="手机视图条" data-group="手机端"
+          data-measured="48 高白底 pad 0 8 下边线 0.5px rgba(0,0,0,.08)：左视图按钮 32 高 r6 pad 6＝视图图标＋视图名 15/400 ink-85＋条数 13/400 ink-45＋下拉箭头；右侧 32×32 圆角 6 图标钮（视图切换、搜索）"
+          data-note="H5 默认进网格表格，卡片要切一次；示意图直接画卡片态">
+  <div class="vbar">
+    <span class="vbtn"><svg class="ico"><use href="#i-grid-s"/></svg><!-- 视图名 --><small><!-- 条数 --></small><span class="dd">▾</span></span>
     <span class="sp"></span>
-    <svg class="ico"><use href="#i-table"/></svg>
-    <svg class="ico"><use href="#i-search"/></svg>
-    <svg class="ico plus"><use href="#i-plus"/></svg>
-  </div>
-  <div class="pscroll">
-    <div class="srcnote">来自 <b><!-- 表名 --></b> 的数据<!-- 可接一句范围说明 --></div>
-    <!-- 组件：手机卡片视图，按需重复 -->
+    <span class="vic"><svg class="ico"><use href="#i-table"/></svg></span>
+    <span class="vic"><svg class="ico"><use href="#i-search"/></svg></span>
   </div>
 </template>
 
-<template data-component="手机卡片视图" data-group="手机端"
-          data-measured="卡片白底 r10、margin 10 12 0、pad 14；标题 15.5/700，副标题 12.5/ink-45 单行省略；字段两列等分、第二列左边线＋14 内距；操作按钮线框胶囊 30 高、1.5px 主色描边"
-          data-note="右侧 84 见方图片位可选，只有真有产品图/照片时才放；没有实物图的业务（单据、客户）不要放灰色图标占位">
-  <div class="ocard">
-    <div class="obody">
-      <div class="ot"><!-- 主标题：一般是「主体名｜编号」 --></div>
-      <div class="os"><!-- 副标题：归属、日期、金额等一行摘要 --></div>
-      <div class="ofr">
-        <div class="ofi"><div class="ofl"><!-- 字段名 --></div><div class="ofv"><!-- 值，可放 .tag 状态标签 --></div></div>
-        <div class="ofi"><div class="ofl"><!-- 字段名 --></div><div class="ofv"><!-- 值 --></div></div>
+<template data-component="手机卡片列表" data-group="手机端"
+          data-measured="列表区 flex:1 底 #F5F6F8（field-bg）pad 12 12 0、上下边线 1px rgba(0,0,0,.08)；卡片 349 宽白底 r6 无边无影 pad 13、间距 8；标题 14/500 ink-85 高 20；副标题（摘要模板）12/400 ink-45 标题下 4；三槽字段区标题下 8：三槽等分，槽 label 12/400 ink-45 高 16、值 12/400 ink-85 label 下 2，第二三槽左边线 1px line＋左 pad 6；有图片字段时右侧 106×90 图片位、文字区 205 宽；快捷按钮在槽位下 12：28 高 r14 主色实底 pad 0 11 图标＋14 白字"
+          data-note="槽值可放灰底标签（20 高 r10 底 tag-bg pad 0 6 字 12）或彩色选项标签（24 高 r100 选项色白字 15 pad 0 4）">
+  <div class="plist">
+    <div class="ocard">
+      <div class="obody">
+        <div class="ot"><!-- 标题模板：主体名：数量｜归属 --></div>
+        <div class="os"><!-- 副标题：摘要一行，可省 --></div>
+        <div class="slots">
+          <div class="slot"><div class="sl"><!-- 字段名 --></div><div class="sv"><span class="tag"><!-- 灰标签值 --></span></div></div>
+          <div class="slot"><div class="sl"><!-- 字段名 --></div><div class="sv"><!-- 值 --></div></div>
+          <div class="slot"><div class="sl"><!-- 字段名 --></div><div class="sv"><!-- 值 --></div></div>
+        </div>
+        <div class="obtn"><svg class="ico"><use href="#i-check"/></svg><!-- 快捷按钮名，可省 --></div>
       </div>
-      <div class="obtn"><svg class="ico"><use href="#i-edit"/></svg><!-- 快捷操作名 --></div>
+      <div class="oimg"><!-- 可选：产品图 img --></div>
     </div>
-    <div class="oimg"><!-- 可选：产品图或线稿 svg --></div>
   </div>
 </template>
 
-<template data-component="手机表单卡片" data-group="手机端"
-          data-use="PC 标准表单在手机上的形态：字段上下堆叠，一屏填一组"
-          data-measured="卡片白底 r10、pad 2 14；字段行上下 10/12、行间 1px 分隔；标签 12.5/ink-45；输入框 38 高 r6 1px 边；必填星号用 <i class=&quot;req&quot;>*</i>"
-          data-note="只读态（关联带出、自动结出）加 .ro 走 field-bg 灰底；自动算出来的关键数用 .hl 主色加粗，右侧可挂 .rmk 小字注释">
-  <div class="fcard">
-    <div class="mf">
-      <div class="fl"><!-- 字段名 --> <i class="req">*</i></div>
-      <div class="fv2">
-        <svg class="ico"><use href="#i-f-relation"/></svg><!-- 可选：字段类型图标 -->
-        <!-- 值 -->
-        <span class="dd">▾</span><!-- 可选：下拉/选择类字段 -->
+<template data-component="手机悬浮新建与分页" data-group="手机端"
+          data-measured="悬浮新建 48 圆 主色实底白色加号，右 12、距底部条 54；分页条 56 高白底居中：‹ 当前页 40×40 淡主色底 ›，可带「20 行/页」">
+  <div class="fab"><svg class="ico"><use href="#i-plus"/></svg></div>
+  <div class="mpager"><span class="pg">‹</span><span class="pg on">1</span><span class="pg">›</span><span class="pp">20 行/页 ▾</span></div>
+</template>
+
+<template data-component="手机底部工具栏" data-group="手机端"
+          data-measured="56 高白底：列统计 / 字段设置 / 分组 / 筛选 / 排序 等分，图标 22＋10px 字 ink-65；按表权限增减项"
+          data-note="同一条 56 高栏在记录详情页是：上一条 / 下一条 / 编辑 / 评论 / 更多（上一条置灰 ink-25）；企业级页面是应用页签栏：空间 / 流程 / 通知 / 我的（选中主色）">
+  <div class="mtool">
+    <span><svg class="ico"><use href="#i-fields"/></svg>列统计</span>
+    <span><svg class="ico"><use href="#i-settings"/></svg>字段设置</span>
+    <span><svg class="ico"><use href="#i-group"/></svg>分组</span>
+    <span><svg class="ico"><use href="#i-filter"/></svg>筛选</span>
+    <span><svg class="ico"><use href="#i-sort"/></svg>排序</span>
+  </div>
+</template>
+
+<!-- ══════════ 三、记录页：详情 / 编辑 / 新建 / 任务办理共用一套字段骨架 ══════════ -->
+
+<template data-component="手机记录页" data-group="手机端"
+          data-measured="页体白底 pad 16：记录标题 17/500 ink-85（新建时是表名）；标题下 8 一行「二维码」链接 svg16＋13 主色；分组标题 15/700 ink-85 居中、上下各 16；字段 label strong 15/400 ink-65、值框 label 下 6：341×40 r6 pad 10、值 15/400 ink-85；字段间距 19（值框底到下一 label）"
+          data-note="值框底色分态：详情态 field-bg 灰；编辑/新建态白底 1px 线；依赖未满足或未填写显示占位 15/ink-25（「请先选择：仓库」「保存后显示计算结果」）；本节点可编辑字段、计算字段整块外包 .hl 青绿高亮 r6 且值框变白 65%">
+  <div class="rec">
+    <div class="rtitle"><!-- 记录标题 / 表名 --></div>
+    <div class="rqr"><svg class="ico"><use href="#i-f-barcode"/></svg>二维码</div>
+    <div class="rsec"><!-- 分组名 --></div>
+    <div class="fld"><div class="fl"><!-- 字段名 --></div><div class="fv"><!-- 值 --></div></div>
+    <div class="fld"><div class="fl"><!-- 字段名 --></div><div class="fv edit"><!-- 编辑态：空或值 --><span class="dd">▾</span></div></div>
+    <div class="fld hl"><div class="fl"><!-- 计算字段 / 本节点可编辑字段 --></div><div class="fv"><span class="ph"><!-- 占位 --></span></div></div>
+  </div>
+</template>
+
+<template data-component="手机字段值变体" data-group="手机端"
+          data-measured="选项：值框 pad 8 10，选中彩色标签 24 高 r100 选项色白字 15 pad 0 4，其余选项灰字 15/ink-65 pad 0 4 并排；单选右端 24×24 下拉箭头。成员：灰底胶囊 tag-bg r100 24 高＝头像 20＋名 15。关联：值框 76 高＝主行 15/ink-85（前置图标）＋1px 分割线＋副行 13/ink-45。图片：值框 139 高＝缩略图 78 见方 r6（编辑态右上 24 见方删除角标）＋1px 分割线＋「上传图片」40 高行 15/ink-65 居中。数值/金额：编辑态框内右端单位 15/ink-45"
+          data-note="金额详情值形如「1866.00 元」">
+  <div class="fld"><div class="fl"><!-- 选项字段 --></div><div class="fv opts"><span class="tag c-blue"><!-- 当前值 --></span><span class="opt"><!-- 其他选项 --></span><span class="dd">▾</span></div></div>
+  <div class="fld"><div class="fl"><!-- 成员字段 --></div><div class="fv"><span class="mem"><span class="av"><!-- 首字 --></span><!-- 姓名 --></span></div></div>
+  <div class="fld"><div class="fl"><!-- 关联字段 --></div><div class="fv rel"><div class="r1"><svg class="ico"><use href="#i-f-relation"/></svg><!-- 关联记录标题 --></div><div class="r2"><!-- 副信息字段 --></div></div></div>
+  <div class="fld"><div class="fl"><!-- 图片字段 --></div><div class="fv img"><div class="thumbs"><span class="th"><!-- img --></span></div><div class="up"><svg class="ico"><use href="#i-f-image"/></svg>上传图片</div></div></div>
+  <div class="fld"><div class="fl"><!-- 数值字段 --></div><div class="fv edit"><!-- 值 --><span class="unit">元</span></div></div>
+</template>
+
+<template data-component="手机子表页签容器" data-group="手机端"
+          data-measured="343 宽 边 1px rgba(0,0,0,.08) r6；页签行 40 高白底：页签 13px，选中 13/500 主色，间距 20；体内放三槽卡片或空态">
+  <div class="stab">
+    <div class="stab-hd"><span class="on"><!-- 子表页签 --></span><span><!-- 子表页签 --></span></div>
+    <div class="stab-bd"><!-- 子表记录卡 / 「来自 X 的数据 共 N 条」 --></div>
+  </div>
+</template>
+
+<template data-component="手机记录操作条" data-group="手机端"
+          data-measured="详情页底部 56 高白底 pad 0 8：上一条(ink-25)/下一条/编辑/评论/更多，图标＋10px 字 ink-65">
+  <div class="mtool obar">
+    <span class="dis"><svg class="ico"><use href="#i-prev"/></svg>上一条</span>
+    <span><svg class="ico"><use href="#i-next"/></svg>下一条</span>
+    <span><svg class="ico"><use href="#i-edit"/></svg>编辑</span>
+    <span><svg class="ico"><use href="#i-at"/></svg>评论</span>
+    <span><svg class="ico"><use href="#i-more"/></svg>更多</span>
+  </div>
+</template>
+
+<template data-component="手机表单保存条" data-group="手机端"
+          data-measured="编辑/新建页底部 57 高白底 上边线 1px rgba(0,0,0,.08) pad 8 16：取消 40 高 r6 底 rgba(0,0,0,.04) 字 14/ink-65；保存 40 高 r6 主色实底白字 14；两钮等分间距 16；新建页左侧多一个 40×40 灰底方钮（更多）">
+  <div class="fbar">
+    <span class="sq"><svg class="ico"><use href="#i-more"/></svg></span>
+    <span class="b cancel">取消</span>
+    <span class="b save">保存</span>
+  </div>
+</template>
+
+<template data-component="手机任务办理区" data-group="手机端"
+          data-use="流程任务页（/task/{id}）底部，代替 PC 详情弹窗右栏的流程页签；页体就是记录页，本节点可改的字段带 .hl 高亮"
+          data-measured="顶栏下一条 24 高「耗时 1.7天」13/ink-65 底阴影；底部 100 高 底 page-bg 上边线 1px：第一行头像 24＋「办理人 · 流程名」15/ink-85＋副行记录标题 13/ink-45、右侧 20 见方展开钮；第二行按钮 40 高 r6 主色实底白字 15 pad 0 11，多个按钮并排间距 8">
+  <div class="elapsed">耗时 <!-- 1.7天 --></div>
+  <div class="taskbar">
+    <div class="th"><span class="av"><!-- 首字 --></span><span class="tn"><!-- 办理人 · 流程名 --><small><!-- 记录标题 --></small></span><span class="more"><svg class="ico"><use href="#i-expand"/></svg></span></div>
+    <div class="tb"><span class="b solid"><!-- 通过类动作 --></span><span class="b solid"><!-- 驳回类动作 --></span></div>
+  </div>
+</template>
+
+<!-- ══════════ 四、流程列表（企业级「流程」页签）══════════ -->
+
+<template data-component="手机流程任务列表" data-group="手机端"
+          data-measured="顶部页签 48 高白底：我发起的 / 我处理的 / 发起流程，15/400 ink-65，选中 15/500 主色＋28×2 主色下划线，可带 6 见方红点；筛选条 48 高白底：左「筛选出 N 条/共 M 条」13/ink-45，右「批量」52×32 文字钮＋32×32 淡主色底筛选钮；列表底 field-bg pad 12：任务卡 351 宽白底 r6 边 0.5px rgba(0,0,0,.08) 阴影 0 2 3 rgba(0,0,0,.02) pad 16、间距 8；卡内：头像 24 圆主色底白字＋发起人 13/ink-65＋时间 13/ink-45、右上 24 见方来源图标；标题「流程名 · 记录标题」15/ink-85 首行下 11；「任务：节点名」13/ink-65 标题下 3；右下线框主色钮 40 高 r6 15 主色字（办理 ▾ 70 宽 / 领取任务 84 宽），距卡底 16"
+          data-note="底部是应用页签栏：空间 / 流程 / 通知 / 我的（选中主色，可带角标数）">
+  <div class="ptabs"><span>我发起的</span><span class="on">我处理的<i class="dot"></i></span><span>发起流程</span></div>
+  <div class="pfilter"><span class="cnt"><!-- 筛选出 N 条/共 M 条 --></span><span class="sp"></span><span class="b text">批量</span><span class="vic on"><svg class="ico"><use href="#i-filter"/></svg></span></div>
+  <div class="plist">
+    <div class="pcard">
+      <div class="ph"><span class="av"><!-- 首字 --></span><span class="who"><!-- 发起人 --></span><span class="when"><!-- 昨天 19:28 --></span><span class="src"><svg class="ico"><use href="#i-grid-s"/></svg></span></div>
+      <div class="pt"><!-- 流程名 · 记录标题 --></div>
+      <div class="pn">任务：<!-- 节点名 --></div>
+      <div class="pa"><span class="b line">办理<span class="dd">▾</span></span></div>
+    </div>
+  </div>
+  <div class="apptab"><span><svg class="ico"><use href="#i-home"/></svg>空间</span><span class="on"><svg class="ico"><use href="#i-flow"/></svg>流程</span><span><svg class="ico"><use href="#i-bell"/></svg>通知</span><span><svg class="ico"><use href="#i-f-user"/></svg>我的</span></div>
+</template>
+
+<!-- ══════════ 五、自定义页面（工作台）══════════ -->
+
+<template data-component="手机工作台" data-group="手机端"
+          data-measured="顶部是工作区页签行（当前页面名高亮）；页体白底 pad 20，部件 335 宽 r9 阴影 0 20 40 rgba(0,0,0,.08)、间距 20；横幅 80 高＝背景图＋深色叠层，页面名 30/500 白 85% 居中；快捷方式 120 高白卡两列网格，项＝图标＋16/ink-85，行距 60；页签容器：页签行 40 高下边线，16/500 选中＋80×3 主色下划线，未选 16/ink-65，间距 20；流程任务子区：内层 field-bg 深一档(#F7F7F7) r9，子区头 40 高 pad 0 8 外描边 1px rgba(0,0,0,.04)＝名称 16/500＋筛选胶囊 24 高 r6 12px（选中主色字＋primary-08 底）；空态 60 圆 rgba(0,0,0,.04)＋「没有找到任务」14/ink-45">
+  <div class="wpage">
+    <div class="wban"><!-- 页面名 --></div>
+    <div class="wcard wsc"><span><svg class="ico"><use href="#i-pie-s"/></svg><!-- 快捷入口 --></span><span><svg class="ico"><use href="#i-check-s"/></svg><!-- 快捷入口 --></span></div>
+    <div class="wcard">
+      <div class="wtabs"><span class="on"><!-- 页签 --></span><span><!-- 页签 --></span></div>
+      <div class="wsub">
+        <div class="wsh"><!-- 子区名 --><span class="chips"><span class="chip">全部</span><span class="chip on">待执行</span><span class="chip">已完成</span></span></div>
+        <div class="wempty"><i></i>没有找到任务</div>
       </div>
     </div>
-    <div class="mf">
-      <div class="fl"><!-- 只读字段名 --></div>
-      <div class="fv2 ro"><b class="hl"><!-- 自动结出的关键数 --></b><span class="rmk"><!-- 附注 --></span></div>
-    </div>
-    <div class="mf">
-      <div class="fl"><!-- 附件/图片字段名 --></div>
-      <div class="up2">
-        <div class="upbox done"><svg class="ico"><use href="#i-check"/></svg><!-- 已上传项 --></div>
-        <div class="upbox todo"><svg class="ico"><use href="#i-f-image"/></svg><!-- 待上传项 --></div>
-      </div>
-    </div>
   </div>
 </template>
 
-<template data-component="手机审批流程条" data-group="手机端"
-          data-use="手机上代替 PC 详情弹窗右栏的「流程」页签，放在表单卡片下方"
-          data-measured="白卡 r10 pad 12 14；小标题 12.5/ink-45；节点行 13.5，状态点 8 见方（已办 green、当前 orange、未开始 ink-25），右侧时间 12/ink-45">
-  <div class="apv">
-    <div class="apv-h">审批流程</div>
-    <div class="apv-r"><span class="apv-d done"></span><span class="apv-n"><!-- 已完成节点 --></span><span class="apv-t"><!-- 时间 --></span></div>
-    <div class="apv-r"><span class="apv-d cur"></span><span class="apv-n"><!-- 当前节点 --></span><span class="apv-t">待处理</span></div>
-  </div>
-</template>
-
-<template data-component="手机主按钮＋提交说明" data-group="手机端"
-          data-measured="主按钮 44 高 r8 主色实底、15/600；下方说明 12/ink-45 居中"
-          data-note="说明写「提交后会发生什么」的业务后果，不写操作提示">
-  <div class="pbtn"><svg class="ico"><use href="#i-check"/></svg><!-- 按钮名 --></div>
-  <div class="hint"><!-- 提交后的业务后果 --></div>
-</template>
-
-<!-- ══════════ 三、会话形态（企业微信 / 公众号）══════════ -->
+<!-- ══════════ 六、会话形态（企业微信 / 公众号，微信端样式，未实测）══════════ -->
 
 <template data-component="企业微信待办会话" data-group="手机端"
           data-use="讲「消息推送到企微，点进去就能办」时用作双屏的左屏"
@@ -173,42 +252,5 @@
     <span class="mi hot"><!-- 当前菜单项 --><span class="tapdot">①</span></span>
     <span class="mi"><!-- 菜单项 --></span>
     <span class="mi"><!-- 菜单项 --></span>
-  </div>
-</template>
-
-<!-- ══════════ 四、首页与数据展示形态 ══════════ -->
-
-<template data-component="手机门户首页" data-group="手机端"
-          data-measured="横幅卡走 banner-bg 深底白字 r10 pad 14 16；分节标题 13/ink-45 两端对齐；行卡 52 见方缩略图＋信息区＋右侧数值">
-  <div class="pbody">
-    <div class="hcard">
-      <div class="st"><!-- 身份/归属小字 --></div>
-      <div class="nm"><!-- 主标题 --></div>
-      <div class="sub"><!-- 一句补充 --></div>
-    </div>
-    <div class="sec"><span><!-- 分节名 --></span><span><!-- 右侧更多 --></span></div>
-    <div class="mcard">
-      <div class="mthumb"><svg class="ico"><use href="#i-box-s"/></svg></div>
-      <div class="minfo"><b><!-- 名称 --></b><div class="sp"><!-- 副信息 --></div></div>
-      <div class="mnum"><div class="stk"><!-- 主数值 --></div><div class="awd"><!-- 强调数值 --></div></div>
-    </div>
-  </div>
-</template>
-
-<template data-component="手机统计卡与明细列表" data-group="手机端"
-          data-measured="统计卡等分 flex、白卡 pad 14，数值 24/700 等宽数字；列表白卡 r10，行 10 14、表头走 field-bg，合计行加粗灰底；排名圆点 24 见方，第一名橙底白字"
-          data-note="当前用户所在行加 .merow 走 primary-08 底，榜单类图才用">
-  <div class="stats2">
-    <div class="scard"><div class="lb"><!-- 指标名 --></div><div class="vv"><!-- 数值 --><small><!-- 单位 --></small></div></div>
-    <div class="scard gold"><div class="lb"><!-- 指标名 --></div><div class="vv"><!-- 数值 --></div></div>
-  </div>
-  <div class="lcard">
-    <div class="lrow lhead"><span class="c1"><!-- 列名 --></span><span class="c2"><!-- 列名 --></span><span class="c4"><!-- 列名 --></span></div>
-    <div class="lrow">
-      <span class="rk g1"><!-- 名次 --></span>
-      <span class="c1"><div class="nm2"><!-- 主体名 --></div><div class="st2"><!-- 副信息 --></div></span>
-      <span class="c4 amt"><!-- 金额 --></span>
-    </div>
-    <div class="lrow sum"><span class="c1">合计</span><span class="c4 amt"><!-- 合计值 --></span></div>
   </div>
 </template>

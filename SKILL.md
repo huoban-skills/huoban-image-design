@@ -11,7 +11,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 页面类型路由（唯一真相源）
 
-**结构不整读 c 文件**，用脚本按名提取（先 `--list` 看目录，再精确取）：
+**结构不整读 c 文件**：有宏的块直接写宏（[references/macros.md](references/macros.md)），其余用脚本按名提取（先 `--list` 看目录，再精确取）：
 
 ```bash
 python3 scripts/extract_templates.py assets/c3-page-detail.html \
@@ -26,7 +26,7 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 | 弹窗详情 | c1 ＋ c3（widget 卡字段再加 c2 字段类组件） | 记录详情弹窗（仅用户明确要求时） |
 | 工作台 / 看板页 / 数据分析页 | c1 ＋ c3 | 工作台或数据分析页 |
 | 企业门户 | c1 ＋ c3 | 企业门户 |
-| 手机端 | 只提 c4（字段更细可再加 c2 字段类组件） | 手机单屏/双屏对照。手机壳即画布，不要 `.window`／左侧导航／一级顶栏 |
+| 手机端 | 只提 c4（2026-09-03 H5 实测；重复块优先用 macros.md 手机端宏） | 手机单屏/双屏对照。壳 375 宽即画布，不要 `.window`／左侧导航／一级顶栏；列表默认三槽卡片，记录页字段平铺（label 在上、值框 40 高），审批走流程任务列表＋任务办理页，没有审批流程条 |
 
 提取出的 `<template>` 是独立架构或组件，不是整页范例——按 data-* 属性和结构注释识别用途。c1 的 `.main` 是页面内容插槽，把 c2/c3 的页面内部结构放进去，不再嵌套第二个 `.main`。
 
@@ -69,7 +69,7 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 
 ### 4. 拼装
 
-1. 按路由表用 extract_templates.py 提取结构模板，参照模板写两个中间文件到 scratchpad：`.stage` 内容（模板去 `<template>` 壳、按业务填数据）和本图补充样式。
+1. 写两个中间文件到 scratchpad：`.stage` 内容和本图补充样式。内容里的重复块——产品壳与导航、视图页签、工具栏、表格行、统计表、单指标、待办、快捷方式、筛选、横幅、柱/折/环图、看板与卡片视图、详情页信息区与步骤条、手机壳/会话/卡片/表单——一律写 `<hb-*>` 宏，语法见 [references/macros.md](references/macros.md)，build.py 会展开成结构正本里的组件。宏没覆盖的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件等）才按路由表用 extract_templates.py 提取模板手写。
 2. 组装交给脚本（固定顺序拼皮肤、base.css、icons.svg、fit.js，改过公共资产后重跑即可重拼）：
 
    ```bash
@@ -79,7 +79,7 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 
 3. 图标一律 `<svg class="ico"><use href="#i-名称"/></svg>`，着色用 `ic-*`／`tone-*` 工具类；缺的图标先补进 icons.svg 再用，不内联 path。
 4. 内容数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。
-5. 图表绘图区用内联 SVG 手绘，类型按 dashboard-chart-selection 选；SVG 里禁止写死色值：主系列 `var(--primary)`（同系第二层加 `opacity=".45"`）、状态色 `var(--c-green/red/orange/blue/purple)`、轴线 `var(--line)`、轴标字 `var(--ink-45)`；图例色块用 `<rect>` 着色，别用 ■ 字符——字符是文字色，着不上。
+5. 图表类型按 dashboard-chart-selection 选；柱/折/环图写 `hb-bar`/`hb-line`/`hb-donut` 宏由脚本算坐标，其余类型才用内联 SVG 手绘。SVG 里禁止写死色值：主系列 `var(--primary)`（同系第二层加 `opacity=".45"`）、状态色 `var(--c-green/red/orange/blue/purple)`、轴线 `var(--line)`、轴标字 `var(--ink-45)`；图例色块用 `<rect>` 着色，别用 ■ 字符——字符是文字色，着不上。
 6. 工作台/看板/数据分析页第一屏必须放横幅部件：页面名称＋一句话介绍（规则见 c3 横幅部件注释）。介绍学产品官方口吻，说清这页管什么、给谁用，20 字上下，不堆形容词，不加「阵地/平台/门户」帽子（例：实现客户、商机与任务排期的集中管理）。
 
 ### 5. 对照判据
