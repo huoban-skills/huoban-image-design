@@ -69,6 +69,18 @@
   </div>
 </template>
 
+<template data-component="横幅-背景图卡片" data-group="工作台"
+          data-measured="2026-09-04 app.huoban.com 两个工作台页实测：白卡 r9 高 120、内距 20，整卡铺一张背景图（cover，客户上传，左浅右图）；页面名 30/500 ink-85 在左上；下一行日期 16/600 ink-85 ＋ 竖分隔 ＋ 时间 14/400，行高 20，距标题 18"
+          data-note="示意图里背景图用占位：右侧 .ban-img 放图片位（无实物图时留渐变，不放灰色图标）；日期时间写当天，营销图可省时间只留日期。按钮不进横幅">
+  <div class="w-banner card">
+    <div class="ban-body">
+      <h1><!-- 页面名称 --></h1>
+      <div class="ban-dt"><b><!-- 2026年09月04日 --></b><span><!-- 16:51:17 --></span></div>
+    </div>
+    <div class="ban-img"><!-- 可选：<img src> 客户配图 --></div>
+  </div>
+</template>
+
 <!-- 顶部介绍带操作按钮时的排法：横幅让宽，按钮走同行右侧的快捷按钮部件（横排），不塞进横幅里 -->
 <template data-architecture="横幅带操作按钮">
   <div class="w-row">

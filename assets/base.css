@@ -527,6 +527,19 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .w-banner.bg-solid h1 { color: #fff; }
 .w-banner.bg-solid p { color: rgba(255, 255, 255, .82); }
+/* 横幅-背景图卡片（2026-09-04 工作台实测）：白卡 r9 高 120 内距 20，整卡铺客户背景图；无图时右侧走主色淡渐变占位 */
+.w-banner.card {
+  position: relative; height: 120px; padding: 20px; border-radius: 9px; overflow: hidden;
+  background: linear-gradient(90deg, var(--card-bg) 45%, var(--primary-soft)); box-shadow: var(--shadow-card);
+}
+.w-banner.card .ban-body { position: relative; }
+.w-banner.card h1 { font-size: 30px; font-weight: 500; line-height: 42px; color: var(--ink-85); position: relative; }
+.w-banner.card .ban-dt { display: flex; align-items: center; height: 20px; margin-top: 18px; position: relative; }
+.w-banner.card .ban-dt b { font-size: 16px; font-weight: 600; color: var(--ink-85); padding-right: 7px; margin-right: 6px; border-right: 1px solid var(--line); }
+.w-banner.card .ban-dt span { font-size: 14px; color: var(--ink-65); }
+.w-banner.card .ban-img { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; }
+.w-banner.card .ban-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.w-banner.card .ban-img:empty { display: none; }
 /* 横幅与同行部件（如快捷按钮）：按钮不进横幅内部，横幅让宽、右侧部件按内容宽 */
 .w-row:has(> .w-banner) { align-items: center; }
 .w-row > .w-banner { flex: 1 1 auto; min-width: 0; }

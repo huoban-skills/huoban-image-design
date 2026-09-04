@@ -451,6 +451,12 @@ def m_banner(a, body):
     ls = lines(body)
     if not ls:
         raise ExpandError("<hb-banner> 第一行是页面名称，第二行是一句话介绍")
+    if "card" in a:
+        dt = ""
+        if "date" in a or "time" in a:
+            dt = f'<div class="ban-dt"><b>{esc(str(a.get("date", "")))}</b><span>{esc(str(a.get("time", "")))}</span></div>'
+        img = f'<div class="ban-img">{a["img"] if isinstance(a.get("img"), str) and "<" in a["img"] else ""}</div>' if "img" in a else ""
+        return f'<div class="w-banner card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
     p = f"<p>{esc(ls[1])}</p>" if len(ls) > 1 else ""
     cls = "w-banner" + (" bg-solid" if "solid" in a else "")
     return f'<div class="{cls}"><h1>{esc(ls[0])}</h1>{p}</div>'
@@ -1094,7 +1100,7 @@ MACROS = {
     "hb-tasks": (m_tasks, "待办子区：标题 | 时间 | 节点说明；属性 title"),
     "hb-shortcuts": (m_shortcuts, "快捷方式：名称 | 图标；属性 title"),
     "hb-filters": (m_filters, "筛选部件：筛选文本 | 图标"),
-    "hb-banner": (m_banner, "横幅部件：第一行页面名称，第二行一句话介绍；属性 solid"),
+    "hb-banner": (m_banner, "横幅部件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
     "hb-line": (m_line, "折线图卡：同 hb-bar"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
@@ -1186,9 +1192,11 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 例：
 杭州云图 | 行业=制造; 年采购=¥1,204,000 | 拜访:arrow-right:blue""",
 "hb-banner": """第一行页面名称，第二行一句话介绍（口吻规则见 SKILL.md 步骤 4）；属性 solid 铺纯色背景。
+属性 card 出背景图卡片式（120 高白卡，实测工作台常用）：date="2026年09月04日"、time="16:51:17" 出日期时间行；img 出右侧图片位（值写 <img src="…"> 放客户配图，空值留渐变占位）。卡片式不放介绍句。
 例：
 <hb-banner>库管工作台
-实现物资出入库与盘点的集中管理</hb-banner>""",
+实现物资出入库与盘点的集中管理</hb-banner>
+<hb-banner card date="2026年09月04日" time="16:51:17" img>任务工作台</hb-banner>""",
 "hb-filters": """行：筛选文本 | 图标，图标默认 f-select（日期用 f-date）。
 例：
 统计月份：2026 年 8 月 | f-date
