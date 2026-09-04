@@ -264,10 +264,11 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 ### hb-tabcard
-页签卡：属性 tabs=*页签|页签、span；体内放已展开的内容（hb-grid bare、字段、hb-flow）
+页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（center 居中）；体内放已展开的内容
 
 ```
 页签卡（页签容器）。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
+默认是详情页的下划线页签；工作台/看板用 pill 出胶囊式页签（选中主色 20% 底条），再加 center 居中，不加靠左；页签按角色工作流程从左到右或按业务分类编排。
 例：
 <hb-tabcard tabs="*出库明细|历史出入库|现场照片" span="16">
 <hb-grid bare nock>
@@ -278,6 +279,9 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 </hb-tabcard>
 <hb-tabcard tabs="*流程|动态|评论" span="8">
 <hb-flow …>…</hb-flow>
+</hb-tabcard>
+<hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill center>
+<hb-grid bare nock>…</hb-grid>
 </hb-tabcard>
 ```
 

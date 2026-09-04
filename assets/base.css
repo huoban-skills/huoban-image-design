@@ -567,6 +567,13 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .wt-hd .on { color: var(--ink-85); font-weight: 500; box-shadow: inset 0 -2px 0 var(--primary); height: 100%; display: inline-flex; align-items: center; }
 .wt-bd { padding: 16px; }
 .wt-bd.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+/* 页签容器-胶囊式（2026-09-04 自定义页面实测 page-widget-tabs）：页签行上下 20 无边线；页签 40 高 pad 0 16 字 16；
+   选中 600 主色＋主色 20% r9 底条；间距 8；对齐由 .center 切换（默认靠左） */
+.w-tabs .wt-nav { display: flex; align-items: center; gap: 8px; margin: 20px 0; padding: 0 16px; }
+.w-tabs .wt-nav.center { justify-content: center; }
+.w-tabs .wt-tab { height: 40px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 9px; font-size: 16px; font-weight: 500; color: var(--ink-65); white-space: nowrap; }
+.w-tabs .wt-tab.on { color: var(--primary); font-weight: 600; background: color-mix(in srgb, var(--primary) 20%, transparent); }
+.w-tabs .wt-body { padding: 0 20px 20px; }
 .page-tabs-card { min-width: 0; box-shadow: 0 20px 40px rgba(0,0,0,.08); }
 .page-tabs-nav { height: 40px; display: flex; padding: 0 16px; border-bottom: 1px solid var(--line); overflow: hidden; }
 .page-tabs-list { height: 40px; display: flex; align-items: stretch; gap: 20px; white-space: nowrap; }

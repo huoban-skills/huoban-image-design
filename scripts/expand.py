@@ -699,8 +699,13 @@ def m_tabcard(a, body):
     tabs = "".join(f'<span{" class=\"on\"" if on else ""}>{esc(n)}</span>' for n, on in star_items(a.get("tabs", "")))
     if not tabs:
         raise ExpandError('<hb-tabcard> 缺 tabs（如 tabs="*出库明细|历史出入库"，* 为当前页签）')
-    card = (f'<div class="w-card page-tabs-card"><div class="page-tabs-nav"><div class="page-tabs-list">{tabs}</div></div>'
-            f'<div class="page-tabs-body">{body.strip()}</div></div>')
+    if "pill" in a:
+        tabs = tabs.replace('<span class="on">', '<span class="wt-tab on">').replace("<span>", '<span class="wt-tab">')
+        card = (f'<div class="w-card w-tabs"><div class="wt-nav{" center" if "center" in a else ""}">{tabs}</div>'
+                f'<div class="wt-body">{body.strip()}</div></div>')
+    else:
+        card = (f'<div class="w-card page-tabs-card"><div class="page-tabs-nav"><div class="page-tabs-list">{tabs}</div></div>'
+                f'<div class="page-tabs-body">{body.strip()}</div></div>')
     return f'<div class="span-{a["span"]}">{card}</div>' if "span" in a else card
 
 
@@ -1095,7 +1100,7 @@ MACROS = {
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
     "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
     "hb-hcard": (m_hcard, "详情页标题卡片：属性 title、sub；体内关键字段行同 hb-info"),
-    "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；体内放已展开的内容（hb-grid bare、字段、hb-flow）"),
+    "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（center 居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
     "hb-info": (m_info, "详情页标题卡片信息区：字段名 | 值 | 类型"),
     "hb-steps": (m_steps, "选项字段步骤条：步骤 | *当前 | 步骤"),
@@ -1247,6 +1252,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 申请日期 | 2026-08-24
 </hb-hcard>""",
 "hb-tabcard": """页签卡（页签容器）。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
+默认是详情页的下划线页签；工作台/看板用 pill 出胶囊式页签（选中主色 20% 底条），再加 center 居中，不加靠左；页签按角色工作流程从左到右或按业务分类编排。
 例：
 <hb-tabcard tabs="*出库明细|历史出入库|现场照片" span="16">
 <hb-grid bare nock>
@@ -1257,6 +1263,9 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 </hb-tabcard>
 <hb-tabcard tabs="*流程|动态|评论" span="8">
 <hb-flow …>…</hb-flow>
+</hb-tabcard>
+<hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill center>
+<hb-grid bare nock>…</hb-grid>
 </hb-tabcard>""",
 "hb-flow": """流程页签时间线（放在 tabs="*流程|动态|评论" 的 hb-tabcard 里）。属性 name 流程名（必填）、by="发起人 · 时间"、foot（默认「查看详细记录」）、nocancel 不出「撤销流程」。
 每行一个节点，倒序（最新在上）：节点名 | 状态文本:颜色 | 日期 | 耗时 | 链接；颜色 orange 执行中（缺省）/ green 同意 / red 驳回 / gray 未开始；启动事件写「启动事件 | 事件描述 | 日期」。
