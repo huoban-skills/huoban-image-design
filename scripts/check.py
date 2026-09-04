@@ -266,7 +266,7 @@ def check(path, render=True):
     for m in re.finditer(r'class="([^"]+)"', body):
         used.update(c for c in m.group(1).split() if c)
     for c in sorted(used):
-        if c.startswith(("i-", "sw-", "c-", "tint-")) or c in known:
+        if c.startswith(("i-", "sw-", "c-", "tint-", "bg-")) or c in known:
             continue
         if c in local:
             add("Nit", "local-only-class",

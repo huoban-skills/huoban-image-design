@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+<defs><pattern id="g" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#2fd3d9" stroke-opacity=".10"/></pattern>
+<linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="#2fd3d9" stop-opacity="0"/><stop offset=".5" stop-color="#8ff3f7" stop-opacity=".9"/><stop offset="1" stop-color="#2fd3d9" stop-opacity="0"/></linearGradient>
+<radialGradient id="v" cx="50%" cy="50%" r="75%"><stop offset="0" stop-color="#0e1c25" stop-opacity="0"/><stop offset="1" stop-color="#050b10" stop-opacity=".9"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="#0e1c25"/><rect width="1920" height="1080" fill="url(#g)"/>
+<rect y="118" width="1920" height="2" fill="url(#beam)"/><rect y="124" width="1920" height="1" fill="url(#beam)" opacity=".5"/>
+<rect width="1920" height="1080" fill="url(#v)"/>
+</svg>

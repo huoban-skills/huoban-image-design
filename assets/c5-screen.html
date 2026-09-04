@@ -1,0 +1,86 @@
+<!--
+伙伴云界面示意图 · 结构 5：数据大屏
+
+来源：2026-09-04 app.huoban.com 实测三类大屏页——客户搭的「生产车间大屏」「项目管理数字大屏」，
+   官方模板「黑金金融」「深青未来」。大屏＝自定义页面「超宽」模式＋深色＋整页背景图＋卡片装饰框，
+   部件仍是工作台/看板那套（单指标、图表、统计表、进度条、日期时间、标题）。
+   产品里的背景、标题条、装饰框都是搭建者上传的图片（border-image）；本 skill 不带这些图，
+   用 CSS 画等价几何（base.css「数据大屏」一节），背景用 assets/screens/ 里的四张 SVG，颜色随 theme 变。
+
+本文件是架构与组件目录，不含业务示例：
+1. .screen 是画布，宽随 .stage（1640），最低高 922（16:9），内距 20，部件间距 20；用 .sc-grid 24 栅格排布，列跨度 sp-N。
+2. 主题三选一挂在 .screen 上：theme-blue（科技蓝，默认）/ theme-teal（深青）/ theme-gold（黑金）；背景四选一：bg-earth 星空地球 / bg-city 城市夜景 / bg-grid 科技网格 / bg-gold 黑金菱格。
+3. 装饰框三选一挂在指标框和图表卡上：frame-bracket 四角括号 / frame-round 圆角发光 / frame-none 无框；同一张图只用一种。
+4. 图表卡标题条三选一：tag 斜切标签（深青）/ chevron 雁翎居中（黑金）/ line 左标题渐变底线（科技蓝）；同一张图只用一种。
+5. 放进 .screen 的既有部件（w-stat、w-chart、w-pivot、图表 SVG）自动走深色 token，不用改类名。
+6. 大屏是营销图里的"大屏模式看板"，不套产品壳（.window/左侧导航/顶栏）；用户明确要"演示模式截图"就这样交付。
+7. 布局按 Z 型：顶部标题条，上排结果指标，中间大视觉位或主图，两侧对比图，底部明细/播报（见 principles/dashboard-layout.md 大屏一节）。
+-->
+
+<!-- ══════════ 一、画布架构 ══════════ -->
+
+<template data-architecture="数据大屏" data-default-for="大屏"
+          data-measured="画布 1455 视口宽（超宽模式）× 1080；内距 20；24 栅格间距 20；指标框 159×100（4 栏）；图表卡 339 宽（8 栏）/ 698 宽（16 栏）；标题条 1056×80 居中；卡片底 rgba(0,0,0,.65)">
+  <div class="stage">
+    <div class="screen theme-blue bg-earth">
+      <!-- 组件：大屏标题条 -->
+      <div class="sc-grid">
+        <!-- 组件：指标框 × N（sp-4 或 sp-3） -->
+        <!-- 组件：图表卡（sp-8）/ 中央视觉位（sp-8 rs-2）/ 图表卡（sp-8） -->
+        <!-- 组件：播报表 / 进度条卡（sp-8～sp-24） -->
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ══════════ 二、组件 ══════════ -->
+
+<template data-component="大屏标题条" data-group="大屏"
+          data-measured="80 高；页面名居中 30/700 白 85%（客户页 26/500），可带一行英文副题 14；两侧渐变装饰线；右上日期 16/600 白＋星期＋时间 14/400 白 65%；左上可放企业名/logo 16"
+          data-note="band 变体＝带斜切底色的标题条（项目管理大屏那种）">
+  <div class="sc-head">
+    <div class="sc-logo"><!-- 企业名，可省 --></div>
+    <h1><!-- 页面名 --><small><!-- 英文副题，可省 --></small></h1>
+    <div class="sc-dt"><b><!-- 2026年09月04日 --></b><span><!-- 星期五 --></span><small><!-- 17:04:06 --></small></div>
+  </div>
+</template>
+
+<template data-component="指标框" data-group="大屏"
+          data-measured="159×100，内距 20 16，居中；指标名 14/400 白 45%，值 32/500 白 85% 等宽数字；底 rgba(0,0,0,.65)＋装饰框"
+          data-note="up/down 类把值染成状态绿/红；单位用 <small>">
+  <div class="sc-kpi frame-bracket sp-4">
+    <div class="lb"><!-- 指标名 --></div>
+    <div class="vl"><!-- 值 --><small><!-- 单位，可省 --></small></div>
+  </div>
+</template>
+
+<template data-component="大屏图表卡" data-group="大屏"
+          data-measured="标题条 40 高、标题 16/500（黑金模板标题为金色）、右侧 32×32 图标钮（打开、更多）；绘图区高 300（339×340 卡）；底 rgba(0,0,0,.65)＋装饰框"
+          data-note="绘图区放 hb-bar/hb-line/hb-donut 的 bare 输出或手绘 SVG，颜色自动走深色 token；统计表放 hb-pivot bare">
+  <div class="sc-card frame-bracket sp-8">
+    <div class="sc-hd line"><!-- 图表名 --><span class="acts"><svg class="ico"><use href="#i-linkout"/></svg><svg class="ico"><use href="#i-more"/></svg></span></div>
+    <div class="sc-bd"><!-- 图表 SVG / 表格 / 进度条列表 --></div>
+  </div>
+</template>
+
+<template data-component="中央视觉位" data-group="大屏"
+          data-measured="生产车间大屏：698×220 的 3D 厂区图放在指标行下方、两列图表卡之间；无图时用光晕地台占位"
+          data-note="只有客户真有 3D 图/地图时才放图；没有就用 placeholder，不画灰图标">
+  <div class="sc-visual placeholder sp-8 rs-2"><!-- 可选：<img src> --></div>
+</template>
+
+<template data-component="进度条列表" data-group="大屏"
+          data-measured="官方模板「进度条」卡：每行名称 14 白＋右端百分比 14 白，行距 40；条 6 高圆角 3，底白 12%，填充主色渐变">
+  <div class="sc-bars">
+    <div class="sc-bar"><div class="t"><span><!-- 名称 --></span><span><!-- 10% --></span></div><div class="r"><i style="width:10%"></i></div></div>
+  </div>
+</template>
+
+<template data-component="播报表" data-group="大屏"
+          data-measured="生产车间「实时报工播报」：图表卡内放表格，表头 32、行 35，偶数行白 3% 斑马底；列数 4～6"
+          data-note="用 hb-grid bare nock noidx 生成，外层加 sc-ticker">
+  <div class="sc-card frame-bracket sp-16">
+    <div class="sc-hd line"><!-- 播报名 --></div>
+    <div class="sc-bd sc-ticker"><!-- hb-grid bare nock noidx --></div>
+  </div>
+</template>

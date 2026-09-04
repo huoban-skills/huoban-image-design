@@ -747,6 +747,84 @@ def m_flow(a, body):
             f'<div class="flowbox-timeline">{"".join(boxes)}</div><div class="flow-foot">{esc(a.get("foot", "查看详细记录"))}</div>')
 
 
+# ── 数据大屏（assets/c5-screen.html）──────────────────────────────────────
+SCREEN_THEMES = {"blue", "teal", "gold"}
+SCREEN_BGS = {"earth", "city", "grid", "gold"}
+SCREEN_FRAMES = {"bracket", "round", "none"}
+SCREEN_HDS = {"line", "tag", "chevron"}
+
+
+def m_screen(a, body):
+    theme = a.get("theme", "blue")
+    bg = a.get("bg", "earth")
+    if theme not in SCREEN_THEMES:
+        raise ExpandError(f"<hb-screen theme> 只能是 {'/'.join(sorted(SCREEN_THEMES))}")
+    if bg not in SCREEN_BGS:
+        raise ExpandError(f"<hb-screen bg> 只能是 {'/'.join(sorted(SCREEN_BGS))}")
+    title = a.get("title", "")
+    if not title:
+        raise ExpandError("<hb-screen> 缺 title（大屏页面名）")
+    sub = f"<small>{esc(a['sub'])}</small>" if a.get("sub") else ""
+    logo = f'<div class="sc-logo">{esc(a["logo"])}</div>' if a.get("logo") else ""
+    dt = ""
+    if a.get("date"):
+        week = f"<span>{esc(a['week'])}</span>" if a.get("week") else ""
+        time = f"<small>{esc(a['time'])}</small>" if a.get("time") else ""
+        dt = f'<div class="sc-dt"><b>{esc(a["date"])}</b>{week}{time}</div>'
+    head = f'<div class="sc-head{" band" if "band" in a else ""}">{logo}<h1>{esc(title)}{sub}</h1>{dt}</div>'
+    return f'<div class="screen theme-{theme} bg-{bg}">{head}<div class="sc-grid">{body.strip()}</div></div>'
+
+
+def m_skpi(a, body):
+    frame = a.get("frame", "bracket")
+    if frame not in SCREEN_FRAMES:
+        raise ExpandError(f"<hb-skpi frame> 只能是 {'/'.join(sorted(SCREEN_FRAMES))}")
+    span = a.get("span", "4")
+    out = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-skpi> 每行「指标名 | 值 | 单位 | up/down」：{ln}")
+        unit = f"<small>{esc(c[2])}</small>" if len(c) > 2 and c[2] else ""
+        st = c[3].strip() if len(c) > 3 and c[3].strip() in ("up", "down") else ""
+        out.append(f'<div class="sc-kpi frame-{frame} sp-{span}{" " + st if st else ""}"><div class="lb">{esc(c[0])}</div><div class="vl">{esc(c[1])}{unit}</div></div>')
+    return "".join(out)
+
+
+def m_scard(a, body):
+    title = a.get("title", "")
+    if not title:
+        raise ExpandError("<hb-scard> 缺 title（图表名）")
+    frame = a.get("frame", "bracket")
+    hd = a.get("hd", "line")
+    if frame not in SCREEN_FRAMES or hd not in SCREEN_HDS:
+        raise ExpandError(f"<hb-scard> frame 只能是 {'/'.join(sorted(SCREEN_FRAMES))}，hd 只能是 {'/'.join(sorted(SCREEN_HDS))}")
+    span = a.get("span", "8")
+    rs = f" rs-{a['rs']}" if a.get("rs") else ""
+    acts = "" if "noacts" in a else f'<span class="acts">{ico("linkout")}{ico("more")}</span>'
+    ticker = " sc-ticker" if "ticker" in a else ""
+    return (f'<div class="sc-card frame-{frame} sp-{span}{rs}"><div class="sc-hd {hd}">{esc(title)}{acts}</div>'
+            f'<div class="sc-bd{ticker}">{body.strip()}</div></div>')
+
+
+def m_sbars(a, body):
+    out = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-sbars> 每行「名称 | 百分比」：{ln}")
+        pct = num_of(c[1])
+        out.append(f'<div class="sc-bar"><div class="t"><span>{esc(c[0])}</span><span>{esc(c[1])}</span></div><div class="r"><i style="width:{pct:g}%"></i></div></div>')
+    return '<div class="sc-bars">' + "".join(out) + "</div>"
+
+
+def m_svisual(a, body):
+    span = a.get("span", "8")
+    rs = f" rs-{a['rs']}" if a.get("rs") else ""
+    inner = body.strip()
+    return f'<div class="sc-visual{" placeholder" if not inner else ""} sp-{span}{rs}">{inner}</div>'
+
+
 # ── 卡片与看板 ──────────────────────────────────────────────────────────
 def kv_pairs(s, tagname):
     out = []
@@ -1112,6 +1190,11 @@ MACROS = {
     "hb-steps": (m_steps, "选项字段步骤条：步骤 | *当前 | 步骤"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
+    "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=blue|teal|gold、bg=earth|city|grid|gold、band；体内放 hb-skpi/hb-scard/hb-svisual"),
+    "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 4）、frame=bracket|round|none"),
+    "hb-scard": (m_scard, "大屏图表卡：属性 title、span（默认 8）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare"),
+    "hb-sbars": (m_sbars, "大屏进度条列表：每行「名称 | 百分比」"),
+    "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span、rs；体内可放 <img>，空则光晕地台占位"),
     "hb-phone": (m_phone, "手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容"),
     "hb-mhome": (m_mhome, "工作区首页：属性 tabs=表格|*流程…；每行一个分组，- 前缀为展开的表"),
     "hb-vbar": (m_vbar, "列表页视图条：属性 view、count、icon、nosearch"),
@@ -1140,6 +1223,7 @@ GROUPS = [
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
     ("自定义页面部件（工作台 / 看板 / 数据分析页）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
     ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-steps", "hb-tabcard", "hb-flow"]),
+    ("数据大屏（2026-09-04 实测，c5-screen.html）", ["hb-screen", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
 ]
 
@@ -1290,6 +1374,46 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 "hb-steps": """选项字段步骤条，* 标当前步骤；属性 span（默认 24）。
 例：
 <hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>""",
+"hb-screen": """数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 英文副题、logo 左上企业名、date/week/time 右上日期星期时间、theme 配色 blue（科技蓝，默认）/teal（深青）/gold（黑金）、bg 背景 earth 星空地球（默认）/city 城市夜景/grid 科技网格/gold 黑金菱格、band 标题条带斜切底色。
+体内直接放 hb-skpi / hb-scard / hb-svisual，它们自带 24 栅格跨度（sp-N），一行 24。常用排法：8 个指标框 sp-3 一行；图表卡 sp-8 ＋ 视觉位 sp-8 rs-2 ＋ 图表卡 sp-8；底部播报 sp-16。
+本图补充样式给 .stage 高度；.screen 最低 922 高。
+例：
+<div class="stage">
+<hb-screen title="生产车间大屏" logo="生产制造ERP" date="2026年09月04日" week="星期五" time="17:04:06" theme="blue" bg="earth">
+<hb-skpi span="3">
+本月产量 | 44 | 件
+今日产量 | 2
+在产产品数 | 28 | | up
+</hb-skpi>
+<hb-scard title="近30日产量趋势"><hb-line bare labels="…">…</hb-line></hb-scard>
+<hb-svisual rs="2"/>
+<hb-scard title="生产工单趋势分析"><hb-bar bare labels="…">…</hb-bar></hb-scard>
+<hb-scard title="实时报工播报" span="16" ticker><hb-grid bare nock noidx>…</hb-grid></hb-scard>
+</hb-screen>
+</div>""",
+"hb-skpi": """大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 4＝一行 6 个；8 个一行写 3）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
+例：
+<hb-skpi span="3" frame="round">
+本月产量 | 44 | 件
+今日工序报工量 | 30,000 | | up
+</hb-skpi>""",
+"hb-scard": """大屏图表卡。属性 title 图表名（必填）、span（默认 8）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
+体内放 hb-bar/hb-line/hb-donut 的 bare 输出、hb-grid bare nock noidx、hb-sbars 或手绘 SVG，颜色自动走深色 token。同一张图标题条只用一种。
+例：
+<hb-scard title="近30日产量趋势" hd="tag" frame="none">
+<hb-line bare labels="1|5|10|15|20|25|30">
+产量 | 120,140,90,160,180,150,170
+</hb-line>
+</hb-scard>""",
+"hb-sbars": """大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。
+例：
+<hb-sbars>
+一车间 | 82%
+二车间 | 64%
+</hb-sbars>""",
+"hb-svisual": """大屏中央视觉位。属性 span（默认 8）、rs 行跨度（常写 2）；体内放 <img src="…"> 客户的 3D 厂区图/地图，留空则光晕地台占位，不画灰图标。
+例：
+<hb-svisual rs="2"/>""",
 "hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，双屏对照必加）、nobar。体内按页面形态放手机端其他宏。
 .stage 宽度（单屏 520、双屏 1100）和 .duo 仍由你写。
 例：

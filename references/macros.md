@@ -301,6 +301,79 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 
+## 数据大屏（2026-09-04 实测，c5-screen.html）
+
+### hb-screen
+数据大屏画布：属性 title、sub、logo、date、week、time、theme=blue|teal|gold、bg=earth|city|grid|gold、band；体内放 hb-skpi/hb-scard/hb-svisual
+
+```
+数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 英文副题、logo 左上企业名、date/week/time 右上日期星期时间、theme 配色 blue（科技蓝，默认）/teal（深青）/gold（黑金）、bg 背景 earth 星空地球（默认）/city 城市夜景/grid 科技网格/gold 黑金菱格、band 标题条带斜切底色。
+体内直接放 hb-skpi / hb-scard / hb-svisual，它们自带 24 栅格跨度（sp-N），一行 24。常用排法：8 个指标框 sp-3 一行；图表卡 sp-8 ＋ 视觉位 sp-8 rs-2 ＋ 图表卡 sp-8；底部播报 sp-16。
+本图补充样式给 .stage 高度；.screen 最低 922 高。
+例：
+<div class="stage">
+<hb-screen title="生产车间大屏" logo="生产制造ERP" date="2026年09月04日" week="星期五" time="17:04:06" theme="blue" bg="earth">
+<hb-skpi span="3">
+本月产量 | 44 | 件
+今日产量 | 2
+在产产品数 | 28 | | up
+</hb-skpi>
+<hb-scard title="近30日产量趋势"><hb-line bare labels="…">…</hb-line></hb-scard>
+<hb-svisual rs="2"/>
+<hb-scard title="生产工单趋势分析"><hb-bar bare labels="…">…</hb-bar></hb-scard>
+<hb-scard title="实时报工播报" span="16" ticker><hb-grid bare nock noidx>…</hb-grid></hb-scard>
+</hb-screen>
+</div>
+```
+
+### hb-skpi
+大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 4）、frame=bracket|round|none
+
+```
+大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 4＝一行 6 个；8 个一行写 3）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
+例：
+<hb-skpi span="3" frame="round">
+本月产量 | 44 | 件
+今日工序报工量 | 30,000 | | up
+</hb-skpi>
+```
+
+### hb-scard
+大屏图表卡：属性 title、span（默认 8）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare
+
+```
+大屏图表卡。属性 title 图表名（必填）、span（默认 8）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
+体内放 hb-bar/hb-line/hb-donut 的 bare 输出、hb-grid bare nock noidx、hb-sbars 或手绘 SVG，颜色自动走深色 token。同一张图标题条只用一种。
+例：
+<hb-scard title="近30日产量趋势" hd="tag" frame="none">
+<hb-line bare labels="1|5|10|15|20|25|30">
+产量 | 120,140,90,160,180,150,170
+</hb-line>
+</hb-scard>
+```
+
+### hb-sbars
+大屏进度条列表：每行「名称 | 百分比」
+
+```
+大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。
+例：
+<hb-sbars>
+一车间 | 82%
+二车间 | 64%
+</hb-sbars>
+```
+
+### hb-svisual
+大屏中央视觉位：属性 span、rs；体内可放 <img>，空则光晕地台占位
+
+```
+大屏中央视觉位。属性 span（默认 8）、rs 行跨度（常写 2）；体内放 <img src="…"> 客户的 3D 厂区图/地图，留空则光晕地台占位，不画灰图标。
+例：
+<hb-svisual rs="2"/>
+```
+
+
 ## 手机端（2026-09-03 H5 实测结构，壳 375 宽）
 
 ### hb-phone

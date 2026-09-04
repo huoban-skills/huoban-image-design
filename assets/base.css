@@ -1143,3 +1143,111 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .wmenu .mi:last-child { border-right: none; }
 .phone .wmenu .mi.hot { color: var(--primary); font-weight: 700; }
 .phone .tapdot { position: absolute; top: 4px; right: 10px; width: 18px; height: 18px; border-radius: 50%; background: var(--c-orange); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+/* ══════════════════ 数据大屏（2026-09-04 app.huoban.com 三个大屏页实测：生产车间大屏、项目管理数字大屏、官方模板黑金金融/深青未来）══════════════════
+   大屏＝自定义页面「超宽」模式＋深色＋背景图＋卡片装饰框。部件仍是工作台那套，放进 .screen 后走这里的深色 token；
+   实测：画布内距 20、24 栅格间距 20；标题条 80 高、页面名 26～30/500～700 白 85%；右上日期 16/600 白＋星期＋时间 14；
+   指标框 159×100：指标名 14 白 45%、值 32/500 白 85% 居中；卡片底 rgba(0,0,0,.65)；图表卡标题条 40 高、标题 16/500。
+   产品里的装饰框和标题条是搭建者上传的图片（border-image），本 skill 用 CSS 画等价几何：四角括号框、圆角发光框、斜切标签条、金色雁翎条。 */
+.screen {
+  --screen-accent: var(--primary);
+  --screen-card: rgba(0, 0, 0, .65);
+  --ink-85: rgba(255, 255, 255, .85); --ink-65: rgba(255, 255, 255, .65); --ink-45: rgba(255, 255, 255, .45); --ink-25: rgba(255, 255, 255, .25);
+  --line: rgba(255, 255, 255, .12); --tag-bg: rgba(255, 255, 255, .12); --field-bg: rgba(255, 255, 255, .06);
+  --card-bg: var(--screen-card); --page-bg: transparent; --primary: var(--screen-accent);
+  position: relative; padding: 20px; min-height: 922px; color: var(--ink-85);
+  background: #050a16 center / cover no-repeat; /* 背景由 build.py 按 bg-* 类注入 assets/screens/*.svg */
+  display: flex; flex-direction: column; gap: 20px;
+}
+.screen.theme-teal { --screen-accent: #2FD3D9; }
+.screen.theme-gold { --screen-accent: #E8C36A; --screen-card: rgba(0, 0, 0, .66); }
+.screen.theme-blue { --screen-accent: #4AA3FF; }
+.screen .w-card, .screen .w-stat, .screen .w-pivot, .screen .w-chart { background: var(--screen-card); border: 1px solid color-mix(in srgb, var(--screen-accent) 35%, transparent); box-shadow: none; }
+.screen .w-pivot th, .screen .w-pivot td { border-color: var(--line); }
+.screen .w-pivot .dim { background: var(--field-bg); }
+.screen .legend { color: var(--ink-65); }
+
+/* 24 栅格：大屏用 grid 排布，列跨度 sp-N（N 为 24 分之几）；未给跨度的子项占 4 */
+.sc-grid { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+.sc-grid > * { grid-column: span 4; min-width: 0; }
+.sc-grid > .sp-2 { grid-column: span 2; } .sc-grid > .sp-3 { grid-column: span 3; } .sc-grid > .sp-4 { grid-column: span 4; }
+.sc-grid > .sp-6 { grid-column: span 6; } .sc-grid > .sp-8 { grid-column: span 8; } .sc-grid > .sp-12 { grid-column: span 12; }
+.sc-grid > .sp-16 { grid-column: span 16; } .sc-grid > .sp-18 { grid-column: span 18; } .sc-grid > .sp-24 { grid-column: span 24; }
+.sc-grid > .rs-2 { grid-row: span 2; } .sc-grid > .rs-3 { grid-row: span 3; }
+
+/* 标题条：80 高，页面名居中，两侧装饰线（实测两页都是图片标题条，这里用渐变线＋斜切） */
+.sc-head { position: relative; height: 80px; display: flex; align-items: center; justify-content: center; }
+.sc-head h1 { font-size: 30px; font-weight: 700; color: var(--ink-85); letter-spacing: 2px; position: relative; padding: 0 60px; text-shadow: 0 0 18px color-mix(in srgb, var(--screen-accent) 60%, transparent); }
+.sc-head h1 small { display: block; font-size: 14px; font-weight: 400; color: var(--ink-65); letter-spacing: 3px; text-align: center; margin-top: 4px; }
+.sc-head::before, .sc-head::after {
+  content: ""; position: absolute; top: 50%; height: 2px; width: 34%;
+  background: linear-gradient(90deg, transparent, var(--screen-accent) 40%, var(--screen-accent) 85%, transparent);
+}
+.sc-head::before { left: 0; } .sc-head::after { right: 0; transform: scaleX(-1); }
+.sc-head.band { background: linear-gradient(180deg, color-mix(in srgb, var(--screen-accent) 22%, transparent), transparent 90%); clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%); }
+.sc-head.band::before, .sc-head.band::after { top: auto; bottom: 0; height: 1px; width: 100%; }
+.sc-head.band::after { transform: none; }
+.sc-dt { position: absolute; right: 0; top: 14px; text-align: right; color: var(--ink-85); }
+.sc-dt b { font-size: 16px; font-weight: 600; margin-right: 6px; }
+.sc-dt span { font-size: 16px; font-weight: 600; }
+.sc-dt small { display: block; font-size: 14px; font-weight: 400; color: var(--ink-65); margin-top: 4px; }
+.sc-logo { position: absolute; left: 0; top: 24px; font-size: 16px; font-weight: 500; color: var(--ink-85); }
+
+/* 指标框（实测 159×100，内容居中） */
+.sc-kpi { position: relative; height: 100px; padding: 20px 16px; background: var(--screen-card); text-align: center; }
+.sc-kpi .lb { font-size: 14px; color: var(--ink-45); line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-kpi .vl { font-size: 32px; font-weight: 500; color: var(--ink-85); line-height: 38px; margin-top: 1px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sc-kpi .vl small { font-size: 14px; font-weight: 400; color: var(--ink-45); margin-left: 4px; }
+.sc-kpi.up .vl { color: var(--c-green); } .sc-kpi.down .vl { color: var(--c-red); }
+
+/* 装饰框三态：四角括号（生产车间/项目管理）、圆角发光（黑金）、无框（深青只有标题条） */
+.frame-bracket {
+  --fb: var(--screen-accent);
+  background-image:
+    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb)),
+    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb)),
+    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb)),
+    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb));
+  background-repeat: no-repeat;
+  background-size: 16px 2px, 2px 16px, 16px 2px, 2px 16px, 16px 2px, 2px 16px, 16px 2px, 2px 16px;
+  background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fb) 30%, transparent);
+}
+.frame-round { border: 1px solid color-mix(in srgb, var(--screen-accent) 70%, transparent); border-radius: 10px; box-shadow: inset 0 0 14px color-mix(in srgb, var(--screen-accent) 22%, transparent); }
+.frame-none { background: transparent; }
+
+/* 图表卡：标题条 40 高＋绘图区；标题条三种：tag 斜切标签（深青）、chevron 雁翎居中（黑金）、line 左标题渐变底线（生产车间） */
+.sc-card { position: relative; background: var(--screen-card); display: flex; flex-direction: column; min-height: 0; }
+.sc-hd { height: 40px; flex: none; display: flex; align-items: center; padding: 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-85); position: relative; }
+.sc-hd .acts { margin-left: auto; display: flex; gap: 8px; color: var(--ink-45); }
+.sc-hd .acts .ico { width: 16px; height: 16px; }
+.sc-hd.tag { background: linear-gradient(90deg, color-mix(in srgb, var(--screen-accent) 32%, transparent), transparent 70%); clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%); }
+.sc-hd.tag::before { content: "➤"; font-size: 12px; color: var(--screen-accent); margin-right: 10px; }
+.sc-hd.chevron { justify-content: center; padding: 0 64px; color: color-mix(in srgb, var(--screen-accent) 75%, #fff); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--screen-accent) 18%, transparent), transparent); border-bottom: 1px solid color-mix(in srgb, var(--screen-accent) 45%, transparent); }
+.sc-hd.chevron::before, .sc-hd.chevron::after { content: "‹‹‹‹"; position: absolute; top: 0; font-size: 18px; letter-spacing: -3px; color: var(--screen-accent); opacity: .8; }
+.sc-hd.chevron::before { left: 16px; } .sc-hd.chevron::after { right: 16px; transform: scaleX(-1); }
+.sc-hd.chevron .acts { position: absolute; right: 56px; top: 12px; margin-left: 0; }
+.sc-hd.line::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 1px; background: linear-gradient(90deg, var(--screen-accent), transparent); }
+.sc-hd.line::before { content: ""; width: 4px; height: 16px; background: var(--screen-accent); margin-right: 10px; border-radius: 1px; }
+.sc-bd { flex: 1; min-height: 0; padding: 12px 16px 16px; display: flex; flex-direction: column; }
+.sc-bd > svg { width: 100%; height: 100%; min-height: 160px; }
+.sc-bd .grid { background: transparent; }
+.sc-bd .grid th { background: var(--field-bg); color: var(--ink-65); border-bottom-color: var(--line); }
+.sc-bd .grid td { color: var(--ink-85); border-color: var(--line); }
+
+/* 中央视觉位：放 3D 场景图/地图；没图时留一圈光晕地台 */
+.sc-visual { position: relative; min-height: 220px; display: flex; align-items: flex-end; justify-content: center; }
+.sc-visual img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sc-visual:empty::after, .sc-visual.placeholder::after {
+  content: ""; width: 70%; height: 36%; border-radius: 50%;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--screen-accent) 45%, transparent), transparent 70%);
+  border: 1px solid color-mix(in srgb, var(--screen-accent) 40%, transparent);
+}
+/* 进度条列表（黑金/深青模板里的「进度条」卡：行 40 高，名称 14 白，右端百分比） */
+.sc-bars { display: flex; flex-direction: column; gap: 12px; }
+.sc-bar { font-size: 14px; color: var(--ink-85); }
+.sc-bar .t { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.sc-bar .r { height: 6px; background: var(--tag-bg); border-radius: 3px; overflow: hidden; }
+.sc-bar .r i { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--screen-accent) 55%, transparent), var(--screen-accent)); }
+/* 滚动播报表（生产车间「实时报工播报」）：表头 32、行 35，斑马底 */
+.sc-ticker tr:nth-child(even) td { background: rgba(255, 255, 255, .03); }

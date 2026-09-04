@@ -23,7 +23,7 @@ import tempfile
 from pathlib import Path
 
 SKILL = Path(__file__).resolve().parent.parent
-C_FILES = ["c1-shell.html", "c2-table-form.html", "c3-page-detail.html", "c4-mobile.html"]
+C_FILES = ["c1-shell.html", "c2-table-form.html", "c3-page-detail.html", "c4-mobile.html", "c5-screen.html"]
 
 TPL_OPEN = re.compile(r"^\s*<template\b")  # 只认行首，避免命中注释里提到的 <template> 字样
 

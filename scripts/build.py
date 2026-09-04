@@ -89,6 +89,17 @@ def main():
             head = "" if "本图布局" in raw else "/* ── 本图布局 ── */\n"
             extra = head + raw
 
+    # 大屏背景：内容里出现 class="… bg-xxx …" 时把 assets/screens/bg-xxx.svg 以 data URI 注入
+    import base64
+    for name in sorted(set(re.findall(r'class="[^"]*\bbg-([a-z0-9-]+)\b', content))):
+        svg_path = ASSETS / "screens" / f"bg-{name}.svg"
+        if not svg_path.exists():
+            avail = "、".join(sorted(p.stem[3:] for p in (ASSETS / "screens").glob("bg-*.svg")))
+            sys.stderr.write(f"大屏背景 bg-{name} 不存在，可用：{avail}\n")
+            return 1
+        uri = "data:image/svg+xml;base64," + base64.b64encode(svg_path.read_bytes()).decode()
+        extra += f"\n.screen.bg-{name} {{ background-image: url({uri}); }}"
+
     icons = (ASSETS / "icons.svg").read_text(encoding="utf-8").strip()
     html = PAGE.format(
         title=a.title,
