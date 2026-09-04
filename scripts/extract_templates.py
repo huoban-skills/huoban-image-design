@@ -98,6 +98,8 @@ def main():
 
     if not a.files:
         ap.error("需要结构文件路径（或用 --list）")
+    # 目录里组件名带「（分组）」后缀，直接照抄也能命中
+    a.component = [re.sub(r"（[^）]*）$", "", c) for c in a.component]
     if not (a.architecture or a.component or a.group):
         ap.error("至少给一个 --architecture / --component / --group")
 

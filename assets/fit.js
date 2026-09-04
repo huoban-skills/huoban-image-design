@@ -6,9 +6,12 @@
   function fit() {
     var full = document.body.classList.contains('fullbleed');
     var w = document.documentElement.clientWidth - (full ? 0 : 64);
-    var k = w / 1640;
-    if (!full) k = Math.min(1, k);
-    document.querySelectorAll('.stage').forEach(function (s) { s.style.zoom = k; });
+    document.querySelectorAll('.stage').forEach(function (s) {
+      s.style.zoom = 1;
+      var k = w / (s.offsetWidth || 1640);   // 按画布实际宽算：PC 1640，手机单屏 520、双屏 1100
+      if (!full) k = Math.min(1, k);
+      s.style.zoom = k;
+    });
   }
   fit();
   addEventListener('resize', fit);

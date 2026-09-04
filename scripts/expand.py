@@ -4,11 +4,13 @@
 用法：
     python3 scripts/expand.py stage.html                 # 展开后的 HTML 打到标准输出
     python3 scripts/expand.py stage.html --out /tmp/x.html
-    python3 scripts/expand.py --list                     # 列出全部宏与一行说明
+    python3 scripts/expand.py --list                     # 通用写法＋宏目录（一宏一行）
+    python3 scripts/expand.py --doc hb-shell hb-grid     # 只取要用的宏的详细语法
+    python3 scripts/expand.py --doc all > references/macros.md   # 生成人看的全文
 
 宏只消灭机械重复（壳层、表格行、卡片、图表坐标），不做设计决策：用哪个视图、放不放浮层、
 字段怎么排，仍由写片段的人定。每个宏对应 assets/c1～c4 里的一个已收录组件，输出的类名与
-结构正本一致，check.py 照常检查。宏语法见 references/macros.md。
+结构正本一致，check.py 照常检查。宏语法在本文件 DOCS，--list / --doc 按需取。
 
 规则：
 - 宏体按行写，行内用 | 分列，\\| 表示字面竖线；空行和 // 开头的行忽略。
@@ -1033,6 +1035,236 @@ MACROS = {
     "hb-conn": (m_conn, "双屏中缝说明：每行「步骤标题 | 一句说明」，行间自动加箭头"),
 }
 
+# ── 宏说明（--list 看目录，--doc 名 取详细语法；references/macros.md 由 --doc all 生成）──
+COMMON = """通用写法
+- 宏体按行写，一行一条；行内用 | 分列，\\| 表示字面竖线；空行和 // 开头的行忽略。
+- 值后缀 :red :blue :green :orange :teal :purple :yellow :gray 把该值做成彩色标签（:gray 是灰底标签）。
+- 值前缀 ~ 做成次要灰字（空值、备注）；值前缀 = 表示后面是写好的 HTML 原样放入；含 < 的值也按 HTML 原样放。
+- 宏可嵌套，内层先展开。列数不对、图标名不存在、工具名没图标都会报错并指出行，改完重跑。
+- 宏只消灭机械重复，不替你做设计决策：用哪种视图、放不放浮层、字段怎么排、数据编成什么样，仍按 SKILL.md 和设计原则定。
+- 没有对应宏的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件、手机端视图切换抽屉与卡片视图大卡等）按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
+
+GROUPS = [
+    ("产品壳（PC）", ["hb-shell", "hb-nav"]),
+    ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
+    ("自定义页面部件（工作台 / 看板 / 数据分析页）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
+    ("独立自定义详情页", ["hb-info", "hb-steps"]),
+    ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
+]
+
+DOCS = {
+"hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
+体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
+.stage、has-float、.float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
+例：
+<div class="stage">
+<hb-shell ws="永铭世纪" page="物资档案" nav="table" me="周">
+<hb-nav>…</hb-nav>
+…页面内容…
+</hb-shell>
+</div>""",
+"hb-nav": """行：# 分组名；名称 | 图标 | 颜色（图标默认 app-s，颜色给 ic-* 类）；* 前缀＝当前页；> 文件夹名 | 子项数；- 前缀＝文件夹下的子项。
+例：
+# 物资台账
+* 物资档案 | app-s
+库存明细 | grid-s | green
+> 归档资料 | 3
+- 2025 年台账 | doc
+# 出入库
+出库单 | check-s | orange""",
+"hb-views": """行：名称 | 图标，图标默认 grid-s（看板 board-s、日历 f-date、甘特 chart-s）；* 前缀＝当前视图。自动补「创建视图」和溢出入口，noadd 去掉创建。
+例：
+* 全部物资
+按品类查看
+珍藏品专区 | board-s""",
+"hb-tools": """工具用 | 分开；内置图标的工具名：字段 分组 筛选 排序 冻结 行高 导入 导出 打印 分享；筛选:1＝激活态并显示条数；其他工具写 名称:图标名。
+属性 search 搜索框占位文字、new 新建按钮文字（nodd 去掉分裂箭头）。放在 <div class="view-box"> 里、hb-grid 之前。
+例：
+<hb-tools search="搜索品名或编号" new="新建物资">字段 | 筛选:1 | 排序 | 导入 | 打印二维码:print</hb-tools>""",
+"hb-grid": """首行表头，列名后可接类型 :tag（彩色选项）:tags（多值，值用 / 分）:user（人员，多人用 / 分）:ops（行内按钮，名:图标:颜色，多个用 / 分）；统计 :sum=值 :avg= :max= :min= :count=。
+其后每行一条记录，列数必须与表头一致。# 分组值:颜色 插分组行；! 前缀＝选中行。
+属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、页签容器内时用），默认带 .table-view.grid-view 和横向滚动条。
+例：
+<hb-grid total="1,217条">
+物资编号 | 品名 | 品类:tag | 当前库存:sum=4,386 | 建档人:user | 操作:ops
+WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏 | 打印:print:teal / 出库:arrow-right:blue
+# 茶叶:green
+WZ-CY-0412 | 武夷山大红袍 | 茶叶:green | 24 | 陈晓东 | ~
+</hb-grid>""",
+"hb-kanban": """# 分组名:颜色 | 数量 开一列，其后每行 标题 | 字段=值; 字段=值。
+例：
+# 待审核:orange | 3
+SO-2026-0901 | 客户=杭州云图; 金额=¥12,480.00
+# 已完成:green | 12
+SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
+"hb-cards": """卡片视图，每行 标题 | 字段=值; 字段=值 | 操作:图标:颜色。
+例：
+杭州云图 | 行业=制造; 年采购=¥1,204,000 | 拜访:arrow-right:blue""",
+"hb-banner": """第一行页面名称，第二行一句话介绍（口吻规则见 SKILL.md 步骤 4）；属性 solid 铺纯色背景。
+例：
+<hb-banner>库管工作台
+实现物资出入库与盘点的集中管理</hb-banner>""",
+"hb-filters": """行：筛选文本 | 图标，图标默认 f-select（日期用 f-date）。
+例：
+统计月份：2026 年 8 月 | f-date
+存放点：全部""",
+"hb-stats": """每行 指标名 | 值 | 单位 | 附加。mode="center"（默认，居中大数）或 mode="strip"（左文右图，附加写 spark:数,数,… 自动画走势线）；居中大数的附加可写 trend 或 trend:red 出底部趋势条。4～6 个时自动加 stats-N。
+例：
+<hb-stats>
+在库总量 | 4,386
+本月出库 | 217 | 件
+库存预警品种 | 6 | | trend:red
+</hb-stats>
+<hb-stats mode="strip">
+今日扫码开单 | 14 | spark:28,22,25,14,17,9,6
+</hb-stats>""",
+"hb-shortcuts": """行：名称 | 图标；属性 title 出标题栏。
+例：
+<hb-shortcuts title="常用">
+扫码出入库 | f-barcode
+发起盘点 | chart-s
+</hb-shortcuts>""",
+"hb-tasks": """行：标题 | 时间 | 节点说明；属性 title 出子区标题。
+例：
+<hb-tasks title="待我办理的流程">
+出库审批 · CK-20260824-0037 | 1.4 小时前 | 陈晓东 扫码创建 · 待仓库主管审批
+</hb-tasks>""",
+"hb-bar": """属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .w-chart .wc-bd 高度时同步给）。
+每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card w-chart 卡，bare 只出 svg＋图例。
+例：
+<hb-bar title="近 6 个月出入库趋势" labels="3 月|4 月|5 月|6 月|7 月|8 月">
+出库 | 135,165,115,185,212,217
+入库 | 82,102,70,135,117,143
+</hb-bar>""",
+"hb-line": """折线图，属性和行格式同 hb-bar。
+例：
+<hb-line title="近 5 周签约额" labels="W31|W32|W33|W34|W35">
+签约额 | 42,55,38,61,70
+目标 | 50,50,50,50,50 | orange
+</hb-line>""",
+"hb-donut": """每行 名称 | 值 | 颜色（值可带千分位；颜色缺省按 red/blue/purple/teal/green/orange 轮转）；center="标签|值" 出中心文字；百分比自动算，图例画在右侧。默认 w-card w-chart 卡，bare 只出 svg。
+例：
+<hb-donut title="各存放点库存占比" center="在库总量|4,386">
+城建大厦酒窖 | 1,842
+北京办公室 | 1,097
+</hb-donut>""",
+"hb-pivot": """统计表白卡，首行表头，其后数据行，值可带 :red 做成标签。属性 title、icon、tint（yellow/blue/teal 标题栏底色，浮层里常用）、dim（首列维度灰底）、bare 只出 <table>。
+例：
+<hb-pivot title="分存放点库存统计" dim>
+存放点 | 品种数 | 在库数量
+城建大厦酒窖 | 486 | 1,842
+</hb-pivot>""",
+"hb-info": """标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .page-header-card 里、标题区之后。
+例：
+出库类型 | 领用出库:orange
+申请人 | 陈晓东 | user
+申请日期 | 2026-08-24""",
+"hb-steps": """选项字段步骤条，* 标当前步骤；属性 span（默认 24）。
+例：
+<hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>""",
+"hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，双屏对照必加）、nobar。体内按页面形态放手机端其他宏。
+.stage 宽度（单屏 520、双屏 1100）和 .duo 仍由你写。
+例：
+<div class="stage">
+  <div class="duo">
+<hb-phone title="纳承国际 · 存货管理"><hb-chat>…</hb-chat></hb-phone>
+<hb-conn>…</hb-conn>
+<hb-phone title="客户存货单" fix><hb-vbar view="未取完" count="12"/><hb-ocards fab>…</hb-ocards><hb-mtool/></hb-phone>
+  </div>
+</div>""",
+"hb-mhome": """工作区首页＝页签行＋搜索＋分组列表。属性 tabs="*表格|流程|页面|动态|库管工作台"（* 当前）、search 占位、head（默认「全部表格」）；每行一个分组名如 产品库存(3)，- 前缀是展开后的表名。
+例：
+<hb-mhome tabs="*表格|流程|页面|动态|库管工作台">
+产品库存(3)
+- 物品资料表
+- 库存表
+出库(2)
+</hb-mhome>""",
+"hb-vbar": """列表页视图条 48。属性 view 视图名、count 条数、icon（默认 grid-s）、nosearch。自闭合写法。
+例：
+<hb-vbar view="全部数据" count="11"/>""",
+"hb-ocards": """三槽卡片列表（产品默认卡片形态，最多 3 个字段）。每行 标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮名:图标 | img；副标题可留空；值后缀 :gray 做灰底标签、:orange 等做彩色选项标签；第四列省略则无按钮；第五列写 img 出右侧图片位。
+属性 fab 出悬浮新建钮、pager="20 行/页" 出分页条、bare 只出卡片不带列表底。
+例：
+<hb-ocards fab>
+王丽娟：8 件｜朝阳门店 | 2026-08-12 下单 · 收款 ¥3,680 | 未取件数=8 件; 状态=部分取货:orange; 经手=李明 | 登记取货:check
+孙国强：0 件｜朝阳门店 | | 库位=A-03-02-02:gray; 当前库存数量=0; 库存下限=1
+</hb-ocards>""",
+"hb-mtool": """底部 56 栏。mode="list"（默认：列统计/字段设置/分组/筛选/排序）、mode="obar"（记录详情操作条：上一条置灰/下一条/编辑/评论/更多）、mode="app"（企业级应用页签：空间/*流程/通知/我的）；体内写 名:图标 | 名 可自定义，* 前缀高亮，:dis 置灰。
+例：
+<hb-mtool/>
+<hb-mtool mode="obar"/>
+<hb-mtool>列统计 | 筛选 | 排序</hb-mtool>""",
+"hb-rec": """记录页（详情/编辑/新建/任务办理共用）。属性 title（记录标题；新建写表名）、edit（编辑态白值框）、noqr、elapsed="1.7天"（任务页顶部耗时条）。
+体内：# 分组名 出居中分组标题；字段名 | 值 | 类型——类型缺省文本，sel 带下拉箭头，opt 选项并排（值写 当前值:blue / 其他 / 其他），mem 成员胶囊（多人 / 分），rel 关联（值写 主行 / 副行），img 图片（值写张数），num:元 数值带单位；值前缀 ~ 出占位灰字（「请先选择：仓库」「保存后显示计算结果」）；字段名前缀 ! 整块青绿高亮（计算字段、本节点可编辑字段）；> 页签1 | 页签2 | 来自 出库明细 的数据 · 共 1 条 出子表页签容器。
+例：
+<hb-rec title="CK_20260902_001 直接出库" elapsed="1.7天">
+!出库状态 | 待审批:blue / 已出库 / 已驳回 / 作废 | opt
+出库单号 | CK_20260902_001
+# 出库信息
+出库仓库 | 澄川珍藏物品库 / 联系电话 | rel
+申请人 | 詹达富 | mem
+出库拍照 | 1 | img
+> 出库明细 | 辅助字段 | 来自 出库明细 的数据 · 共 1 条
+</hb-rec>""",
+"hb-fbar": """编辑/新建底部保存条 57。属性 cancel、save、more（新建页左侧方钮）。
+例：
+<hb-fbar more/>""",
+"hb-taskbar": """任务办理页底部 100 高。属性 who="詹达富 · 出库审批"、sub 记录标题；体内 按钮名 | 按钮名。任务页＝hb-rec elapsed ＋ hb-taskbar，本节点可改字段加 !。
+例：
+<hb-taskbar who="詹达富 · 出库审批" sub="CK_20260902_001 直接出库">确认出库 | 驳回修改</hb-taskbar>""",
+"hb-ptasks": """企业级流程任务列表。属性 tabs（默认 我发起的|*我处理的|发起流程）、count="筛选出 1990 条/共 17842 条"、dot（当前页签红点）、app（带底部应用页签栏）；每行 发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮（按钮缺省「办理 ▾」，可写「领取任务」）。
+例：
+<hb-ptasks count="筛选出 1990 条/共 17842 条" dot app>
+詹达富 | 昨天 19:28 | 付款审批 · 待审批-啥都有集团 | 财务审批 | 领取任务
+詹达富 | 昨天 01:37 | 出库审批 · CK_20260902_001 直接出库 | 出库审批
+</hb-ptasks>""",
+"hb-wpage": """手机工作台。# 页面名 横幅；sc: 库存看板:pie-s | 出库管理:check-s 快捷方式两列；tabs: *出入库情况 | 仓库报表 页签容器；sub: 出库审批 | 全部 | *待执行 | 已完成 流程任务子区（空态）。
+例：
+<hb-wpage>
+# 库管工作台
+sc: 库存看板:pie-s | 出库管理:check-s | 入库管理:trend-s | 库存盘点:chart-s
+tabs: *出入库情况 | 仓库报表
+sub: 出库审批 | 全部 | *待执行 | 已完成
+</hb-wpage>""",
+"hb-chat": """企微会话流（微信端样式，未实测）。@时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
+例：
+@今天 09:21
+[取货审批 · 待办] 王丽娟 的取货申请待你确认
+门店 = 朝阳门店 · 经手 李明
+> 去确认
+@昨天 17:06
+! 本周配货已确认
+8 家门店的配货申请已由库管确认，合计 76 件。""",
+"hb-conn": """双屏中缝，每行 步骤标题 | 一句说明，行间自动加大箭头。
+例：
+企业微信收到待办 | 不用另装 App，消息点进去就能办
+进入本人工作台 | 销售只看得到自己名下的客户与存货""",
+}
+MOBILE_NOTE = "手机上没有独立的「审批流程条」组件：审批走流程页签的任务列表（hb-ptasks）和任务办理页（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。"
+
+
+def render_docs(names):
+    out = []
+    for n in names:
+        if n not in MACROS:
+            raise ExpandError(f"没有宏 <{n}>。可用：{'、'.join(MACROS)}")
+        out.append(f"<{n}>  {MACROS[n][1]}\n{DOCS[n]}")
+    return "\n\n".join(out)
+
+
+def render_all():
+    parts = ["# 宏语法\n\n本文件由 `python3 scripts/expand.py --doc all` 生成，改语法请改 expand.py 的 DOCS，不要手改这里。\n出图时不整读本文件：先 `--list` 看目录，再 `--doc 宏名…` 只取要用的几条。\n", COMMON]
+    for title, names in GROUPS:
+        parts.append(f"\n## {title}\n")
+        for n in names:
+            parts.append(f"### {n}\n{MACROS[n][1]}\n\n```\n{DOCS[n]}\n```\n")
+        if title.startswith("手机端"):
+            parts.append(MOBILE_NOTE + "\n")
+    return "\n".join(parts)
+
+
+
 TAG_RE = re.compile(r"<(hb-[\w-]+)(\s[^>]*?)?(?:/>|>(.*?)</\1>)", re.S)
 
 
@@ -1057,11 +1289,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("file", nargs="?")
     ap.add_argument("--out")
-    ap.add_argument("--list", action="store_true")
+    ap.add_argument("--list", action="store_true", help="通用写法＋全部宏目录（一宏一行）")
+    ap.add_argument("--doc", nargs="+", metavar="宏名", help="打印指定宏的详细语法；all 打印全部（用于生成 references/macros.md）")
     a = ap.parse_args()
     if a.list:
-        for k, (_, doc) in MACROS.items():
-            print(f"<{k}>  {doc}")
+        print(COMMON + "\n")
+        for title, names in GROUPS:
+            print(f"[{title}]")
+            for n in names:
+                print(f"  <{n}>  {MACROS[n][1]}")
+        print("\n详细语法：python3 scripts/expand.py --doc 宏名 宏名…")
+        return 0
+    if a.doc:
+        try:
+            print(render_all() if a.doc == ["all"] else render_docs(a.doc))
+        except ExpandError as e:
+            sys.stderr.write(f"{e}\n")
+            return 1
         return 0
     if not a.file:
         print(__doc__)

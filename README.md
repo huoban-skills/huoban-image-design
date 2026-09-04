@@ -38,7 +38,7 @@
 皮肤（纯色彩 token）          assets/skins/*.css         8 套
 ```
 
-配套：`assets/icons.svg`（图标雪碧图）、`assets/fit.js`（画布自适应）、`scripts/extract_templates.py`（按需提取结构模板）、`scripts/expand.py`（把片段里的 `<hb-*>` 宏展开成组件 HTML，语法见 `references/macros.md`）、`scripts/build.py`（确定性组装单文件 HTML，组装前自动展开宏）、`scripts/check.py`（静态检查）。
+配套：`assets/icons.svg`（图标雪碧图）、`assets/fit.js`（画布自适应）、`scripts/extract_templates.py`（按需提取结构模板）、`scripts/expand.py`（把片段里的 `<hb-*>` 宏展开成组件 HTML；`--list` 看目录、`--doc 宏名` 按需取语法，`references/macros.md` 是 `--doc all` 生成的全文）、`scripts/build.py`（确定性组装单文件 HTML，组装前自动展开宏）、`scripts/check.py`（静态检查）。
 
 ## 皮肤
 
@@ -66,7 +66,7 @@ python3 scripts/check.py 图.html
 
 ## 文档
 
-- `references/macros.md` — 重复块的宏语法（壳层、表格行、图表、手机卡片等）
+- `references/macros.md` — 宏语法全文（由 expand.py 生成，出图时按需 `--doc` 取，不整读）
 - `references/canvas/` — 画布规范（按用途分产品设计/营销）、验证与导出、SVG 嵌报告
 - `references/skin/` — 皮肤选型（routing）与制作（custom-skin）
 - `references/principles/` — 设计判据（视觉四原则、交互三原则、看板数据故事、图表选型、防千篇一律等 8 份）
