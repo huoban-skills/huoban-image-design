@@ -660,6 +660,82 @@ def m_steps(a, body):
     return f'<div class="option-steps span-{span}">' + "".join(out) + "</div>"
 
 
+# ── 独立自定义详情页 ──────────────────────────────────────────────────────
+def m_itembar(a, body):
+    title = a.get("title", "")
+    if not title:
+        raise ExpandError("<hb-itembar> 缺 title（记录主标题）")
+    btns = []
+    for ln in lines(body):
+        for it in cells(ln):
+            if not it:
+                continue
+            parts = [x.strip() for x in it.split(":")]
+            style = parts[1] if len(parts) > 1 and parts[1] else "line"
+            if style not in ("solid", "line"):
+                raise ExpandError(f"<hb-itembar> 按钮样式只能是 solid/line（可再加 :dis 置灰、:green/:orange/:teal 实底色）：{it}")
+            extra = " ".join(x for x in parts[2:] if x)
+            btns.append(f'<span class="b {style}{" " + extra if extra else ""}">{esc(parts[0])}</span>')
+    sys_ = "" if "nosys" in a else (
+        '<span class="b text">编辑</span>' + "".join(ico(i) for i in ("copy", "share", "print", "history", "more"))
+        + f'<span class="close">{ico("close")}</span>')
+    return (f'<div class="item-page-toolbar"><div class="item-page-nav">{ico("prev")}{ico("next")}</div>'
+            f'<div class="item-page-record-title">{esc(title)} <span class="caret">▾</span></div>'
+            f'<div class="item-page-shortcuts">{"".join(btns)}</div>'
+            f'<div class="item-page-system-actions">{sys_}</div></div>')
+
+
+def m_hcard(a, body):
+    title = a.get("title", "")
+    if not title:
+        raise ExpandError("<hb-hcard> 缺 title（主标题）")
+    sub = f'<div class="page-header-subtitle">{esc(a["sub"])}</div>' if a.get("sub") else ""
+    info = m_info(a, body) if lines(body) else ""
+    return (f'<div class="w-card page-header-card span-{a.get("span", "24")}"><div class="page-header-heading">'
+            f'<div class="page-header-title">{esc(title)}</div>{sub}</div>{info}</div>')
+
+
+def m_tabcard(a, body):
+    tabs = "".join(f'<span{" class=\"on\"" if on else ""}>{esc(n)}</span>' for n, on in star_items(a.get("tabs", "")))
+    if not tabs:
+        raise ExpandError('<hb-tabcard> 缺 tabs（如 tabs="*出库明细|历史出入库"，* 为当前页签）')
+    card = (f'<div class="w-card page-tabs-card"><div class="page-tabs-nav"><div class="page-tabs-list">{tabs}</div></div>'
+            f'<div class="page-tabs-body">{body.strip()}</div></div>')
+    return f'<div class="span-{a["span"]}">{card}</div>' if "span" in a else card
+
+
+def m_flow(a, body):
+    name = a.get("name", "")
+    if not name:
+        raise ExpandError('<hb-flow> 缺 name（流程名）；by="发起人 · 时间"')
+    by = f'<small>{esc(a["by"])}</small>' if a.get("by") else ""
+    cancel = "" if "nocancel" in a else '<div class="flow-msg-actions">撤销流程</div>'
+    boxes = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-flow> 每行「节点名 | 状态文本:颜色 | 日期 | 耗时 | 链接」；启动事件写「启动事件 | 事件描述 | 日期」：{ln}")
+        node, st = c[0], c[1]
+        date = c[2] if len(c) > 2 else ""
+        dur = c[3] if len(c) > 3 else ""
+        link = c[4] if len(c) > 4 else ""
+        start = node == "启动事件"
+        icon = "play" if start else "f-user"
+        if start:
+            body_ = f'<div class="txt">{esc(st)}</div>'
+        else:
+            text, color = split_color(st)
+            body_ = f'<div class="st{" " + color if color else ""}">{esc(text)}</div>'
+        tm = ""
+        if date or dur:
+            tm = '<div class="tm">' + (f"<span>{esc(date)}</span>" if date else "") + (f'<span>{ico("history")} {esc(dur)}</span>' if dur else "") + "</div>"
+        links = f'<div class="flowbox-links">{esc(link)}</div>' if link else ""
+        boxes.append(f'<div class="flowbox"><div class="flowbox-head"><span class="n-ic">{ico(icon)}</span><strong>{esc(node)}</strong></div>'
+                     f'<div class="flowbox-body">{body_}{tm}</div>{links}</div>')
+    return (f'<div class="flow-msg"><div class="flow-msg-body"><span class="app-ic">{ico("grid-s")}</span><span><b>{esc(name)}</b>{by}</span></div>{cancel}</div>'
+            f'<div class="flowbox-timeline">{"".join(boxes)}</div><div class="flow-foot">{esc(a.get("foot", "查看详细记录"))}</div>')
+
+
 # ── 卡片与看板 ──────────────────────────────────────────────────────────
 def kv_pairs(s, tagname):
     out = []
@@ -1017,6 +1093,10 @@ MACROS = {
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
     "hb-line": (m_line, "折线图卡：同 hb-bar"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
+    "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
+    "hb-hcard": (m_hcard, "详情页标题卡片：属性 title、sub；体内关键字段行同 hb-info"),
+    "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；体内放已展开的内容（hb-grid bare、字段、hb-flow）"),
+    "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
     "hb-info": (m_info, "详情页标题卡片信息区：字段名 | 值 | 类型"),
     "hb-steps": (m_steps, "选项字段步骤条：步骤 | *当前 | 步骤"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
@@ -1048,7 +1128,7 @@ GROUPS = [
     ("产品壳（PC）", ["hb-shell", "hb-nav"]),
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
     ("自定义页面部件（工作台 / 看板 / 数据分析页）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
-    ("独立自定义详情页", ["hb-info", "hb-steps"]),
+    ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-steps", "hb-tabcard", "hb-flow"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
 ]
 
@@ -1154,6 +1234,37 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 存放点 | 品种数 | 在库数量
 城建大厦酒窖 | 486 | 1,842
 </hb-pivot>""",
+"hb-itembar": """记录功能区（自定义详情页默认自带，56 高）。属性 title 记录主标题（必填）、nosys 不出右侧系统操作。
+体内快捷按钮用 | 分开：名:solid（主色实底）、名:line（线框）、再接 :dis 置灰或 :green/:orange/:teal 实底色。
+例：
+<hb-itembar title="出库单 CK-20260824-0037">确认出库:solid | 驳回修改:line | 打印出库单:line:dis</hb-itembar>""",
+"hb-hcard": """标题卡片（信息摘要，不放按钮）。属性 title 主标题（必填）、sub 副标题或编号、span（默认 24）。体内 1～4 行关键字段，格式同 hb-info：字段名 | 值 | 类型。
+例：
+<hb-hcard title="领用出库 · 城建大厦酒窖" sub="CK-20260824-0037 · 共 8 个品种 / 14 瓶">
+出库类型 | 领用出库:orange
+出库仓库 | 城建大厦酒窖
+申请人 | 陈晓东 | user
+申请日期 | 2026-08-24
+</hb-hcard>""",
+"hb-tabcard": """页签卡（页签容器）。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
+例：
+<hb-tabcard tabs="*出库明细|历史出入库|现场照片" span="16">
+<hb-grid bare nock>
+品名 | 库位 | 本次出库:sum=14 | 领用人:user
+七燕酒庄干红 750ml | 3 号酒柜 2 层 | 2 瓶 | 徐慧敏
+</hb-grid>
+<div class="form-hint">审批状态变为「已出库」时库存自动扣减。</div>
+</hb-tabcard>
+<hb-tabcard tabs="*流程|动态|评论" span="8">
+<hb-flow …>…</hb-flow>
+</hb-tabcard>""",
+"hb-flow": """流程页签时间线（放在 tabs="*流程|动态|评论" 的 hb-tabcard 里）。属性 name 流程名（必填）、by="发起人 · 时间"、foot（默认「查看详细记录」）、nocancel 不出「撤销流程」。
+每行一个节点，倒序（最新在上）：节点名 | 状态文本:颜色 | 日期 | 耗时 | 链接；颜色 orange 执行中（缺省）/ green 同意 / red 驳回 / gray 未开始；启动事件写「启动事件 | 事件描述 | 日期」。
+例：
+<hb-flow name="出库审批" by="陈晓东 · 8月24日 09:12">
+仓库主管审批 | 周敏 执行中 | 8月24日 09:40 | 1.4小时 | 催办
+启动事件 | 陈晓东 扫码创建了「CK-20260824-0037 领用出库单」 | 8月24日 09:12
+</hb-flow>""",
 "hb-info": """标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .page-header-card 里、标题区之后。
 例：
 出库类型 | 领用出库:orange
