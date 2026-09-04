@@ -64,9 +64,9 @@
 </template>
 
 <template data-component="中央视觉位" data-group="大屏"
-          data-measured="生产车间大屏：698×220 的 3D 厂区图放在指标行下方、两列图表卡之间；无图时用光晕地台占位"
-          data-note="只有客户真有 3D 图/地图时才放图；没有就用 placeholder，不画灰图标">
-  <div class="sc-visual placeholder sp-8 rs-2"><!-- 可选：<img src> --></div>
+          data-measured="生产车间大屏：698×220 的 3D 厂区图放在指标行下方、两列图表卡之间；官方模板中央是地图"
+          data-note="客户真有 3D 图/地图时放 img；没有就用 hb-svisual 默认的线框地球＋节点连线（颜色跟主题）。不手画中国地图（边界准确性与审图号），不画灰图标">
+  <div class="sc-visual sp-8 rs-2"><!-- <img src> 或 hb-svisual 默认地球 SVG --></div>
 </template>
 
 <template data-component="进度条列表" data-group="大屏"

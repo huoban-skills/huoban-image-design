@@ -100,6 +100,21 @@ def main():
         uri = "data:image/svg+xml;base64," + base64.b64encode(svg_path.read_bytes()).decode()
         extra += f"\n.screen.bg-{name} {{ background-image: url({uri}); }}"
 
+    # 客户图片：<img src="本地路径"> 内嵌为 data URI（相对内容文件目录或当前目录），保证单文件可再导出
+    import mimetypes
+    def _inline(m):
+        src = m.group(2)
+        if src.startswith(("http://", "https://", "data:")):
+            return m.group(0)
+        for base in (Path(a.content).resolve().parent, Path.cwd()):
+            fp = base / src
+            if fp.exists():
+                mime = mimetypes.guess_type(fp.name)[0] or "application/octet-stream"
+                return m.group(1) + "data:" + mime + ";base64," + base64.b64encode(fp.read_bytes()).decode() + m.group(3)
+        sys.stderr.write(f"提示：图片 {src} 没找到，按原路径保留\n")
+        return m.group(0)
+    content = re.sub(r'(<img\b[^>]*\bsrc=")([^"]+)(")', _inline, content)
+
     icons = (ASSETS / "icons.svg").read_text(encoding="utf-8").strip()
     html = PAGE.format(
         title=a.title,

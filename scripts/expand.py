@@ -818,11 +818,52 @@ def m_sbars(a, body):
     return '<div class="sc-bars">' + "".join(out) + "</div>"
 
 
+def visual_globe():
+    """默认中央视觉：线框地球＋节点连线＋地台光环，全部走 var(--screen-accent)，不含任何真实地图边界。"""
+    import random
+    r = random.Random(42)
+    A = "var(--screen-accent)"
+    W, H, cx, cy, R = 700, 420, 350, 180, 168
+    g = [f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">']
+    g.append(f'<defs><radialGradient id="gl" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{A}" stop-opacity=".35"/><stop offset=".7" stop-color="{A}" stop-opacity=".06"/><stop offset="1" stop-color="{A}" stop-opacity="0"/></radialGradient>'
+             f'<linearGradient id="ring" x1="0" x2="1"><stop offset="0" stop-color="{A}" stop-opacity="0"/><stop offset=".5" stop-color="{A}"/><stop offset="1" stop-color="{A}" stop-opacity="0"/></linearGradient></defs>')
+    g.append(f'<circle cx="{cx}" cy="{cy}" r="{R + 40}" fill="url(#gl)"/>')
+    g.append(f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="{A}" stroke-opacity=".55" stroke-width="1.2"/>')
+    for k in (0.33, 0.66, 0.88):
+        ry = R * k
+        g.append(f'<ellipse cx="{cx}" cy="{cy}" rx="{R}" ry="{ry:.0f}" fill="none" stroke="{A}" stroke-opacity=".22"/>')
+        g.append(f'<ellipse cx="{cx}" cy="{cy}" rx="{ry:.0f}" ry="{R}" fill="none" stroke="{A}" stroke-opacity=".22"/>')
+    g.append(f'<line x1="{cx - R}" y1="{cy}" x2="{cx + R}" y2="{cy}" stroke="{A}" stroke-opacity=".3"/>')
+    g.append(f'<line x1="{cx}" y1="{cy - R}" x2="{cx}" y2="{cy + R}" stroke="{A}" stroke-opacity=".3"/>')
+    pts = []
+    for _ in range(9):
+        t = r.uniform(0, 6.283); rr = R * r.uniform(.4, .92)
+        pts.append((cx + rr * __import__("math").cos(t), cy + rr * 0.8 * __import__("math").sin(t)))
+    for i in range(len(pts) - 1):
+        (x1, y1), (x2, y2) = pts[i], pts[i + 1]
+        mx, my = (x1 + x2) / 2, min(y1, y2) - 60
+        g.append(f'<path d="M{x1:.0f} {y1:.0f} Q{mx:.0f} {my:.0f} {x2:.0f} {y2:.0f}" fill="none" stroke="{A}" stroke-opacity=".7" stroke-width="1.2"/>')
+    for x, y in pts:
+        g.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="7" fill="{A}" fill-opacity=".18"/><circle cx="{x:.0f}" cy="{y:.0f}" r="3" fill="{A}"/>')
+    for i in range(140):
+        t = r.uniform(0, 6.283); rr = R * r.uniform(0, .97)
+        x, y = cx + rr * __import__("math").cos(t), cy + rr * __import__("math").sin(t)
+        g.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="1.2" fill="{A}" fill-opacity="{r.uniform(.2, .7):.2f}"/>')
+    by = cy + R + 28
+    for rx, op in ((R + 60, .8), (R + 100, .45), (R + 140, .2)):
+        g.append(f'<ellipse cx="{cx}" cy="{by}" rx="{rx}" ry="{rx * .16:.0f}" fill="none" stroke="url(#ring)" stroke-opacity="{op}" stroke-width="1.5"/>')
+    g.append("</svg>")
+    return "".join(g)
+
+
 def m_svisual(a, body):
     span = a.get("span", "8")
     rs = f" rs-{a['rs']}" if a.get("rs") else ""
     inner = body.strip()
-    return f'<div class="sc-visual{" placeholder" if not inner else ""} sp-{span}{rs}">{inner}</div>'
+    if a.get("img") and isinstance(a["img"], str):
+        inner = f'<img src="{a["img"]}" alt="">'
+    inner = inner or visual_globe()
+    return f'<div class="sc-visual sp-{span}{rs}">{inner}</div>'
 
 
 # ── 卡片与看板 ──────────────────────────────────────────────────────────
@@ -1194,7 +1235,7 @@ MACROS = {
     "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 4）、frame=bracket|round|none"),
     "hb-scard": (m_scard, "大屏图表卡：属性 title、span（默认 8）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare"),
     "hb-sbars": (m_sbars, "大屏进度条列表：每行「名称 | 百分比」"),
-    "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span、rs；体内可放 <img>，空则光晕地台占位"),
+    "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span、rs、img=客户图片路径；空则默认线框地球图"),
     "hb-phone": (m_phone, "手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容"),
     "hb-mhome": (m_mhome, "工作区首页：属性 tabs=表格|*流程…；每行一个分组，- 前缀为展开的表"),
     "hb-vbar": (m_vbar, "列表页视图条：属性 view、count、icon、nosearch"),
@@ -1411,9 +1452,10 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 一车间 | 82%
 二车间 | 64%
 </hb-sbars>""",
-"hb-svisual": """大屏中央视觉位。属性 span（默认 8）、rs 行跨度（常写 2）；体内放 <img src="…"> 客户的 3D 厂区图/地图，留空则光晕地台占位，不画灰图标。
+"hb-svisual": """大屏中央视觉位。属性 span（默认 8）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
 例：
-<hb-svisual rs="2"/>""",
+<hb-svisual rs="2"/>
+<hb-svisual rs="2" img="素材/厂区3D.png"/>""",
 "hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，双屏对照必加）、nobar。体内按页面形态放手机端其他宏。
 .stage 宽度（单屏 520、双屏 1100）和 .duo 仍由你写。
 例：
