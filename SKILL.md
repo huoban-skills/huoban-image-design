@@ -36,8 +36,8 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 | --- | --- | --- |
 | 所有界面 | visual-four-principles、visual-components | 无 |
 | 多张营销配图 | 同上 | anti-sameness |
-| 工作台 | 同上 | interaction-principles；涉及管理洞察再读 dashboard-data-story |
-| 看板/数据分析页 | 同上＋dashboard-data-story、dashboard-chart-selection | anti-sameness |
+| 工作台 | 同上＋workbench | interaction-principles |
+| 看板/数据分析页 | 同上＋dashboard-data-story、dashboard-layout | dashboard-chart-selection（选具体图表类型时）、anti-sameness |
 | 表单/编辑态 | 同上＋interaction-principles | visual-layout |
 | 自定义详情页 | 同上＋visual-layout | 有操作设计时读 interaction-principles |
 | 新造或调整皮肤 | visual-color | 页面原则仍按页面类型读 |
