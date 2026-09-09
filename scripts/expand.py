@@ -424,7 +424,10 @@ def m_tasks(a, body):
         title = esc(c[0])
         time = f'<span class="t-time">{esc(c[1])}</span>' if len(c) > 1 and c[1] else ""
         node = f'<div class="t-node">{esc(c[2])}</div>' if len(c) > 2 and c[2] else ""
-        out.append(f'<div class="task"><div class="t-bd"><div class="t-title">{title}{time}</div>{node}</div></div>')
+        # 实测：流程任务行右侧固定有办理按钮（次要按钮 68×32）；第 4 列可改按钮名，写 - 去掉
+        label = c[3].strip() if len(c) > 3 and c[3].strip() else "办理"
+        act = "" if label == "-" else f'<div class="t-act"><span class="b line">{esc(label)}</span></div>'
+        out.append(f'<div class="task"><div class="t-bd"><div class="t-title">{title}{time}</div>{node}</div>{act}</div>')
     hd = f'<div class="ws-hd">{esc(a.get("title", ""))}</div>' if a.get("title") else ""
     return f'<div class="w-sub">{hd}{"".join(out)}</div>'
 
@@ -435,7 +438,8 @@ def m_shortcuts(a, body):
         c = cells(ln)
         icon = c[1] if len(c) > 1 and c[1] else "app-s"
         out.append(f'<div class="sc"><span class="sc-ic">{ico(icon, tag="<hb-shortcuts> ")}</span>{esc(c[0])}</div>')
-    return f'<div class="w-card w-shortcut">{card_head(a, "hb-shortcuts")}<div class="wc-bd sc-grid">{"".join(out)}</div></div>'
+    return (f'<div class="w-card w-shortcut">{card_head(a, "hb-shortcuts")}'
+            f'<div class="wc-bd sc-list">{"".join(out)}</div></div>')
 
 
 def m_filters(a, body):
@@ -536,9 +540,10 @@ def legend_html(series):
     return '<div class="legend">' + "".join(items) + "</div>"
 
 
-def chart_card(a, inner, legend, tagname):
+def chart_card(a, inner, legend, tagname, par="none"):
+    # par：柱/折线拉伸填满卡片（none）；环图必须等比，否则圆被抻成椭圆
     W, H = int(a.get("w", 560)), int(a.get("h", 240))
-    svg = f'<svg viewBox="0 0 {W} {H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">{"".join(inner)}</svg>'
+    svg = f'<svg viewBox="0 0 {W} {H}" preserveAspectRatio="{par}" xmlns="http://www.w3.org/2000/svg">{"".join(inner)}</svg>'
     if "bare" in a:
         return svg + legend
     return f'<div class="w-card w-chart">{card_head(a, tagname)}<div class="wc-bd">{svg}</div>{legend}</div>'
@@ -633,7 +638,7 @@ def m_donut(a, body):
         inner.append(f'<rect x="290" y="{y - 9:.0f}" width="10" height="10" rx="2" fill="var(--c-{s["color"]})"/>'
                      f'<text x="308" y="{y:.0f}">{esc(s["name"])}　{esc(s["raw"])}（{pct}%）</text>')
     inner.append("</g>")
-    return chart_card(a, inner, "", "hb-donut")
+    return chart_card(a, inner, "", "hb-donut", par="xMidYMid meet")
 
 
 # ── 详情页 ──────────────────────────────────────────────────────────────
@@ -706,8 +711,9 @@ def m_tabcard(a, body):
     if not tabs:
         raise ExpandError('<hb-tabcard> 缺 tabs（如 tabs="*出库明细|历史出入库"，* 为当前页签）')
     if "pill" in a:
+        # 胶囊底块只在居中时成立；靠左的页签在产品里是下划线式，不带底块
         tabs = tabs.replace('<span class="on">', '<span class="wt-tab on">').replace("<span>", '<span class="wt-tab">')
-        card = (f'<div class="w-card w-tabs"><div class="wt-nav{" center" if "center" in a else ""}">{tabs}</div>'
+        card = (f'<div class="w-card w-tabs"><div class="wt-nav center">{tabs}</div>'
                 f'<div class="wt-body">{body.strip()}</div></div>')
     else:
         card = (f'<div class="w-card page-tabs-card"><div class="page-tabs-nav"><div class="page-tabs-list">{tabs}</div></div>'
@@ -1225,7 +1231,7 @@ MACROS = {
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
     "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
     "hb-hcard": (m_hcard, "详情页标题卡片：属性 title、sub；体内关键字段行同 hb-info"),
-    "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（center 居中）；体内放已展开的内容"),
+    "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
     "hb-info": (m_info, "详情页标题卡片信息区：字段名 | 值 | 类型"),
     "hb-steps": (m_steps, "选项字段步骤条：步骤 | *当前 | 步骤"),
@@ -1336,13 +1342,13 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 <hb-stats mode="strip">
 今日扫码开单 | 14 | spark:28,22,25,14,17,9,6
 </hb-stats>""",
-"hb-shortcuts": """行：名称 | 图标；属性 title 出标题栏。
+"hb-shortcuts": """行：名称 | 图标；属性 title 出标题栏。按钮宽度自适应内容、文字不折行，一行排不下自动换第二行（2026-09-04 实测）。
 例：
 <hb-shortcuts title="常用">
 扫码出入库 | f-barcode
 发起盘点 | chart-s
 </hb-shortcuts>""",
-"hb-tasks": """行：标题 | 时间 | 节点说明；属性 title 出子区标题。
+"hb-tasks": """行：标题 | 时间 | 节点说明 | 按钮名（缺省「办理」，写 - 去掉）；属性 title 出子区标题。任务行右侧固定有办理按钮（2026-09-04 实测）。
 例：
 <hb-tasks title="待我办理的流程">
 出库审批 · CK-20260824-0037 | 1.4 小时前 | 陈晓东 扫码创建 · 待仓库主管审批
@@ -1385,7 +1391,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 申请日期 | 2026-08-24
 </hb-hcard>""",
 "hb-tabcard": """页签卡（页签容器）。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
-默认是详情页的下划线页签；工作台/看板用 pill 出胶囊式页签（选中主色 20% 底条），再加 center 居中，不加靠左；页签按角色工作流程从左到右或按业务分类编排。
+默认是详情页的下划线页签，靠左；工作台/看板要胶囊式页签（选中主色 20% 底条）写 pill，胶囊只在居中时成立，pill 一律居中；页签按角色工作流程从左到右或按业务分类编排。
 例：
 <hb-tabcard tabs="*出库明细|历史出入库|现场照片" span="16">
 <hb-grid bare nock>
@@ -1397,7 +1403,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 <hb-tabcard tabs="*流程|动态|评论" span="8">
 <hb-flow …>…</hb-flow>
 </hb-tabcard>
-<hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill center>
+<hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill>
 <hb-grid bare nock>…</hb-grid>
 </hb-tabcard>""",
 "hb-flow": """流程页签时间线（放在 tabs="*流程|动态|评论" 的 hb-tabcard 里）。属性 name 流程名（必填）、by="发起人 · 时间"、foot（默认「查看详细记录」）、nocancel 不出「撤销流程」。

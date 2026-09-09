@@ -554,8 +554,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .w-row { display: flex; gap: 20px; }
 .w-row > * { flex: 1; }
 .w-card { background: var(--card-bg); border-radius: 9px; overflow: hidden; }
-/* 快捷方式 */
-.sc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 10px; }
+/* 快捷方式（2026-09-04 实测：项高 40，左图标右文字不折行；列数随容器宽自适应，实测 566 宽出 3 列 162、1152 宽 4 项出 4 列 263，排不下换下一行） */
+.sc-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(162px, 1fr)); gap: 14px 20px; }
+.sc-list > .sc { height: 40px; white-space: nowrap; }
 .sc { display: flex; align-items: center; gap: 8px; font-size: 16px; }
 .sc-ic { width: 24px; height: 24px; border-radius: 6px; background: var(--primary-soft); color: var(--primary); display: inline-flex; align-items: center; justify-content: center; }
 .sc-ic svg { width: 14px; height: 14px; }
@@ -615,6 +616,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .t-title { font-weight: 500; }
 .t-time { color: var(--c-red); font-size: 12px; margin-left: 6px; font-weight: 400; }
 .t-no2, .t-node { color: var(--ink-45); font-size: 13px; margin-top: 3px; }
+/* 流程任务行右侧的办理按钮（2026-09-04 实测：次要按钮 68×32，r6，1px 浅边） */
+.task .t-act { margin-left: auto; align-self: center; padding-left: 12px; }
 /* 图表部件 */
 .w-chart .wc-bd { height: 240px; display: flex; align-items: center; justify-content: center; }
 .w-chart .wc-bd svg { width: 100%; height: 100%; }

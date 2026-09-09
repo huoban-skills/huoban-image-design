@@ -28,6 +28,22 @@ HEX = re.compile(r'#[0-9A-Fa-f]{3,8}\b')
 RGB = re.compile(r'\brgba?\(')
 ALLOW_LITERAL = {"#fff", "#ffffff", "#000", "#000000"}
 
+# 常见姓氏，只用来识别横幅标题里的具名个人；列表数据里的人名不查
+SURNAMES = (
+    "赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜"
+    "戚谢邹喻柏水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳鲍史唐"
+    "费廉岑薛雷贺倪汤滕殷罗毕郝邬安常乐于时傅皮卞齐康伍余元卜顾孟平黄"
+)
+_NAME = "[" + SURNAMES + "][\u4e00-\u9fa5]{1,2}"
+PERSON_PATTERNS = [
+    re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)"),
+    re.compile(_NAME + r"[，,]?\s*(?:你好|您好|早上好|上午好|下午好|晚上好|欢迎)"),
+    re.compile(r"(?:欢迎回来|欢迎|[Hh]i|[Hh]ello)[，,]?\s*" + _NAME),
+]
+# 姓氏碰巧是业务词头字的情况（周报、金额、马上……），命中后按前缀排除
+PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报",
+                  "周会", "周期", "周边", "周转", "金额", "马上", "于今")
+
 
 def load_known_classes():
     """base.css 里定义过的 class，作为"组件是否存在"的判据。"""
@@ -302,10 +318,24 @@ def check(path, render=True):
     if "■" in body or "●" in body:
         add("Medium", "legend-char",
             "图例用了 ■/● 字符：字符只能着文字色，无法与系列色一致，应改 <rect>/<circle>")
-    if re.search(r'class="[^"]*\bstage\b', body) and "class=\"window\"" in body:
+    if re.search(r'class="[^"]*\bstage\b', body) and 'class="window"' in body:
         if not re.search(r"\.stage\s*\{[^}]*height", "\n".join([styles])):
             add("High", "stage-no-height",
                 ".stage 没设 height：画布高度必须按渲染实测回填，否则导出会截断或留白")
+
+    # ── High：横幅写成某个具体人（工作台服务角色，不服务某位员工） ──
+    for bm in re.finditer(r'<div class="[^"]*\bw-banner\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)',
+                          body, re.S):
+        for tm in re.finditer(r"<(h1|p)[^>]*>(.*?)</\1>", bm.group(1), re.S):
+            txt = re.sub(r"<[^>]+>", "", tm.group(2)).strip()
+            for pat in PERSON_PATTERNS:
+                hit = pat.search(txt)
+                if hit and not hit.group().startswith(PERSON_EXCLUDE):
+                    add("High", "banner-person-name",
+                        f'横幅写成具体某个人「{hit.group()}」：工作台服务的是角色（律师、库管、店长），'
+                        f"不是某位员工。改成角色名，如「律师工作台」",
+                        line_of(body, bm.start()))
+                    break
 
     # ── Medium：渲染后组件留下大片空白 ─────────────────────────────
     if render:

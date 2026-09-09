@@ -98,7 +98,7 @@
 <template data-component="快捷方式" data-group="工作台">
   <div class="w-card w-shortcut">
     <div class="wc-hd"><!-- 组件名称 --></div>
-    <div class="wc-bd sc-grid">
+    <div class="wc-bd sc-list">
       <div class="sc"><span class="sc-ic"><svg class="ico"><use href="#i-app-s"/></svg></span><!-- 快捷入口名称 --></div> <!-- 快捷方式的彩色应用图标，同 c1 第 57 行的可选集 -->
     </div>
   </div>
@@ -146,7 +146,9 @@
 <template data-component="待办或流程任务子区" data-group="流程">
   <div class="w-sub">
     <div class="ws-hd"><!-- 子区名称与筛选 --></div>
-    <div class="task"><!-- 任务条目 --></div>
+    <div class="task"><!-- 任务条目：左侧标题＋节点说明，右侧办理按钮 .t-act > .b.line -->
+      <div class="t-bd"></div><div class="t-act"><span class="b line">办理</span></div>
+    </div>
   </div>
 </template>
 
