@@ -11,6 +11,47 @@
 - 宏只消灭机械重复，不替你做设计决策：用哪种视图、放不放浮层、字段怎么排、数据编成什么样，仍按 SKILL.md 和设计原则定。
 - 没有对应宏的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件、手机端视图切换抽屉与卡片视图大卡等）按 SKILL.md 路由表用 extract_templates.py 提取模板手写。
 
+## 页面骨架（先写它，外壳由它产出）
+
+### hb-page
+页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表
+
+```
+整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
+体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。
+```
+
+### hb-row
+24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放部件宏，最多 4 个
+
+```
+24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放部件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
+例：
+<hb-row spans="16|8">
+<hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
+<hb-donut title="构成">酒品 | 60 | red</hb-donut>
+</hb-row>
+```
+
+### hb-float
+营销浮层：属性 side=right|left、top、w、title；体内放底层没有的部件（bare 模式）
+
+```
+营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西：bare 模式的宏（hb-grid bare、hb-ocards bare）或 extract_templates.py 提的模板；不复制底层已有内容；最多两张卡。
+例：
+<hb-float top="120" w="404" title="扫码开单">
+<hb-ocards bare>…</hb-ocards>
+</hb-float>
+```
+
+### hb-duo
+手机双屏对照壳：体内两个 hb-phone 夹一个 hb-conn
+
+```
+手机双屏对照壳：体内依次 hb-phone、hb-conn、hb-phone；hb-page kind=mobile 会把画布设成 1100 宽。
+```
+
+
 ## 产品壳（PC）
 
 ### hb-shell
@@ -150,7 +191,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 快捷方式：名称 | 图标；属性 title
 
 ```
-行：名称 | 图标；属性 title 出标题栏。
+行：名称 | 图标；属性 title 出标题栏。按钮宽度自适应内容、文字不折行，一行排不下自动换第二行（2026-09-04 实测）。
 例：
 <hb-shortcuts title="常用">
 扫码出入库 | f-barcode
@@ -162,7 +203,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 待办子区：标题 | 时间 | 节点说明；属性 title
 
 ```
-行：标题 | 时间 | 节点说明；属性 title 出子区标题。
+行：标题 | 时间 | 节点说明 | 按钮名（缺省「办理」，写 - 去掉）；属性 title 出子区标题。任务行右侧固定有办理按钮（2026-09-04 实测）。
 例：
 <hb-tasks title="待我办理的流程">
 出库审批 · CK-20260824-0037 | 1.4 小时前 | 陈晓东 扫码创建 · 待仓库主管审批
@@ -266,11 +307,11 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 ### hb-tabcard
-页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（center 居中）；体内放已展开的内容
+页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容
 
 ```
 页签卡（页签容器）。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
-默认是详情页的下划线页签；工作台/看板用 pill 出胶囊式页签（选中主色 20% 底条），再加 center 居中，不加靠左；页签按角色工作流程从左到右或按业务分类编排。
+默认是详情页的下划线页签，靠左；工作台/看板要胶囊式页签（选中主色 20% 底条）写 pill，胶囊只在居中时成立，pill 一律居中；页签按角色工作流程从左到右或按业务分类编排。
 例：
 <hb-tabcard tabs="*出库明细|历史出入库|现场照片" span="16">
 <hb-grid bare nock>
@@ -282,7 +323,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 <hb-tabcard tabs="*流程|动态|评论" span="8">
 <hb-flow …>…</hb-flow>
 </hb-tabcard>
-<hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill center>
+<hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill>
 <hb-grid bare nock>…</hb-grid>
 </hb-tabcard>
 ```
@@ -327,10 +368,10 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 ### hb-skpi
-大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 4）、frame=bracket|round|none
+大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 3，一行 8 个）、frame=bracket|round|none
 
 ```
-大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 4＝一行 6 个；8 个一行写 3）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
+大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 3＝一行 8 个；6 个一行写 4）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
 例：
 <hb-skpi span="3" frame="round">
 本月产量 | 44 | 件
@@ -339,10 +380,10 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 ### hb-scard
-大屏图表卡：属性 title、span（默认 8）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare
+大屏图表卡：属性 title、span（默认 6）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare
 
 ```
-大屏图表卡。属性 title 图表名（必填）、span（默认 8）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
+大屏图表卡。属性 title 图表名（必填）、span（默认 6，中央播报表写 12）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
 体内放 hb-bar/hb-line/hb-donut 的 bare 输出、hb-grid bare nock noidx、hb-sbars 或手绘 SVG，颜色自动走深色 token。同一张图标题条只用一种。
 例：
 <hb-scard title="近30日产量趋势" hd="tag" frame="none">
@@ -368,7 +409,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 大屏中央视觉位：属性 span、rs、img=客户图片路径；空则默认线框地球图
 
 ```
-大屏中央视觉位。属性 span（默认 8）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
+大屏中央视觉位。属性 span（默认 12）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
 例：
 <hb-svisual rs="2"/>
 <hb-svisual rs="2" img="素材/厂区3D.png"/>

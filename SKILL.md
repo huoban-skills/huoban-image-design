@@ -1,39 +1,29 @@
 ---
 name: huoban-image-design
-description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实产品组件。当用户要画伙伴云界面示意图/mockup（列表页、详情页、表单、工作台、看板、门户、手机端），给报告/方案配系统图，或 huoban-solution-report 给出图需求单时，必须使用本 skill。不用于：海报/朋友圈营销图、流程图（hb-flowchart）、ER 图（hb-er-draw）、网站（hb-website-creator）。
+description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实产品组件。当用户要画伙伴云界面示意图/mockup（列表页、详情页、表单、工作台、看板、大屏、手机端），给报告/方案配系统图，或 huoban-solution-report 给出图需求单时，必须使用本 skill。不用于：海报/朋友圈营销图、流程图（hb-flowchart）、ER 图（hb-er-draw）、网站（hb-website-creator）。
 ---
 
 # 伙伴云系统界面示意图
 
-产出"长得像伙伴云产品"的界面示意图：拼装真实产品实测组件，不自由发挥。输入是出图需求或 huoban-solution-report 的图需求单；输出 `图名@2x.png` ＋ `源文件/图名.html`（可再导出的源稿）。只画伙伴云产品界面，海报/流程图/ER 图/网站不在本 skill。
+产出"长得像伙伴云产品"的界面示意图：用骨架宏拼装真实产品实测组件，不自由发挥。输入是出图需求或 huoban-solution-report 的图需求单；**交付物是单文件 HTML**（`源文件/图名.html`，离线可开、自适应），PNG／SVG 只在用户或报告明确要时用 export.py 另出。只画伙伴云产品界面，海报/流程图/ER 图/网站不在本 skill。
 
-核心资产三层：**结构**（assets/c1～c5 实测架构，唯一结构真相源；模板带官方部件 data-type）＋**骨架样式**（base.css，尺寸取自实测）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）。
+核心资产：**登记表**（assets/registry.json，官方部件 type ↔ 类名 ↔ 宏，唯一名录）＋**结构**（assets/c1～c5 实测架构，模板带官方 `data-type`）＋**骨架样式**（base.css）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）＋**宏**（scripts/expand.py，模型只填内容）。
 
-## 页面类型路由（唯一真相源）
+## 页面类型路由
 
-**结构不整读 c 文件**：有宏的块直接写宏（`expand.py --list` 看目录、`--doc` 取语法），其余用脚本按名提取（先 `--list` 看目录，再精确取）：
+| 用户说的 | `<hb-page kind>` | 原则文档（references/principles/） | 说明 |
+| --- | --- | --- | --- |
+| 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
+| 表单弹窗 / 编辑态 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗与编辑态尺寸未实测，交付说明注明 |
+| 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
+| 工作台 | workbench | workbench | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
+| 看板 / 数据分析页 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 透视表 |
+| 数据大屏 | screen | dashboard（大屏一节） | 体内只放 hb-screen；不套壳、无浮层 |
+| 手机端 | mobile | 各页面篇的手机端说明＋c4 注释 | hb-phone 单屏或 hb-duo 双屏；不套 .window |
 
-```bash
-python3 scripts/extract_templates.py assets/c3-page-detail.html \
-  --architecture "独立自定义详情页" --component "记录功能区" --component "标题卡片"
-```
+## 设计原则路由（步骤 3、5 按任务读，不整目录读）
 
-| 用户说的 | 从哪几份提取 | 用哪个架构 |
-| --- | --- | --- |
-| 列表页（网格/卡片/看板/甘特/日历/任务/透视） | c1 ＋ c2 | 产品壳层 ＋ 列表页主内容 ＋ 对应视图 |
-| 详情页 / 详情界面 | c3（带字段再加 c2 字段类组件） | 独立自定义详情页。不套产品壳与弹窗遮罩；顶部记录功能区默认包含 |
-| 编辑态 / 标准表单 / 字段录入 | c1 ＋ c2 | 标准表单编辑态（仅用户明确要求时） |
-| 弹窗详情 | c1 ＋ c3（widget 卡字段再加 c2 字段类组件） | 记录详情弹窗（仅用户明确要求时） |
-| 工作台 / 看板页 / 数据分析页 | c1 ＋ c3 | 工作台或数据分析页 |
-| 企业门户 | c1 ＋ c3 | 企业门户 |
-| 数据大屏 / 大屏模式看板 | 只提 c5（重复块用 hb-screen 系列宏） | 数据大屏。不套产品壳；深色＋背景＋装饰框，部件仍是看板那套；主题/背景/装饰框/标题条各只选一种 |
-| 手机端 | 只提 c4（2026-09-03 H5 实测；重复块优先用手机端宏） | 手机单屏/双屏对照。壳 375 宽即画布，不要 `.window`／左侧导航／一级顶栏；列表默认三槽卡片，记录页字段平铺（label 在上、值框 40 高），审批走流程任务列表＋任务办理页，没有审批流程条 |
-
-提取出的 `<template>` 是独立架构或组件，不是整页范例——按 data-* 属性和结构注释识别用途。c1 的 `.main` 是页面内容插槽，把 c2/c3 的页面内部结构放进去，不再嵌套第二个 `.main`。
-
-## 设计原则路由（步骤 4、5 按任务读，不整目录读）
-
-| 任务类型 | 必读（references/principles/） | 条件读取 |
+| 任务类型 | 必读 | 条件读取 |
 | --- | --- | --- |
 | 所有界面 | visual-four-principles、visual-components、visual-color | 多张营销配图读 anti-sameness |
 | 列表和视图页 | 同上＋list-view | 无 |
@@ -41,7 +31,7 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 | 自定义详情页 | 同上＋item-detail、dashboard-chart-selection（组件选取） | 无 |
 | 工作台 | 同上＋workbench、dashboard-chart-selection（组件选取） | 无 |
 | 看板/数据分析页/数据大屏 | 同上＋dashboard、dashboard-chart-selection（组件选取） | 指标拆解不清时读 dashboard-data-story |
-| 新造或调整皮肤 | visual-color | 页面原则仍按页面类型读 |
+| 新造或调整皮肤 | visual-color、skin/custom-skin | 页面原则仍按页面类型读 |
 
 ## 执行步骤
 
@@ -49,89 +39,90 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 
 按 [references/skin/routing.md](references/skin/routing.md) 判定输入物、选皮肤、定壳层主题；仅在沿用已有样式提色值或新造皮肤时再读 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
 
-### 2. 判用途，定画布
+### 2. 确认图需求单（闸门）
 
-**画布类型由用户定，不自行判断。** 它决定整张图的形态，判错了是整张返工：营销类是"一张图"（窗口浮在透明底上，可加浮层强调重点），产品设计类是"一个系统"（用户照着搭建）。和步骤 3 的需求单一起问，只打断一次。
+**清单没拿到用户确认，不进入步骤 3。** 多张图列成一个清单一次确认；用户没表态的项不替他决定。格式对内对外一致（huoban-solution-report 的调用也是这个格式）：
 
-- **营销类**（放进报告／给客户讲解／宣传）→ [references/canvas/marketing.md](references/canvas/marketing.md)。
-- **产品设计类**（用户照着搭建）→ [references/canvas/product-design.md](references/canvas/product-design.md)。
+- **画布类型**：营销类（放进报告／给客户讲解，一张图，可加浮层）／产品设计类（用户照着搭，一个系统，无浮层）。由用户定，不自行判断；需求单没写明就回去问。
+- **页面类型**与**端**：路由表的"用户说的"一列；PC（默认）／手机端。手机端另确认单屏还是双屏、要不要企微会话那一屏；手机竖图嵌报告时限宽居中（约 360px）。
+- **要呈现的字段和数据**：用用户业务的真实字段名，数据编得像真的。
+- **自定义页面另加**（工作台/看板/详情页）：层次白底描边还是浅底白卡（默认白底描边）；横幅无背景／纯色／背景图卡片（默认无背景）。营销类另加：浮层要突出什么。
 
-来自 huoban-solution-report 的图需求单会写明类型；没写明就回去问，不替用户默认。
+### 3. 写骨架片段
 
-画布统一宽 **1640px**（`.stage`），高度按内容实测回填，禁止大片空白也禁止溢出；内容多时窗口高度截到主要内容展示完为止，底部被窗口边缘自然切断是正常的。
+先看槽位表，再取要用的宏的语法，**不整读宏文档、不读 c 文件**：
 
-### 3. 确认图需求单
+```bash
+python3 scripts/expand.py --page workbench            # 该页面类型的槽位表、可用宏、最小示例
+python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # 只取要用的宏
+```
 
-**这是闸门：清单没拿到用户确认，不进入步骤 4。** 多张图一起做时列成一个清单让用户一次确认，不逐张打断；用户没表态的项不替他决定，宁可多问一句也不要出完一版再返工。格式对内对外一致（来自 huoban-solution-report 的调用也是这个格式）：
+把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏；并排用 `<hb-row spans="16|8">`；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。外壳、画布高度、浮层定位、栅格都由宏产出，不手写 `.stage`/`.window`/`.page`，不手写 `.stage{height}`。
 
-- **画布类型**：营销类／产品设计类（步骤 2 那两类，与本清单一并确认）
-- **页面类型**（路由表的"用户说的"一列）与**端**：PC（默认）／手机端。手机端另确认屏数（单屏/双屏对照）、要不要企微会话那一屏；手机竖图嵌进报告时要限宽居中（约 360px），否则会被版心拉得巨大。
-- **要呈现的字段和数据**：用用户业务的真实字段名，数据编得像真的——编号有规则、金额有零头、人名像人名。
-- **自定义页面另加**（工作台/看板/数据分析页）：层次要白底描边还是浅底白卡。营销类另加：浮层要突出什么。
+宏没覆盖的组件（甘特/日历/任务/透视视图、表单弹窗、门户内容、流程页签细节）才用模板提取后手写在对应槽位：
 
+```bash
+python3 scripts/extract_templates.py assets/c2-table-form.html --list
+python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘特视图"
+```
+
+写内容时按页面原则文档定选取与数量；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。图表柱/折/环写 `hb-bar`/`hb-line`/`hb-donut` 由脚本算坐标；其余图表类型未采集，先告知用户。
 
 ### 4. 拼装
 
-1. 写两个中间文件到 scratchpad：`.stage` 内容和本图补充样式。内容里的重复块——产品壳与导航、视图页签、工具栏、表格行、统计表、单指标、待办、快捷方式、筛选、横幅、柱/折/环图、看板与卡片视图、详情页的记录功能区/标题卡片/步骤条/页签卡/流程页签、手机端各屏——一律写 `<hb-*>` 宏，build.py 会展开成结构正本里的组件。宏语法**按需取，不整读**：
+```bash
+python3 scripts/build.py --skin dawn-blue --content stage.html --output "源文件/图名.html" --title "图名"
+```
 
-   ```bash
-   python3 scripts/expand.py --list                    # 通用写法＋宏目录，先定这张图用哪几个
-   python3 scripts/expand.py --doc hb-shell hb-nav hb-views hb-tools hb-grid   # 只取要用的
-   ```
-
-   宏没覆盖的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件等）才按路由表用 extract_templates.py 提取模板手写。
-2. 组装交给脚本（固定顺序拼皮肤、base.css、icons.svg、fit.js，改过公共资产后重跑即可重拼）：
-
-   ```bash
-   python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style page.css \
-     --output "源文件/图名.html" --title "图名"    # 产品设计类加 --fullbleed
-   ```
-
-3. 图标一律 `<svg class="ico"><use href="#i-名称"/></svg>`，着色用 `ic-*`／`tone-*` 工具类；缺的图标先补进 icons.svg 再用，不内联 path。
-4. 内容数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。
-5. 图表类型按 dashboard-chart-selection 选；柱/折/环图写 `hb-bar`/`hb-line`/`hb-donut` 宏由脚本算坐标，其余类型才用内联 SVG 手绘。SVG 里禁止写死色值：主系列 `var(--primary)`（同系第二层加 `opacity=".45"`）、状态色 `var(--c-green/red/orange/blue/purple)`、轴线 `var(--line)`、轴标字 `var(--ink-45)`；图例色块用 `<rect>` 着色，别用 ■ 字符——字符是文字色，着不上。
-6. 工作台/看板/数据分析页第一屏必须放横幅部件：页面名称＋一句话介绍（规则见 c3 横幅部件注释）。介绍学产品官方口吻，说清这页管什么、给谁用，20 字上下，不堆形容词，不加「阵地/平台/门户」帽子（例：实现客户、商机与任务排期的集中管理）。
+固定顺序拼皮肤、base.css、icons.svg、内容、fit.js；`canvas="product"` 自动全屏。展开失败会指出第几行、缺什么、可用什么，照提示改片段重跑；"提示："开头的是规模与顺序建议，不阻断。改过公共资产后重跑即重拼。
 
 ### 5. 对照判据
 
-拼完按「设计原则路由」读对应文件过一遍：状态标签用红绿灯语义色、按钮分主/次/警示/置灰、表单列数一致。
+拼完按「设计原则路由」读对应文件过一遍：状态标签红绿灯、按钮主/次/警示/置灰、表单列数一致、首屏顺序、单指标一行。
 
-### 6. 验证与交付
+### 6. 检查与验收
 
-按 [references/canvas/verify-export.md](references/canvas/verify-export.md) 执行：
+```bash
+python3 scripts/check.py "源文件/图名.html"             # 静态：色值、组件与 token 存在性、结构禁令、规模上限
+python3 scripts/check.py "源文件/图名.html" --render    # 有 Chrome 时加渲染检查；没有会明说"渲染检查未执行"
+python3 scripts/check.py "源文件/图名.html" --acceptance # 起草十条人工验收表
+```
 
-1. `python3 scripts/check.py 图.html`——检查写死色值、自造组件、缺失图标、导出前置，并渲染量空隙。**Blocker 必须清零**；empty-gap 逐条处理。
-2. 浏览器渲染核对：高度贴合、无溢出、组件不走样，回填 `.stage` 高度（改补充样式后重跑 build.py）。
-3. **过人工验收表并逐图回报十条结论**（verify-export.md 的 B 节）——机检查不了浮层是否重复底层、是否挡住关键内容、底层是否完整这类语义问题，只能逐条看逐条写。有一条没过就不交付。
-4. 出 2x PNG；嵌报告场景另读 [references/canvas/report-embed.md](references/canvas/report-embed.md) 走 SVG 管线。
+**Blocker 必须清零**，High 逐条处理（本图样式里的新类默认 High，确属一次性布局加 `--allow-local`）。然后按 [references/canvas/verify-export.md](references/canvas/verify-export.md) 的人工验收表逐图回报十条结论，有一条没过不交付。
 
-Chrome 渲染环境按需获取：脚本自动探测本机 Chrome，Linux 沙箱没有时才下载一次并缓存复用，报找不到时读 [references/chrome-env.md](references/chrome-env.md)。
+### 7. 交付
+
+默认交付 `源文件/图名.html`。用户或报告明确要 PNG／SVG 时：
+
+```bash
+python3 scripts/export.py "源文件/图名.html" --png     # 2x PNG；找不到 Chrome 会给手动命令，不下载
+python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量，不需要 Chrome
+```
+
+细节见 [references/canvas/export.md](references/canvas/export.md)。
 
 ## 输出物落点
 
-**PNG 在外、HTML 进 `源文件/` 子文件夹**——PNG 给人看和嵌报告，HTML 是可再导出的源稿。
-
-| 场景 | PNG | HTML |
+| 场景 | HTML（默认交付） | PNG／SVG（可选） |
 | --- | --- | --- |
-| 独立出图 | 当前工作目录 `图名@2x.png` | `源文件/图名.html` |
-| 报告配图 | 报告项目 `figures/` | `figures/源文件/` |
+| 独立出图 | 当前工作目录 `源文件/图名.html` | 当前工作目录 `图名@2x.png`／`图名.svg` |
+| 报告配图 | 报告项目 `figures/源文件/` | 报告项目 `figures/` |
 
-渲染中间产物（preview 截图）放 scratchpad，不留在交付目录。
+片段与探针中间产物放 scratchpad，不留在交付目录。
 
 ## 硬约束
 
 | 约束 | 内容 |
 | --- | --- |
-| 不自造组件 | 伙伴云没有的控件、布局、交互形态一律不画。要画组件名录（18 类 70 项，来自产品组件预览图库，与结构文件里的 `data-component` 不是同一份计数）里有但结构文件未收录的形态，先告知用户该组件尚未实测采集，确认后按注释里的实测尺寸就近仿写；名录里没有的不画 |
+| 不自造组件 | 只画登记表（assets/registry.json）里有的部件；`registry.py --list 页面类型` 看该页可用部件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
 | 尺寸是实测的 | 顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24 来自真实产品，改了就不像 |
-| 层次也是实测的 | 是"白卡浮在灰底上"还是"透明融进容器"，以结构文件的 `data-measured` 注释为准；没有注释的组件先去产品实测再画，不许猜（猜错过四次：工具栏透灰底、看板列臆造灰底、筛选部件融背景、底部合计堆成左下角一行文字而不是与列对齐的 tfoot） |
-| 自定义页面层次二选一 | ①白底描边（`.page` 加 `flat`）＝页底白、组件白底＋1px 很浅外框、无投影；②浅底白卡（不加类）＝页底浅灰、组件纯白浮起。没指定时默认 ①。**只用于自定义页面**，列表页的视图区白卡浮灰底是实测强特征，不参与切换 |
-| 组件底色优先级 | 纯白 ＞ 很浅的背景色 ＞ 深色块。深色只留给一级顶栏、状态标签这类要强调的地方 |
-| 详情页标题卡片不放按钮 | 只管自定义详情页的标题卡片——它是信息摘要不是操作区，按钮只能放在记录功能区。工作台/看板的横幅不受此限，但按钮也不进横幅内部 |
-| 自定义详情页独立存在 | 默认交付＝记录功能区＋页面内容画布；禁止套记录弹窗、一级顶栏、左侧导航或底部栏。只有用户明确要求产品壳/弹窗时才调用对应架构 |
-| 营销浮层不得重复 | 浮层必须补充底层没有的真实组件或信息，禁止把底层卡片、字段、统计或表格复制放大一遍。不得遮住关键内容，也不得靠裁短底层窗口造成页面底部缺失 |
-| 横幅写角色不写人 | 工作台、看板的横幅标题写岗位角色（律师工作台、库管工作台），不写「张伟的工作台」，也不放「李静，早上好」这类问候语；数据行里的人名照常要像真人 |
-| 标注气泡不默认加 | 只有用户明确要求业务价值标注时才用 |
-| Skill 资产是唯一结构真相源 | 新实采的界面结构直接沉淀到对应的 `assets/c1～c4` 和必要的 `assets/base.css` |
+| 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画，不猜 |
+| 自定义页面层次二选一 | `level=flat` 白底描边（默认）／`level=card` 浅底白卡；列表页的视图区白卡浮灰底是产品强特征，不参与切换 |
+| 组件底色优先级 | 纯白 ＞ 很浅的背景色 ＞ 深色块；深色只留给一级顶栏、状态标签 |
+| 详情页页头卡片不放按钮 | 按钮只在记录功能区；工作台/看板的横幅同样不放按钮 |
+| 营销浮层不得重复 | 浮层只放底层没有的真实组件或点击结果态；不遮关键内容；不裁短底层窗口 |
+| 横幅写角色不写人 | 「库管工作台」不写「张伟的工作台」，不放问候语；数据行里的人名照常像真人 |
+| 标注气泡不默认加 | 只有用户明确要求业务价值标注才用 |
 | 只写业务结论 | 示意图内容不留设计过程的痕迹 |
+| Skill 资产是唯一结构真相源 | 新实采的界面结构直接沉淀到对应的 assets/c1～c5、base.css 和 registry.json；实测记录写 references/measured/ |

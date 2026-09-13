@@ -35,7 +35,7 @@ TOKEN_MAP = {
     "location-field": "field-location", "file-field": "field-file", "signature-field": "field-signature",
     "image-field": "field-image",
     # c3 自定义页面与详情
-    "widget-card": "modal-card", "comment-box": "comment", "w-banner": "rich hero", "w-filters": "filter",
+    "widget-card": "modal-card", "comment-box": "comment", "w-banner": "rich title", "w-filters": "filter",
     "w-shortcut": "button shortcuts", "shortcut-widget": "button", "w-stat": "chart_single",
     "page-tabs-card": "tabs", "w-tabs": "tabs pill", "w-sub": "procedure_task", "w-chart": "chart",
     "w-pivot": "chart_table", "pa": "portal-app", "rich-widget": "rich", "image-widget": "image",
@@ -107,7 +107,7 @@ def rename_md(text):
 def rename_expand(text):
     """expand.py：class="…" 属性 ＋ 少数拼接类名的字符串字面量。"""
     text, n = rename_class_attr(text)
-    for old, new in (('cls = "w-banner"', 'cls = "rich hero"'),
+    for old, new in (('cls = "w-banner"', 'cls = "rich title"'),
                      ('("mtool obar" if mode == "obar" else "mtool")', '("m-tool obar" if mode == "obar" else "m-tool")'),
                      ('"apptab" if mode == "app"', '"apptab" if mode == "app"')):
         if old in text:

@@ -13,7 +13,8 @@
 - --content：<body> 里的页面内容，即 <div class="stage">…</div> 整段（浮层、标注都在其中）。
   片段里的 <hb-*> 宏（壳层、表格行、卡片、图表等重复块，见 references/macros.md）先由 expand.py 展开。
 - --extra-style：本图补充样式，可省略。自动加“/* ── 本图布局 ── */”分隔头供 check.py 识别。
-- --fullbleed：产品设计类加此开关（body 加 class="fullbleed"）；营销类不加。
+- --fullbleed：产品设计类加此开关（body 加 class="fullbleed"）；用 <hb-page canvas="product"> 时自动加，不用传。
+- --png：拼装后顺带出 2x PNG（转调 export.py，找不到 Chrome 只提示不报错）。默认只出 HTML。
 
 拼接顺序固定：宏展开 → 皮肤 css → base.css → 本图补充样式 → icons.svg（body 开头）→ 内容 → fit.js（body 末尾）。
 改过 base.css 或皮肤后重跑本脚本即可重拼既有图（图里嵌的是拼装时的快照）。
@@ -30,6 +31,7 @@ PAGE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
+<meta name="hb-skill" content="huoban-image-design 2.0">
 <title>{title}</title>
 <style>
 {skin_css}
@@ -56,6 +58,7 @@ def main():
     ap.add_argument("--output", required=True)
     ap.add_argument("--fullbleed", action="store_true")
     ap.add_argument("--title", default="伙伴云界面示意图")
+    ap.add_argument("--png", action="store_true")
     a = ap.parse_args()
 
     skin_path = Path(a.skin)
@@ -69,12 +72,16 @@ def main():
     content = Path(a.content).read_text(encoding="utf-8").strip()
     if "<hb-" in content:
         sys.path.insert(0, str(Path(__file__).resolve().parent))
-        from expand import expand, ExpandError
+        from expand import expand, ExpandError, WARNINGS
         try:
             content = expand(content)
         except ExpandError as e:
             sys.stderr.write(f"宏展开失败：{e}\n")
             return 1
+        for w in WARNINGS:
+            sys.stderr.write(f"提示：{w}\n")
+    if re.search(r'class="stage[^"]*\bproduct\b', content):
+        a.fullbleed = True
     if '<template' in content:
         sys.stderr.write("内容里还有 <template> 标签：模板要去壳后放进 .stage，template 元素浏览器不渲染\n")
         return 1
@@ -130,6 +137,10 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
     sys.stderr.write(f"已拼装：{out}（皮肤 {skin_path.stem}{'，全屏模式' if a.fullbleed else '，画布模式'}）\n")
+    if a.png:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import export
+        export.export_png(str(out))
     return 0
 
 

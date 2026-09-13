@@ -460,9 +460,9 @@ def m_banner(a, body):
         if "date" in a or "time" in a:
             dt = f'<div class="ban-dt"><b>{esc(str(a.get("date", "")))}</b><span>{esc(str(a.get("time", "")))}</span></div>'
         img = f'<div class="ban-img">{a["img"] if isinstance(a.get("img"), str) and "<" in a["img"] else ""}</div>' if "img" in a else ""
-        return f'<div class="rich hero card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
+        return f'<div class="rich title card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
     p = f"<p>{esc(ls[1])}</p>" if len(ls) > 1 else ""
-    cls = "rich hero" + (" bg-solid" if "solid" in a else "")
+    cls = "rich title" + (" bg-solid" if "solid" in a else "")
     return f'<div class="{cls}"><h1>{esc(ls[0])}</h1>{p}</div>'
 
 
@@ -1214,7 +1214,361 @@ def m_conn(a, body):
     return '<div class="conn">' + arrow.join(steps) + "</div>"
 
 
+# ── 页面骨架：hb-page / hb-row / hb-float / hb-duo ─────────────────────
+# 模型只填槽位内容，外壳（.stage、.window、.page、详情页画布）由这里产出；
+# 槽位表来自 references/principles/ 五篇页面原则里的"固定顺序"。
+WARNINGS = []
+
+
+def warn(msg):
+    if msg not in WARNINGS:
+        WARNINGS.append(msg)
+
+
+VIEW_MACROS = {"hb-grid", "hb-kanban", "hb-cards"}
+PAGE_SLOTS = {
+    "list": dict(
+        cn="列表和视图页",
+        allowed={"hb-nav", "hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards", "hb-float"},
+        required=["hb-nav", "hb-views", "hb-tools"],
+        order=["hb-nav", "hb-views", "hb-tools", "视图", "hb-float"],
+        need_view=True,
+        doc="产品壳 → 视图页签 → 视图区白卡（工具栏 → 视图 → 合计/分页）。视图三选一：hb-grid / hb-kanban / hb-cards；甘特、日历、任务、透视用 extract_templates.py 提模板手写在同一位置。",
+        example="""<hb-page kind="list" ws="永铭世纪" page="物资档案" me="周">
+<hb-nav>
+# 物资台账
+* 物资档案 | app-s
+库存明细 | grid-s | green
+</hb-nav>
+<hb-views>
+* 全部物资
+按品类查看
+</hb-views>
+<hb-tools search="搜索物资" new="新建物资">字段|筛选:1|排序|导入</hb-tools>
+<hb-grid total="1,217条">
+物资编号 | 品名 | 品类:tag | 当前库存:sum=4,386 | 建档人:user
+WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
+</hb-grid>
+<hb-float top="96" w="356">…浮层内容（底层没有的组件）…</hb-float>
+</hb-page>"""),
+    "workbench": dict(
+        cn="工作台",
+        allowed={"hb-nav", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-tabcard", "hb-pivot", "hb-filters", "hb-float", "hb-bar", "hb-line", "hb-donut"},
+        required=["hb-nav", "hb-banner", "hb-shortcuts"],
+        order=["hb-nav", "hb-banner", "hb-stats", "hb-shortcuts", "hb-row", "hb-tasks", "hb-tabcard", "hb-pivot", "hb-float"],
+        first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-filters"},
+        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 快捷方式（必）与待办（hb-row 并排）→ 页签容器/我的数据。趋势与对比图表、筛选不放首屏（顶层出现会提示），要放收进 hb-tabcard 或页面末尾。",
+        example="""<hb-page kind="workbench" ws="永铭世纪" page="库管工作台" me="周">
+<hb-nav>
+# 物资台账
+* 库管工作台 | home
+</hb-nav>
+<hb-banner>
+库管工作台
+集中处理出入库审批、库存预警与盘点任务
+</hb-banner>
+<hb-stats>
+待我审批 | 3 | | trend:red
+本月出库 | 217 | 件
+本仓在库 | 1,842 | 件
+库存预警品种 | 6
+</hb-stats>
+<hb-row spans="8|16">
+<hb-shortcuts title="快捷方式">
+扫码出入库 | f-barcode
+发起盘点 | chart-s
+</hb-shortcuts>
+<hb-tasks title="待我办理的流程">
+出库审批 · CK-20260824-0037 领用出库 | 1.4 小时前 | 库管审批
+</hb-tasks>
+</hb-row>
+<hb-tabcard pill tabs="*出库明细|历史出入库">
+<hb-grid bare>…</hb-grid>
+</hb-tabcard>
+</hb-page>"""),
+    "dashboard": dict(
+        cn="看板／数据分析页",
+        allowed={"hb-nav", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut", "hb-pivot", "hb-tabcard", "hb-float"},
+        required=["hb-nav", "hb-banner"],
+        order=["hb-nav", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut", "hb-pivot", "hb-float"],
+        doc="产品壳 → 横幅（必，一行高）→ 筛选（可选）→ 单指标一行（看板必有）→ 图表行（hb-row 16+8 或 12+12）→ 透视表/明细（底部，≤2 张）。",
+        example="""<hb-page kind="dashboard" ws="永铭世纪" page="库存分析" me="周">
+<hb-nav>
+* 库存分析 | chart-s
+</hb-nav>
+<hb-banner>
+库存分析
+按仓库与品类查看库存结构、周转与预警
+</hb-banner>
+<hb-filters>
+月份 | f-date
+仓库 | f-select
+</hb-filters>
+<hb-stats>
+在库总量 | 4,386 | 件 | trend
+本月出库 | 217 | 件 | trend:red
+库存周转天数 | 42 | 天 | trend
+预警品种 | 6 | | trend:red
+</hb-stats>
+<hb-row spans="16|8">
+<hb-line title="近 30 日出入库趋势" labels="1|5|10|15|20|25|30">
+出库 | 12,18,15,22,19,25,21 | blue
+入库 | 9,14,11,17,16,19,18 | teal
+</hb-line>
+<hb-donut title="库存构成" center="在库|4,386">
+酒品 | 1842 | red
+茶叶 | 1204 | green
+</hb-donut>
+</hb-row>
+<hb-pivot title="库存预警明细">
+品名 | 仓库 | 在库 | 下限 | 状态:tag
+茅台飞天 53° | 城建大厦酒窖 | 36 | 60 | 低于下限:red
+</hb-pivot>
+</hb-page>"""),
+    "detail": dict(
+        cn="自定义详情页",
+        allowed={"hb-itembar", "hb-hcard", "hb-steps", "hb-row", "hb-tabcard", "hb-flow", "hb-stats", "hb-pivot", "hb-grid", "hb-float"},
+        required=["hb-itembar", "hb-tabcard"],
+        order=["hb-itembar", "hb-hcard", "hb-steps", "hb-row", "hb-tabcard", "hb-flow", "hb-float"],
+        doc="记录功能区（必）→ 页头卡片（可选）→ 步骤条（可选）→ 字段组/双栏（hb-row spans=13|11）→ 页签容器（必）→ 流程页签。不套产品壳；浮层只能右探出。",
+        example="""<hb-page kind="detail">
+<hb-itembar title="CK-20260824-0037 领用出库">
+打印出库单:solid | 撤销:line | 复制:line:dis
+</hb-itembar>
+<hb-hcard title="CK-20260824-0037" sub="领用出库 · 城建大厦酒窖">
+出库状态 | 待审批 | tag
+领用人 | 周敏 | user
+</hb-hcard>
+<hb-steps>已提交 | *库管审批 | 财务复核 | 完成</hb-steps>
+<hb-tabcard span="24" tabs="*出库明细|审批记录">
+<hb-grid bare>…</hb-grid>
+</hb-tabcard>
+</hb-page>"""),
+    "screen": dict(
+        cn="数据大屏",
+        allowed={"hb-screen"},
+        required=["hb-screen"],
+        order=["hb-screen"],
+        doc="只放一个 hb-screen，其体内是 hb-skpi / hb-scard / hb-svisual；不套产品壳、不放浮层。",
+        example="""<hb-page kind="screen">
+<hb-screen title="生产车间数字大屏" theme="blue" bg="earth" date="2026-09-14" time="14:32">
+<hb-skpi>本月产量 | 12,480 | 件 | up</hb-skpi>
+…
+</hb-screen>
+</hb-page>"""),
+    "mobile": dict(
+        cn="手机端",
+        allowed={"hb-phone", "hb-duo"},
+        required=[],
+        order=["hb-phone", "hb-duo"],
+        doc="单屏放一个 hb-phone（画布 520 宽）；双屏对照放一个 hb-duo，体内两个 hb-phone 夹一个 hb-conn（画布 1100 宽）。不套 .window。",
+        example="""<hb-page kind="mobile">
+<hb-duo>
+<hb-phone title="待办">
+<hb-ptasks tabs="*待办|已办" count="3">
+周敏 | 10:24 | 出库审批 · CK-0037 | 库管审批 | 办理
+</hb-ptasks>
+</hb-phone>
+<hb-conn>
+点「办理」 | 进入任务办理页
+核对后审批 | 一键通过或驳回
+</hb-conn>
+<hb-phone title="任务办理">
+<hb-rec title="CK-0037 领用出库">
+物资 | 茅台飞天 53° | text
+</hb-rec>
+<hb-taskbar who="周敏" sub="库管审批">通过 | 驳回</hb-taskbar>
+</hb-phone>
+</hb-duo>
+</hb-page>"""),
+}
+PAGE_SLOTS["analysis"] = PAGE_SLOTS["dashboard"]
+
+SHELL_ATTRS = ("ws", "logo", "page", "nav", "me", "theme", "bottom")
+
+
+def _top_level(raw):
+    """把 hb-page 体内拆成顶层片段：[(宏名或 None, 原文)]，非宏的手写 HTML 原样保留。"""
+    parts, pos = [], 0
+    for m in TAG_RE.finditer(raw):
+        gap = raw[pos:m.start()].strip()
+        if gap:
+            parts.append((None, gap))
+        parts.append((m.group(1), m.group(0)))
+        pos = m.end()
+    tail = raw[pos:].strip()
+    if tail:
+        parts.append((None, tail))
+    return parts
+
+
+def m_float(a, body):
+    side = a.get("side", "right")
+    if side not in ("right", "left"):
+        raise ExpandError('<hb-float side> 只能是 right 或 left')
+    top = str(a.get("top", "96")).rstrip("px")
+    w = str(a.get("w", "356")).rstrip("px")
+    n_cards = len(re.findall(r'class="w-card', body))
+    if n_cards > 2:
+        warn(f"浮层里放了 {n_cards} 个部件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
+    title = f'<div class="float-title">{esc(a["title"])}</div>' if a.get("title") else ""
+    return (f'<div class="mk-float{" left" if side == "left" else ""}" data-side="{side}" '
+            f'style="--float-top:{top}px;--float-w:{w}px">{title}{body.strip()}</div>')
+
+
+def m_row(a, body):
+    parts = [p for p in _top_level(a.get("_raw", body))]
+    spans = [s.strip() for s in str(a.get("spans", "")).split("|") if s.strip()]
+    items = []
+    for name, raw in parts:
+        items.append(expand(raw) if name else raw)
+    if spans:
+        if len(spans) != len(items):
+            raise ExpandError(f'<hb-row spans="{a["spans"]}"> 有 {len(spans)} 段，体内却有 {len(items)} 个部件，两者要一样多')
+        total = sum(int(s) for s in spans)
+        if total != 24:
+            raise ExpandError(f'<hb-row spans="{a["spans"]}"> 跨度加起来是 {total}，必须等于 24（常用 12|12、16|8、8|16、8|8|8、13|11）')
+        items = [f'<div class="span-{s}">{it}</div>' for s, it in zip(spans, items)]
+    if len(items) > 4:
+        warn(f"hb-row 里并排了 {len(items)} 个部件：一行最多 4 个，图表行只放 2～3 个")
+    return '<div class="w-row">' + "".join(items) + "</div>"
+
+
+def m_duo(a, body):
+    return f'<div class="duo">{body.strip()}</div>'
+
+
+def _check_slots(kind, spec, names, deep):
+    allowed = spec["allowed"]
+    for n in deep:
+        if n in spec.get("first_screen_ban", set()):
+            warn(f"<hb-page kind=\"{kind}\"> 顶层放了 <{n}>：{spec['cn']}首屏不放图表与筛选，要放收进 <hb-tabcard> 或页面末尾")
+    for n in names:
+        if n not in allowed:
+            raise ExpandError(f"<hb-page kind=\"{kind}\"> 顶层不能放 <{n}>；{spec['cn']}顶层可用：{'、'.join(sorted(allowed))}。"
+                              f"{'图表与筛选请放进 <hb-tabcard> 或页面末尾。' if n in spec.get('first_screen_ban', set()) else ''}")
+    for r in spec["required"]:
+        if r not in deep:
+            raise ExpandError(f"<hb-page kind=\"{kind}\"> 缺 <{r}>：{spec['cn']}必有。顺序：{' → '.join(spec['order'])}")
+    if spec.get("need_view") and not (set(names) & VIEW_MACROS):
+        warn("列表页顶层没有视图宏（hb-grid/hb-kanban/hb-cards）：用模板手写的甘特/日历/任务/透视视图请放在 hb-tools 之后")
+    # 顺序：按 order 表的位次应单调不减（视图宏都算"视图"位）
+    rank = {n: i for i, n in enumerate(spec["order"])}
+    last = -1
+    for n in names:
+        r = rank.get(n if n not in VIEW_MACROS else "视图", rank.get(n, -1))
+        if r == -1:
+            continue
+        if r < last:
+            warn(f"<hb-page kind=\"{kind}\"> 的 <{n}> 位置靠后了：建议顺序 {' → '.join(spec['order'])}")
+        last = max(last, r)
+    from collections import Counter
+    c = Counter(names)
+    if c.get("hb-stats", 0) > 1:
+        warn("出现了两组单指标：单指标只放一行，多出来的并成多项统计或改进度条/透视表")
+    if c.get("hb-banner", 0) > 1 and kind != "dashboard":
+        warn("横幅出现了两次：只有分析页中段可以再放一个做段落标题")
+    if c.get("hb-pivot", 0) > 2:
+        warn(f"透视表 {c['hb-pivot']} 张：默认 ≤2 张，多了先并成一张多维透视")
+    if kind == "detail" and any(n == "hb-float" for n in names):
+        pass
+
+
+def m_page(a, body):
+    kind = a.get("kind")
+    if kind not in PAGE_SLOTS:
+        raise ExpandError(f"<hb-page kind> 只能是 {'/'.join(k for k in PAGE_SLOTS if k != 'analysis')}（analysis 同 dashboard）")
+    spec = PAGE_SLOTS[kind]
+    canvas = a.get("canvas", "marketing")
+    if canvas not in ("marketing", "product"):
+        raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
+    parts = _top_level(a.get("_raw", body))
+    names = [n for n, _ in parts if n]
+    deep = list(names)
+    for n, raw in parts:
+        if n == "hb-row":
+            deep += [m.group(1) for m in TAG_RE.finditer(TAG_RE.match(raw).group(3) or "")]
+    _check_slots(kind, spec, names, deep)
+    floats, main_parts, nav_html = [], [], ""
+    for name, raw in parts:
+        if name == "hb-nav":
+            mm = TAG_RE.match(raw)
+            nav_html = m_nav(attrs_of(mm.group(2)), mm.group(3) or "")
+            continue
+        html_ = expand(raw) if name else raw
+        if name == "hb-float":
+            if canvas == "product":
+                raise ExpandError("产品设计类画布不放浮层：去掉 <hb-float>，或改 canvas=\"marketing\"")
+            floats.append(html_)
+        else:
+            main_parts.append((name, html_))
+    stage_cls = ["stage", "auto"]
+    if floats:
+        stage_cls.append("has-float")
+        if any('data-side="left"' in f for f in floats):
+            stage_cls.append("float-left")
+    if canvas == "product":
+        stage_cls.append("product")
+    stage_style = ""
+    cut = str(a.get("cut", "")).rstrip("px")
+
+    def shell(inner):
+        attrs = " ".join(f'{k}="{a[k]}"' for k in SHELL_ATTRS if k in a and a[k] is not True)
+        if "ws" not in a:
+            raise ExpandError(f'<hb-page kind="{kind}"> 缺 ws（工作区名，产品壳左上角）')
+        return m_shell(attrs_of(attrs), nav_html + inner)
+
+    if kind == "list":
+        views = "".join(h for n, h in main_parts if n == "hb-views")
+        tools = "".join(h for n, h in main_parts if n == "hb-tools")
+        rest = "".join(h for n, h in main_parts if n not in ("hb-views", "hb-tools"))
+        inner = f'{views}<div class="view-box">{tools}{rest}</div>'
+        body_html = shell(inner)
+    elif kind in ("workbench", "dashboard", "analysis"):
+        level = a.get("level", "flat")
+        if level not in ("flat", "card"):
+            raise ExpandError('<hb-page level> 只能是 flat（白底描边，默认）或 card（浅底白卡）')
+        page_cls = "page flat" if level == "flat" else "page"
+        inner = f'<div class="{page_cls}">' + "".join(h for _, h in main_parts) + "</div>"
+        body_html = shell(inner)
+    elif kind == "detail":
+        bar = "".join(h for n, h in main_parts if n == "hb-itembar")
+        rest = []
+        for n, h in main_parts:
+            if n == "hb-itembar":
+                continue
+            rest.append(h if re.match(r'\s*<div class="(span-|w-row)', h) else f'<div class="span-24">{h}</div>')
+        body_html = (f'<main class="item-page">{bar}<div class="item-page-scroll"><div class="item-page-canvas">'
+                     f'<div class="item-grid">{"".join(rest)}</div></div></div></main>')
+    elif kind == "screen":
+        body_html = "".join(h for _, h in main_parts)
+    else:  # mobile
+        body_html = "".join(h for _, h in main_parts)
+        stage_style = "width:1100px" if any(n == "hb-duo" for n, _ in main_parts) else "width:520px"
+    if kind in ("list", "workbench", "dashboard", "analysis") and cut:
+        body_html = body_html.replace('<div class="window ', f'<div class="window cut" style="height:{cut}px" ', 1)
+    st = f' style="{stage_style}"' if stage_style else ""
+    return f'<div class="{" ".join(stage_cls)}" data-kind="{kind}"{st}>{body_html}{"".join(floats)}</div>'
+
+
+def render_page(kind):
+    if kind not in PAGE_SLOTS:
+        raise ExpandError(f"没有页面类型 {kind}。可用：{'/'.join(k for k in PAGE_SLOTS if k != 'analysis')}")
+    spec = PAGE_SLOTS[kind]
+    lines_ = [f"[{spec['cn']}] <hb-page kind=\"{kind}\">", spec["doc"],
+              f"必有：{'、'.join(spec['required']) or '无'}；顺序：{' → '.join(spec['order'])}",
+              "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"])),
+              "hb-page 通用属性：canvas=marketing|product（默认 marketing）、ws/page/nav/me/theme/logo/bottom（产品壳，同 hb-shell）、level=flat|card（自定义页面层次，默认 flat）、cut=高度px（窗口截到主要内容为止，默认按内容撑高）",
+              "", "最小示例：", spec["example"], "",
+              "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(n for n in spec["allowed"] if n != "hb-float")) + " hb-row hb-float"]
+    return "\n".join(lines_)
+
+
 MACROS = {
+    "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
+    "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放部件宏，最多 4 个"),
+    "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的部件（bare 模式）"),
+    "hb-duo": (m_duo, "手机双屏对照壳：体内两个 hb-phone 夹一个 hb-conn"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
     "hb-views": (m_views, "视图页签行：名称 | 图标，* 前缀＝当前视图"),
@@ -1266,6 +1620,7 @@ COMMON = """通用写法
 - 没有对应宏的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件、手机端视图切换抽屉与卡片视图大卡等）按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
 
 GROUPS = [
+    ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-duo"]),
     ("产品壳（PC）", ["hb-shell", "hb-nav"]),
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
     ("自定义页面部件（工作台 / 看板 / 数据分析页）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
@@ -1275,6 +1630,20 @@ GROUPS = [
 ]
 
 DOCS = {
+"hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
+体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
+"hb-row": """24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放部件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
+例：
+<hb-row spans="16|8">
+<hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
+<hb-donut title="构成">酒品 | 60 | red</hb-donut>
+</hb-row>""",
+"hb-float": """营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西：bare 模式的宏（hb-grid bare、hb-ocards bare）或 extract_templates.py 提的模板；不复制底层已有内容；最多两张卡。
+例：
+<hb-float top="120" w="404" title="扫码开单">
+<hb-ocards bare>…</hb-ocards>
+</hb-float>""",
+"hb-duo": """手机双屏对照壳：体内依次 hb-phone、hb-conn、hb-phone；hb-page kind=mobile 会把画布设成 1100 宽。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
@@ -1574,9 +1943,13 @@ def expand(text):
         name, raw_attrs, body = m.group(1), m.group(2), m.group(3) or ""
         if name not in MACROS:
             raise ExpandError(f"不认识的宏 <{name}>。可用：{'、'.join(MACROS)}（python3 scripts/expand.py --list 看说明）")
+        attrs = attrs_of(raw_attrs)
+        if name in ("hb-page", "hb-row"):
+            attrs["_raw"] = body
+            return MACROS[name][0](attrs, body)
         if "<hb-" in body:
             body = TAG_RE.sub(repl, body)
-        return MACROS[name][0](attrs_of(raw_attrs), body)
+        return MACROS[name][0](attrs, body)
 
     text = TAG_RE.sub(repl, text)
     if "<hb-" in text:
@@ -1591,6 +1964,7 @@ def main():
     ap.add_argument("--out")
     ap.add_argument("--list", action="store_true", help="通用写法＋全部宏目录（一宏一行）")
     ap.add_argument("--doc", nargs="+", metavar="宏名", help="打印指定宏的详细语法；all 打印全部（用于生成 references/macros.md）")
+    ap.add_argument("--page", metavar="页面类型", help="打印该页面类型的槽位表、可用宏与最小示例（list/workbench/dashboard/detail/screen/mobile）")
     a = ap.parse_args()
     if a.list:
         print(COMMON + "\n")
@@ -1599,6 +1973,13 @@ def main():
             for n in names:
                 print(f"  <{n}>  {MACROS[n][1]}")
         print("\n详细语法：python3 scripts/expand.py --doc 宏名 宏名…")
+        return 0
+    if a.page:
+        try:
+            print(render_page(a.page))
+        except ExpandError as e:
+            sys.stderr.write(f"{e}\n")
+            return 1
         return 0
     if a.doc:
         try:
@@ -1615,6 +1996,8 @@ def main():
     except ExpandError as e:
         sys.stderr.write(f"展开失败：{e}\n")
         return 1
+    for w in WARNINGS:
+        sys.stderr.write(f"提示：{w}\n")
     if a.out:
         Path(a.out).write_text(out, encoding="utf-8")
         sys.stderr.write(f"已展开：{a.out}\n")

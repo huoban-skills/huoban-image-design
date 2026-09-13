@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
+<meta name="hb-skill" content="huoban-image-design 2.0">
 <title>fig2-分仓分库位库存</title>
 <style>
 /* 皮肤：藏蓝金。沉稳商务、纸感（navy #24466B / gold #A67C3D）。
@@ -121,7 +122,38 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .stage.has-float .window { width: 1440px; } /* 有浮层时窗口收窄 200，浮层探出补满 1640 */
 .stage.has-float.float-left .window { margin-left: 200px; } /* 浮层放左侧时窗口右移，浮层从左缘探出 */
-.mk-float { position: absolute; z-index: 3; } /* 位置每图自定 */
+.mk-float { position: absolute; z-index: 3; } /* 位置每图自定（1.x 手写外壳时） */
+/* ── 2.0 骨架宏画布（hb-page 产出 .stage.auto）：高度按内容撑，不再手写 .stage{height} ── */
+.stage.auto { height: auto; }
+.stage.auto .window { position: relative; height: auto; }
+.stage.auto .window.cut { overflow: hidden; }            /* cut=px 时窗口截到指定高度 */
+.stage.auto .win-body { height: auto; align-items: stretch; }
+.stage.auto .main { overflow: visible; }
+.stage.auto .window.cut .main { overflow: hidden; }
+.stage.auto .item-page { height: auto; }
+.stage.auto .item-page-scroll { overflow: visible; }
+.stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
+.stage.auto.has-float .window { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
+.stage.auto.has-float.float-left { grid-template-columns: 200px 1440px; }
+.stage.auto.has-float.float-left .window { grid-area: 1 / 2 / 2 / 3; margin: 0; }
+.stage.auto .mk-float {
+  position: relative; z-index: 3; grid-area: 1 / 1 / 2 / 3; justify-self: end; align-self: start;
+  width: var(--float-w, 356px); margin-top: var(--float-top, 96px); margin-bottom: 24px;
+}
+.stage.auto .mk-float.left { justify-self: start; }
+.stage.auto .float-title { font-size: 13px; font-weight: 500; color: var(--ink-45); margin-bottom: 8px; }
+.stage.auto.product .window { border-radius: 0; border: 0; }
+/* hb-row spans：按跨度比例分配（flex-grow），部件自身宽度不撑开 */
+.w-row > .span-2 { flex: 2 1 0%; } .w-row > .span-3 { flex: 3 1 0%; } .w-row > .span-4 { flex: 4 1 0%; }
+.w-row > .span-5 { flex: 5 1 0%; } .w-row > .span-6 { flex: 6 1 0%; } .w-row > .span-7 { flex: 7 1 0%; }
+.w-row > .span-8 { flex: 8 1 0%; } .w-row > .span-9 { flex: 9 1 0%; } .w-row > .span-10 { flex: 10 1 0%; }
+.w-row > .span-11 { flex: 11 1 0%; } .w-row > .span-12 { flex: 12 1 0%; } .w-row > .span-13 { flex: 13 1 0%; }
+.w-row > .span-14 { flex: 14 1 0%; } .w-row > .span-15 { flex: 15 1 0%; } .w-row > .span-16 { flex: 16 1 0%; }
+.w-row > .span-18 { flex: 18 1 0%; } .w-row > .span-20 { flex: 20 1 0%; } .w-row > .span-24 { flex: 24 1 0%; }
+.w-row > [class*="span-"] { min-width: 0; }
+.w-row > [class*="span-"] > .w-card, .w-row > [class*="span-"] > .procedure_task { height: 100%; }
+/* 详情页栅格里的 hb-row：整行占 24 栏 */
+.item-grid > .w-row { grid-column: span 24; }
 .mk-callout {
   position: absolute; z-index: 4; padding: 8px 18px; border-radius: 100px;
   background: var(--accent); color: #fff; font-size: 15px; font-weight: 500;
@@ -573,33 +605,33 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* 页面标题区：工作台/看板/数据分析页顶部的「页面名称＋一句话介绍」。
    左对齐；默认无背景，标题直接坐在页底上。要背景就加 bg-solid 铺一块干净纯色，
    几何纹理装饰（网格/环纹/斜纹/点阵/光晕）已废弃，别再加回来 */
-.rich.hero { padding: 4px 4px 0; }
-.rich.hero h1 { font-size: 30px; font-weight: 600; color: var(--ink-85); }
-.rich.hero p { margin-top: 8px; font-size: 16px; color: var(--ink-45); line-height: 1.6; }
-.rich.hero.bg-solid {
+.rich.title { padding: 4px 4px 0; }
+.rich.title h1 { font-size: 30px; font-weight: 600; color: var(--ink-85); }
+.rich.title p { margin-top: 8px; font-size: 16px; color: var(--ink-45); line-height: 1.6; }
+.rich.title.bg-solid {
   min-height: 108px; border-radius: 9px; padding: 26px 32px;
   display: flex; flex-direction: column; justify-content: center;
   background: var(--primary-deep);
 }
-.rich.hero.bg-solid h1 { color: #fff; }
-.rich.hero.bg-solid p { color: rgba(255, 255, 255, .82); }
+.rich.title.bg-solid h1 { color: #fff; }
+.rich.title.bg-solid p { color: rgba(255, 255, 255, .82); }
 /* 横幅-背景图卡片（2026-09-04 工作台实测）：白卡 r9 高 120 内距 20，整卡铺客户背景图；无图时右侧走主色淡渐变占位 */
-.rich.hero.card {
+.rich.title.card {
   position: relative; height: 120px; padding: 20px; border-radius: 9px; overflow: hidden;
   background: linear-gradient(90deg, var(--card-bg) 45%, var(--primary-soft)); box-shadow: var(--shadow-card);
 }
-.rich.hero.card .ban-body { position: relative; }
-.rich.hero.card h1 { font-size: 30px; font-weight: 500; line-height: 42px; color: var(--ink-85); position: relative; }
-.rich.hero.card .ban-dt { display: flex; align-items: center; height: 20px; margin-top: 18px; position: relative; }
-.rich.hero.card .ban-dt b { font-size: 16px; font-weight: 600; color: var(--ink-85); padding-right: 7px; margin-right: 6px; border-right: 1px solid var(--line); }
-.rich.hero.card .ban-dt span { font-size: 14px; color: var(--ink-65); }
-.rich.hero.card .ban-img { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; }
-.rich.hero.card .ban-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.rich.hero.card .ban-img:empty { display: none; }
+.rich.title.card .ban-body { position: relative; }
+.rich.title.card h1 { font-size: 30px; font-weight: 500; line-height: 42px; color: var(--ink-85); position: relative; }
+.rich.title.card .ban-dt { display: flex; align-items: center; height: 20px; margin-top: 18px; position: relative; }
+.rich.title.card .ban-dt b { font-size: 16px; font-weight: 600; color: var(--ink-85); padding-right: 7px; margin-right: 6px; border-right: 1px solid var(--line); }
+.rich.title.card .ban-dt span { font-size: 14px; color: var(--ink-65); }
+.rich.title.card .ban-img { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; }
+.rich.title.card .ban-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rich.title.card .ban-img:empty { display: none; }
 /* 横幅与同行部件（如快捷按钮）：按钮不进横幅内部，横幅让宽、右侧部件按内容宽 */
-.w-row:has(> .rich.hero) { align-items: center; }
-.w-row > .rich.hero { flex: 1 1 auto; min-width: 0; }
-.w-row > .rich.hero + * { flex: 0 0 auto; }
+.w-row:has(> .rich.title) { align-items: center; }
+.w-row > .rich.title { flex: 1 1 auto; min-width: 0; }
+.w-row > .rich.title + * { flex: 0 0 auto; }
 /* 反色层次：页底改白、组件靠 1px 浅边线立住（不再靠灰底衬托）。给 .page 加 flat 即可整页切换 */
 .page.flat { background: var(--card-bg); }
 .page.flat .w-card, .page.flat .w-filter {

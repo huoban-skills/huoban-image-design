@@ -1066,7 +1066,7 @@
    "macro": "hb-cover",
    "grid": null,
    "variants": [
-    "hero"
+    "title"
    ],
    "measured": "measured",
    "allowed_in": [
@@ -1087,7 +1087,7 @@
    "macro": "hb-cover",
    "grid": null,
    "variants": [
-    "hero",
+    "title",
     "card"
    ],
    "measured": "measured",
