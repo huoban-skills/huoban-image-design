@@ -7,7 +7,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 产出"长得像伙伴云产品"的界面示意图：拼装真实产品实测组件，不自由发挥。输入是出图需求或 huoban-solution-report 的图需求单；输出 `图名@2x.png` ＋ `源文件/图名.html`（可再导出的源稿）。只画伙伴云产品界面，海报/流程图/ER 图/网站不在本 skill。
 
-核心资产三层：**结构**（assets/c1～c5 实测架构，唯一结构真相源）＋**骨架样式**（base.css，尺寸取自实测）＋**皮肤**（assets/skins/ 纯色彩 token，8 套）。
+核心资产三层：**结构**（assets/c1～c5 实测架构，唯一结构真相源；模板带官方部件 data-type）＋**骨架样式**（base.css，尺寸取自实测）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）。
 
 ## 页面类型路由（唯一真相源）
 
@@ -35,13 +35,12 @@ python3 scripts/extract_templates.py assets/c3-page-detail.html \
 
 | 任务类型 | 必读（references/principles/） | 条件读取 |
 | --- | --- | --- |
-| 所有界面 | visual-four-principles、visual-components | 无 |
-| 多张营销配图 | 同上 | anti-sameness |
-| 工作台 | 同上＋workbench | interaction-principles |
-| 看板/数据分析页 | 同上＋dashboard-data-story、dashboard-layout | dashboard-chart-selection（选具体图表类型时）、anti-sameness |
-| 数据大屏 | 同上＋dashboard-data-story、dashboard-layout（含大屏一节） | dashboard-chart-selection |
-| 表单/编辑态 | 同上＋interaction-principles | visual-layout |
-| 自定义详情页 | 同上＋visual-layout | 有操作设计时读 interaction-principles |
+| 所有界面 | visual-four-principles、visual-components、visual-color | 多张营销配图读 anti-sameness |
+| 列表和视图页 | 同上＋list-view | 无 |
+| 表单/编辑态 | 同上＋form | 无 |
+| 自定义详情页 | 同上＋item-detail、dashboard-chart-selection（组件选取） | 无 |
+| 工作台 | 同上＋workbench、dashboard-chart-selection（组件选取） | 无 |
+| 看板/数据分析页/数据大屏 | 同上＋dashboard、dashboard-chart-selection（组件选取） | 指标拆解不清时读 dashboard-data-story |
 | 新造或调整皮肤 | visual-color | 页面原则仍按页面类型读 |
 
 ## 执行步骤

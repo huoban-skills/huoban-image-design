@@ -93,7 +93,9 @@ def main():
                     print(f"  架构: {at['data-architecture']}{extra}")
                 elif "data-component" in at:
                     g = at.get("data-group", "")
-                    print(f"    组件: {at['data-component']}" + (f"（{g}）" if g else ""))
+                    ty = at.get("data-type")
+                    tag = f" ← 官方 {ty}" if ty else ""
+                    print(f"    组件: {at['data-component']}" + (f"（{g}）" if g else "") + tag)
         return 0
 
     if not a.files:

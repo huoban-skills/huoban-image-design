@@ -8,7 +8,7 @@
 4. 尺寸、颜色与状态外观由 base.css 和 skins/*.css 提供。
 -->
 
-<template data-architecture="产品界面壳层"
+<template data-architecture="产品界面壳层" data-cn="产品壳（左侧导航＋一级顶栏）"
           data-measured="左右两列、左列通顶：左侧导航 248 宽从 y=0 贯到底，顶部 56 高放工作区标志＋名称＋新建；一级顶栏只覆盖右侧内容区（56 高），内含菜单图标＋当前页面名＋右侧系统图标组。顶部这一行左右两段可以同色">
   <div class="stage">
     <!-- 主题四选一，挂在 .window 上：
@@ -28,7 +28,7 @@
   </div>
 </template>
 
-<template data-component="一级顶栏" data-group="产品壳层"
+<template data-component="一级顶栏" data-cn="一级顶栏" data-group="产品壳层"
           data-measured="只覆盖右侧内容区，高 56、padding 0 12；菜单图标＋当前页面名 15/500＋展开图标；右侧系统图标组 gap 18＋头像 28">
   <div class="top-bar">
     <span class="menu"><svg class="ico"><use href="#i-menu"/></svg></span>
@@ -38,7 +38,7 @@
   </div>
 </template>
 
-<template data-component="左侧导航" data-group="产品壳层"
+<template data-component="左侧导航" data-cn="左侧导航" data-group="产品壳层"
           data-measured="248 宽通顶；顶部 56 高工作区块（标志 32 圆形＋名称 16/500＋新建）；其下图标行 44、导航树 padding 12 8、底部条 48">
   <div class="side">
     <div class="side-top">
@@ -52,22 +52,22 @@
   </div>
 </template>
 
-<template data-component="导航图标入口" data-group="左侧导航">
+<template data-component="导航图标入口" data-cn="导航图标入口" data-group="左侧导航">
   <i><svg class="ico"><use href="#i-home"/></svg></i> <!-- 图标页签行四项依次：home / table / doc / flow -->
 </template>
 
-<template data-component="导航分组标题" data-group="左侧导航">
+<template data-component="导航分组标题" data-cn="导航分组" data-group="左侧导航">
   <div class="group"><!-- 分组名称 --></div>
 </template>
 
-<template data-component="导航页面项" data-group="左侧导航">
+<template data-component="导航页面项" data-cn="导航页面项" data-group="左侧导航">
   <div class="leaf">
     <span class="li"><svg class="ico"><use href="#i-app-s"/></svg></span> <!-- 表/页面的彩色应用图标，按业务选：app-s grid-s board-s chart-s trend-s pie-s check-s fire-s factory-s box-s star-s -->
     <!-- 页面名称 -->
   </div>
 </template>
 
-<template data-component="导航文件夹" data-group="左侧导航">
+<template data-component="导航文件夹" data-cn="导航文件夹" data-group="左侧导航">
   <div class="folder">
     <span class="fi"><svg class="ico"><use href="#i-folder"/></svg></span>
     <!-- 文件夹名称 -->
@@ -76,14 +76,14 @@
   </div>
 </template>
 
-<template data-component="导航子项容器" data-group="左侧导航">
+<template data-component="导航子项容器" data-cn="导航子项" data-group="左侧导航">
   <div class="sub"><!-- 导航页面项 --></div>
 </template>
 
-<template data-component="营销浮层" data-group="画布" data-default="off">
+<template data-component="营销浮层" data-cn="营销浮层" data-group="画布" data-default="off">
   <div class="float"><!-- 已收录组件 --></div>
 </template>
 
-<template data-component="营销标注" data-group="画布" data-default="off">
+<template data-component="营销标注" data-cn="营销标注" data-group="画布" data-default="off">
   <div class="callout"><!-- 业务价值说明 --></div>
 </template>

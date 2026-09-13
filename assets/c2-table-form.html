@@ -10,7 +10,7 @@
 -->
 
 <!-- ══════════ 三～五、列表页架构 ══════════ -->
-<template data-architecture="列表页主内容" data-slot="c1 .main" data-measured="视图区容器（_hb-view-component_）：白底、圆角6、1px 黑8%边、四周留缝 12-16">
+<template data-architecture="列表页主内容" data-cn="列表页视图区" data-slot="c1 .main" data-measured="视图区容器（_hb-view-component_）：白底、圆角6、1px 黑8%边、四周留缝 12-16">
   <!-- 直接插入 c1 的 .main，不新增 .main 容器 -->
   <!-- 组件：视图页签 -->
   <div class="view-box">
@@ -21,7 +21,7 @@
   <!-- 工具栏与视图必须同在 .view-box 白卡内，缺这层会出现工具栏透灰底的色带（实测确认） -->
 </template>
 
-<template data-component="视图页签" data-group="列表页">
+<template data-component="视图页签" data-cn="视图页签" data-group="列表页">
   <div class="views">
     <span class="v"><svg class="ico"><use href="#i-grid-s"/></svg><!-- 视图名称 --></span> <!-- 视图类型小图标：grid-s（网格）board-s（看板）f-date（日历）chart-s（甘特） -->
     <span class="add"><svg class="ico"><use href="#i-plus"/></svg><!-- 创建视图操作 --></span>
@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<template data-component="工具栏" data-group="列表页"
+<template data-component="工具栏" data-cn="工具栏" data-group="列表页"
           data-measured="高 48、透明底、下边线 1px rgba(0,0,0,.08)；按钮 32 高圆角 6 padding 0 11，常态字 ink-65，激活态底 rgba(主色,.08)＋字＝主色（已配置的按钮显条数，如「筛选 1」）；右侧搜索框 32 高、主按钮 32 高分裂式（主体＋下拉箭头）">
   <div class="tools">
     <span class="tool"><svg class="ico"><use href="#i-fields"/></svg><!-- 工具名称 --></span> <!-- 按工具选：fields group filter sort freeze rowheight import export -->
@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<template data-component="网格视图" data-group="业务视图"
+<template data-component="网格视图" data-cn="网格视图" data-group="业务视图"
           data-measured="表头 32 高、底 rgba(0,0,0,.02)、下边线 1px、无竖线；数据行 35 高（矮档，另有中/高档，高档实测 72 且内容换行）；单元格有右竖分隔线 1px；首列＝勾选＋行号合并共 95 宽；产品默认列宽 140">
   <div class="table-view grid-view">
     <div class="grid">
@@ -63,21 +63,21 @@
   </div>
 </template>
 
-<template data-component="分组行" data-group="业务视图"
+<template data-component="分组行" data-cn="分组行" data-group="业务视图"
           data-measured="高 32、透明底、上边线 1px；折叠箭头＋分组值胶囊（20 高圆角 100、pad 0 4px、彩底白字）。分组视图里每组一行，组内数据行照常">
   <tr class="group">
     <td colspan="99"><span class="caret">▾</span><span class="tag c-green"><!-- 分组值 --></span></td>
   </tr>
 </template>
 
-<template data-component="分页器" data-group="列表页"
+<template data-component="分页器" data-cn="分页器" data-group="列表页"
           data-measured="整体 32 高；页码与前后箭头 32×32 圆角 6；当前页底 rgba(主色,.08)、字＝主色。数据超一页时出现在合计行下方">
   <div class="pager">
     <span class="pg">‹</span><span class="pg on">1</span><span class="pg">›</span>
   </div>
 </template>
 
-<template data-component="底部合计行" data-group="列表页"
+<template data-component="底部合计行" data-cn="合计行" data-group="列表页"
           data-measured="表格 tfoot（高40、上边线1px、文字14/ink-85、默认左对齐）：单元格与列一一对齐、随列横向滚动。最左格记录数（如「1,073条」）；配了统计的列格＝统计方式＋数值（求和/平均值/最大值/最小值/中间值/极差/已填写/未填写/已填写占比/未填写占比，如「求和 26587」）；其余列一律留空（产品里 hover 才显「统计」占位）。禁止把合计写成堆在左下角的一行说明文字">
   <!-- 放在 .grid 的 <table> 内、tbody 之后 -->
   <tfoot>
@@ -90,42 +90,42 @@
 </template>
 
 <!-- ══════════ 单元格组件 ══════════ -->
-<template data-component="灰底标签" data-group="单元格">
+<template data-component="灰底标签" data-cn="标签" data-group="单元格">
   <span class="tag"><!-- 标签值 --></span>
 </template>
 
-<template data-component="彩色选项标签" data-group="单元格">
+<template data-component="彩色选项标签" data-cn="选项标签" data-group="单元格">
   <span class="tag"><!-- 选项值；按状态语义追加 c-* class --></span>
 </template>
 
-<template data-component="多值标签" data-group="单元格">
+<template data-component="多值标签" data-cn="多值标签" data-group="单元格">
   <span class="tags"><span class="tag"><!-- 标签值 --></span></span>
 </template>
 
-<template data-component="人员" data-group="单元格">
+<template data-component="人员" data-cn="人员" data-group="单元格">
   <span class="user"><span class="av"><!-- 头像 --></span><!-- 人员名称 --></span>
 </template>
 
-<template data-component="行内快捷按钮" data-group="单元格">
+<template data-component="行内快捷按钮" data-cn="行内快捷按钮" data-group="单元格">
   <span class="op-btn"><svg class="ico"><use href="#i-download"/></svg><!-- 操作名称 --></span> <!-- 按业务动作选：download arrow-right check send edit -->
 </template>
 
 <!-- ══════════ 六、字段组件 ══════════ -->
-<template data-component="基础字段" data-group="字段">
+<template data-component="基础字段" data-cn="字段" data-group="字段">
   <div class="field">
     <div class="f-label"><!-- 字段名称；必填时追加 .req --></div>
     <div class="f-value"><!-- 字段值或字段类型组件 --></div>
   </div>
 </template>
 
-<template data-component="字段分组" data-group="字段">
+<template data-component="字段分组" data-type="field_group" data-cn="字段组" data-group="字段">
   <div class="field-group">
     <!-- 分组名称 -->
     <span class="fold"><svg class="ico"><use href="#i-prev"/></svg></span> <!-- 折叠箭头，展开态用 prev 旋转或直接写 ⌃ -->
   </div>
 </template>
 
-<template data-component="关联字段展开态" data-group="字段">
+<template data-component="关联字段展开态" data-cn="关联字段展开态" data-group="字段">
   <div class="field rel-open">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-value-card">
@@ -139,28 +139,28 @@
 </template>
 
 <!-- 字段类型名称：单行文本、手机号、多行文本、选项展开型、选项下拉型、富文本、条码、日期和时间、数值、金额、单成员、多成员、关联其他表、位置、附件、手写签名、图片 -->
-<template data-component="单行输入字段" data-group="字段类型">
+<template data-component="单行输入字段" data-cn="单行文本" data-group="字段类型">
   <div class="field editing">
     <div class="f-label"><!-- 字段名称 --></div>
     <input class="f-input"/>
   </div>
 </template>
 
-<template data-component="多行文本字段" data-group="字段类型">
+<template data-component="多行文本字段" data-cn="多行文本" data-group="字段类型">
   <div class="field editing textarea-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <textarea class="f-textarea"></textarea>
   </div>
 </template>
 
-<template data-component="选项字段" data-group="字段类型">
+<template data-component="选项字段" data-cn="选项" data-group="字段类型">
   <div class="field editing category-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-value option-list"><span class="tag"><!-- 选项值 --></span></div>
   </div>
 </template>
 
-<template data-component="富文本字段" data-group="字段类型">
+<template data-component="富文本字段" data-cn="富文本字段" data-group="字段类型">
   <div class="field rich-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="rich-preview"><!-- 富文本展示态 --></div>
@@ -168,49 +168,49 @@
   </div>
 </template>
 
-<template data-component="带后缀输入字段" data-group="字段类型">
+<template data-component="带后缀输入字段" data-cn="带后缀输入" data-group="字段类型">
   <div class="field editing">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-input-affix"><input/><span class="suffix"><!-- 单位、日期或扫码操作 --></span></div>
   </div>
 </template>
 
-<template data-component="条码字段" data-group="字段类型">
+<template data-component="条码字段" data-cn="条码" data-group="字段类型">
   <div class="field barcode-field editing">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-input-affix"><input/><span class="suffix"><svg class="ico"><use href="#i-f-barcode"/></svg></span></div>
   </div>
 </template>
 
-<template data-component="日期和时间字段" data-group="字段类型">
+<template data-component="日期和时间字段" data-cn="日期和时间" data-group="字段类型">
   <div class="field date-field editing">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-input-affix"><input/><span class="suffix cal"><svg class="ico"><use href="#i-f-date"/></svg></span></div>
   </div>
 </template>
 
-<template data-component="数值字段" data-group="字段类型">
+<template data-component="数值字段" data-cn="数值" data-group="字段类型">
   <div class="field numeric-field editing">
     <div class="f-label"><!-- 字段名称 --></div>
     <input class="f-input" inputmode="decimal"/>
   </div>
 </template>
 
-<template data-component="金额字段" data-group="字段类型">
+<template data-component="金额字段" data-cn="金额" data-group="字段类型">
   <div class="field money-field editing">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-input-affix"><input/><span class="suffix"><!-- 单位 --></span></div>
   </div>
 </template>
 
-<template data-component="成员字段" data-group="字段类型">
+<template data-component="成员字段" data-cn="成员" data-group="字段类型">
   <div class="field user-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-value"><!-- 一个或多个人员组件 --></div>
   </div>
 </template>
 
-<template data-component="位置字段" data-group="字段类型">
+<template data-component="位置字段" data-cn="位置" data-group="字段类型">
   <div class="field location-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="f-value-card">
@@ -221,7 +221,7 @@
   </div>
 </template>
 
-<template data-component="附件字段" data-group="字段类型">
+<template data-component="附件字段" data-cn="附件" data-group="字段类型">
   <div class="field file-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="file-list">
@@ -231,14 +231,14 @@
   </div>
 </template>
 
-<template data-component="手写签名字段" data-group="字段类型">
+<template data-component="手写签名字段" data-cn="手写签名" data-group="字段类型">
   <div class="field signature-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="signature-preview"><svg class="ico"><use href="#i-edit"/></svg></div> <!-- 手写签名预览，实际是笔迹图形 -->
   </div>
 </template>
 
-<template data-component="图片字段" data-group="字段类型">
+<template data-component="图片字段" data-cn="图片字段" data-group="字段类型">
   <div class="field image-field">
     <div class="f-label"><!-- 字段名称 --></div>
     <div class="image-list"><figure><img alt=""/><figcaption><!-- 图片名称 --></figcaption></figure></div>
@@ -246,7 +246,7 @@
 </template>
 
 <!-- ══════════ 八、表单架构 ══════════ -->
-<template data-architecture="标准表单编辑态" data-slot="c1 .stage" data-layer="overlay" data-use="仅在明确要求展示编辑态时">
+<template data-architecture="标准表单编辑态" data-cn="标准表单编辑态" data-slot="c1 .stage" data-layer="overlay" data-use="仅在明确要求展示编辑态时">
   <div class="modal-mask"></div>
   <div class="standard-form-modal">
     <div class="sf-hd edit-mode"><!-- 记录标题与取消、保存操作 --></div>
@@ -254,7 +254,7 @@
   </div>
 </template>
 
-<template data-architecture="创建或编辑表单" data-slot="c1 .stage" data-layer="overlay">
+<template data-architecture="创建或编辑表单" data-cn="创建或编辑表单" data-slot="c1 .stage" data-layer="overlay">
   <div class="modal-mask"></div>
   <div class="form-modal">
     <div class="fm-hd">
@@ -265,12 +265,12 @@
   </div>
 </template>
 
-<template data-component="表单字段行" data-group="表单">
+<template data-component="表单字段行" data-cn="表单字段行" data-group="表单">
   <div class="row"><!-- 按列数追加 cols-2 或 cols-3；内部放字段组件 --></div>
 </template>
 
 <!-- ══════════ 九、卡片视图 ══════════ -->
-<template data-component="卡片视图" data-group="业务视图">
+<template data-component="卡片视图" data-cn="卡片视图" data-group="业务视图">
   <div class="table-view record-card-grid-view">
     <div class="record-card-grid">
       <article class="record-card">
@@ -282,7 +282,7 @@
   </div>
 </template>
 
-<template data-component="卡片视图-快捷操作型" data-group="业务视图">
+<template data-component="卡片视图-快捷操作型" data-cn="卡片视图（快捷操作型）" data-group="业务视图">
   <div class="card-list">
     <div class="ci">
       <div class="ci-title"><!-- 记录标题 --></div>
@@ -294,7 +294,7 @@
 
 <!-- ══════════ 十五、表格业务视图目录 ══════════ -->
 <!-- 合法视图引擎名称：网格、透视表、甘特、卡片、任务、日历、看板。视图名称由用户配置，不代表新引擎。 -->
-<template data-component="透视表视图" data-group="业务视图">
+<template data-component="透视表视图" data-cn="透视表视图" data-group="业务视图">
   <div class="table-view pivot-view">
     <div class="pivot-layout">
       <aside class="pivot-settings"><!-- 字段搜索、行分组、列分组、统计值 --></aside>
@@ -303,7 +303,7 @@
   </div>
 </template>
 
-<template data-component="甘特视图" data-group="业务视图">
+<template data-component="甘特视图" data-cn="甘特视图" data-group="业务视图">
   <div class="table-view gantt-view">
     <div class="gantt-split">
       <div class="gantt-grid"><!-- 字段表 --></div>
@@ -317,7 +317,7 @@
   </div>
 </template>
 
-<template data-component="任务视图" data-group="业务视图">
+<template data-component="任务视图" data-cn="任务视图" data-group="业务视图">
   <div class="table-view task-view">
     <div class="task-render">
       <div class="task-head"><!-- 字段表头 --></div>
@@ -328,7 +328,7 @@
   </div>
 </template>
 
-<template data-component="日历视图" data-group="业务视图"
+<template data-component="日历视图" data-cn="日历视图" data-group="业务视图"
           data-measured="星期表头行 25 高、12px/ink-65、左对齐、格内左右 padding 8；日期格 86 高、边线 rgba(0,0,0,.08)；日期数字行 24 高 padding 4，本月＝主色、非本月＝ink-25，今天＝主色实底圆角白字；无底部合计行">
   <div class="table-view calendar-view">
     <div class="calendar-month-view">
@@ -339,7 +339,7 @@
   </div>
 </template>
 
-<template data-component="看板视图" data-group="业务视图" data-measured="列 254 宽透明底、间距 24；列头 50 高（padding 8/0/10）＝彩底胶囊分组名＋数量，列头下压一条 2px 实线（色＝分组值色，用 header 上的 line-* 类）；卡片 254 宽白底圆角 6、padding 12、三层描边影；卡片内字段竖排——字段名 12/ink-45 一行，值 14/ink-65 一行">
+<template data-component="看板视图" data-cn="看板视图" data-group="业务视图" data-measured="列 254 宽透明底、间距 24；列头 50 高（padding 8/0/10）＝彩底胶囊分组名＋数量，列头下压一条 2px 实线（色＝分组值色，用 header 上的 line-* 类）；卡片 254 宽白底圆角 6、padding 12、三层描边影；卡片内字段竖排——字段名 12/ink-45 一行，值 14/ink-65 一行">
   <div class="table-view kanban-view">
     <div class="kanban-columns">
       <section class="kanban-group">

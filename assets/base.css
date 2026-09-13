@@ -1172,7 +1172,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 
 /* 24 栅格：大屏用 grid 排布，列跨度 sp-N（N 为 24 分之几）；未给跨度的子项占 4 */
 .sc-grid { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
-.sc-grid > * { grid-column: span 4; min-width: 0; }
+.sc-grid > * { grid-column: span 3; min-width: 0; }
 .sc-grid > .sp-2 { grid-column: span 2; } .sc-grid > .sp-3 { grid-column: span 3; } .sc-grid > .sp-4 { grid-column: span 4; }
 .sc-grid > .sp-6 { grid-column: span 6; } .sc-grid > .sp-8 { grid-column: span 8; } .sc-grid > .sp-12 { grid-column: span 12; }
 .sc-grid > .sp-16 { grid-column: span 16; } .sc-grid > .sp-18 { grid-column: span 18; } .sc-grid > .sp-24 { grid-column: span 24; }

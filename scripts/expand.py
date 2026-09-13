@@ -785,7 +785,7 @@ def m_skpi(a, body):
     frame = a.get("frame", "bracket")
     if frame not in SCREEN_FRAMES:
         raise ExpandError(f"<hb-skpi frame> 只能是 {'/'.join(sorted(SCREEN_FRAMES))}")
-    span = a.get("span", "4")
+    span = a.get("span", "3")
     out = []
     for ln in lines(body):
         c = cells(ln)
@@ -805,7 +805,7 @@ def m_scard(a, body):
     hd = a.get("hd", "line")
     if frame not in SCREEN_FRAMES or hd not in SCREEN_HDS:
         raise ExpandError(f"<hb-scard> frame 只能是 {'/'.join(sorted(SCREEN_FRAMES))}，hd 只能是 {'/'.join(sorted(SCREEN_HDS))}")
-    span = a.get("span", "8")
+    span = a.get("span", "6")
     rs = f" rs-{a['rs']}" if a.get("rs") else ""
     acts = "" if "noacts" in a else f'<span class="acts">{ico("linkout")}{ico("more")}</span>'
     ticker = " sc-ticker" if "ticker" in a else ""
@@ -863,7 +863,7 @@ def visual_globe():
 
 
 def m_svisual(a, body):
-    span = a.get("span", "8")
+    span = a.get("span", "12")
     rs = f" rs-{a['rs']}" if a.get("rs") else ""
     inner = body.strip()
     if a.get("img") and isinstance(a["img"], str):
@@ -1238,8 +1238,8 @@ MACROS = {
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
     "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=blue|teal|gold、bg=earth|city|grid|gold、band；体内放 hb-skpi/hb-scard/hb-svisual"),
-    "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 4）、frame=bracket|round|none"),
-    "hb-scard": (m_scard, "大屏图表卡：属性 title、span（默认 8）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare"),
+    "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 3，一行 8 个）、frame=bracket|round|none"),
+    "hb-scard": (m_scard, "大屏图表卡：属性 title、span（默认 6）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare"),
     "hb-sbars": (m_sbars, "大屏进度条列表：每行「名称 | 百分比」"),
     "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span、rs、img=客户图片路径；空则默认线框地球图"),
     "hb-phone": (m_phone, "手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容"),
@@ -1438,13 +1438,13 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 <hb-scard title="实时报工播报" span="16" ticker><hb-grid bare nock noidx>…</hb-grid></hb-scard>
 </hb-screen>
 </div>""",
-"hb-skpi": """大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 4＝一行 6 个；8 个一行写 3）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
+"hb-skpi": """大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 3＝一行 8 个；6 个一行写 4）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
 例：
 <hb-skpi span="3" frame="round">
 本月产量 | 44 | 件
 今日工序报工量 | 30,000 | | up
 </hb-skpi>""",
-"hb-scard": """大屏图表卡。属性 title 图表名（必填）、span（默认 8）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
+"hb-scard": """大屏图表卡。属性 title 图表名（必填）、span（默认 6，中央播报表写 12）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
 体内放 hb-bar/hb-line/hb-donut 的 bare 输出、hb-grid bare nock noidx、hb-sbars 或手绘 SVG，颜色自动走深色 token。同一张图标题条只用一种。
 例：
 <hb-scard title="近30日产量趋势" hd="tag" frame="none">
@@ -1458,7 +1458,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 一车间 | 82%
 二车间 | 64%
 </hb-sbars>""",
-"hb-svisual": """大屏中央视觉位。属性 span（默认 8）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
+"hb-svisual": """大屏中央视觉位。属性 span（默认 12）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
 例：
 <hb-svisual rs="2"/>
 <hb-svisual rs="2" img="素材/厂区3D.png"/>""",
