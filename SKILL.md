@@ -9,29 +9,21 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 核心资产：**登记表**（assets/registry.json，官方部件 type ↔ 类名 ↔ 宏，唯一名录）＋**结构**（assets/c1～c5 实测架构，模板带官方 `data-type`）＋**骨架样式**（base.css）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）＋**宏**（scripts/expand.py，模型只填内容）。
 
-## 页面类型路由
+## 页面类型路由（唯一真相源）
 
-| 用户说的 | `<hb-page kind>` | 原则文档（references/principles/） | 说明 |
+先判页面类型，再按这一行取骨架 kind 和必读原则。所有图都读通用三篇：visual-four-principles、visual-components、visual-color；多张营销配图另读 anti-sameness。
+
+| 用户说的 | `<hb-page kind>` | 必读原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
 | 表单弹窗 / 编辑态 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗与编辑态尺寸未实测，交付说明注明 |
-| 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
-| 工作台 | workbench | workbench | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
-| 看板 / 数据分析页 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 透视表 |
-| 数据大屏 | screen | dashboard（大屏一节） | 体内只放 hb-screen；不套壳、无浮层 |
-| 手机端 | mobile | 各页面篇的手机端说明＋c4 注释 | hb-phone 单屏或 hb-duo 双屏；不套 .window |
+| 详情页 / 详情界面 | detail | item-detail、dashboard-chart-selection | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
+| 工作台 | workbench | workbench、dashboard-chart-selection | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
+| 看板 / 数据分析页 | dashboard | dashboard、dashboard-chart-selection；指标拆不清时读 dashboard-data-story | 横幅 → 筛选 → 单指标 → 图表行 → 透视表 |
+| 数据大屏 | screen | dashboard（大屏一节）、dashboard-chart-selection | 体内只放 hb-screen；不套壳、无浮层 |
+| 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-duo 双屏；不套 .window |
 
-## 设计原则路由（步骤 3、5 按任务读，不整目录读）
-
-| 任务类型 | 必读 | 条件读取 |
-| --- | --- | --- |
-| 所有界面 | visual-four-principles、visual-components、visual-color | 多张营销配图读 anti-sameness |
-| 列表和视图页 | 同上＋list-view | 无 |
-| 表单/编辑态 | 同上＋form | 无 |
-| 自定义详情页 | 同上＋item-detail、dashboard-chart-selection（组件选取） | 无 |
-| 工作台 | 同上＋workbench、dashboard-chart-selection（组件选取） | 无 |
-| 看板/数据分析页/数据大屏 | 同上＋dashboard、dashboard-chart-selection（组件选取） | 指标拆解不清时读 dashboard-data-story |
-| 新造或调整皮肤 | visual-color、skin/custom-skin | 页面原则仍按页面类型读 |
+新造或调整皮肤时另读 visual-color 与 skin/custom-skin。
 
 ## 执行步骤
 
@@ -50,16 +42,16 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ### 3. 写骨架片段
 
-先看槽位表，再取要用的宏的语法，**不整读宏文档、不读 c 文件**：
+先看槽位表，再只取要用的宏的语法：
 
 ```bash
 python3 scripts/expand.py --page workbench            # 该页面类型的槽位表、可用宏、最小示例
 python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # 只取要用的宏
 ```
 
-把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏；并排用 `<hb-row spans="16|8">`；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。外壳、画布高度、浮层定位、栅格都由宏产出，不手写 `.stage`/`.window`/`.page`，不手写 `.stage{height}`。
+把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏；并排用 `<hb-row spans="16|8">`；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 
-宏没覆盖的组件（甘特/日历/任务/透视视图、表单弹窗、门户内容、流程页签细节）才用模板提取后手写在对应槽位：
+宏没覆盖的组件（甘特/日历/任务/透视视图、表单弹窗、流程页签细节）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
 ```bash
 python3 scripts/extract_templates.py assets/c2-table-form.html --list
@@ -78,7 +70,7 @@ python3 scripts/build.py --skin dawn-blue --content stage.html --output "源文�
 
 ### 5. 对照判据
 
-拼完按「设计原则路由」读对应文件过一遍：状态标签红绿灯、按钮主/次/警示/置灰、表单列数一致、首屏顺序、单指标一行。
+拼完按页面类型路由里的必读原则，逐条过该篇的"检查清单"一节。
 
 ### 6. 检查与验收
 
@@ -112,17 +104,14 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 ## 硬约束
 
+页面级规则（横幅写角色不写人、页头卡片不放按钮、浮层只放底层没有的内容、标注气泡只在用户要求时加、自定义页面层次二选一）写在各页面原则和 canvas/marketing.md 里，这里只列跨页面的：
+
 | 约束 | 内容 |
 | --- | --- |
 | 不自造组件 | 只画登记表（assets/registry.json）里有的部件；`registry.py --list 页面类型` 看该页可用部件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
 | 尺寸是实测的 | 顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24 来自真实产品，改了就不像 |
-| 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画，不猜 |
-| 自定义页面层次二选一 | `level=flat` 白底描边（默认）／`level=card` 浅底白卡；列表页的视图区白卡浮灰底是产品强特征，不参与切换 |
+| 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画 |
 | 组件底色优先级 | 纯白 ＞ 很浅的背景色 ＞ 深色块；深色只留给一级顶栏、状态标签 |
-| 详情页页头卡片不放按钮 | 按钮只在记录功能区；工作台/看板的横幅同样不放按钮 |
-| 营销浮层不得重复 | 浮层只放底层没有的真实组件或点击结果态；不遮关键内容；不裁短底层窗口 |
-| 横幅写角色不写人 | 「库管工作台」不写「张伟的工作台」，不放问候语；数据行里的人名照常像真人 |
-| 标注气泡不默认加 | 只有用户明确要求业务价值标注才用 |
 | 只写业务结论 | 示意图内容不留设计过程的痕迹 |
 | Skill 资产是唯一结构真相源 | 新实采的界面结构直接沉淀到对应的 assets/c1～c5、base.css 和 registry.json；实测记录写 references/measured/ |
