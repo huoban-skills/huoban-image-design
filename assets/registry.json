@@ -100,7 +100,7 @@
   },
   {
    "kind": "component",
-   "id": "shell-nav-ico",
+   "id": "ico-row",
    "type_key": null,
    "cn": "导航图标入口",
    "old_class": "i",
@@ -118,7 +118,7 @@
   },
   {
    "kind": "component",
-   "id": "shell-nav-group",
+   "id": "group",
    "type_key": null,
    "cn": "导航分组",
    "old_class": "group",
@@ -172,7 +172,7 @@
   },
   {
    "kind": "component",
-   "id": "shell-nav-sub",
+   "id": "sub",
    "type_key": null,
    "cn": "导航子项",
    "old_class": "sub",
@@ -296,7 +296,7 @@
   },
   {
    "kind": "component",
-   "id": "view-grid-group",
+   "id": "group",
    "type_key": null,
    "cn": "分组行",
    "old_class": "group",
@@ -310,7 +310,7 @@
    "allowed_in": [
     "view-grid"
    ],
-   "note": null
+   "note": "tr.group，与导航分组 div.group 同名不同标签"
   },
   {
    "kind": "component",
@@ -332,7 +332,7 @@
   },
   {
    "kind": "component",
-   "id": "view-grid-foot",
+   "id": "tfoot",
    "type_key": null,
    "cn": "合计行",
    "old_class": "table",
@@ -512,7 +512,7 @@
   },
   {
    "kind": "component",
-   "id": "field-text",
+   "id": "field",
    "type_key": null,
    "cn": "单行文本",
    "old_class": "field editing",
@@ -521,7 +521,9 @@
    "group": "字段类型",
    "macro": null,
    "grid": null,
-   "variants": [],
+   "variants": [
+    "editing"
+   ],
    "measured": "unverified",
    "allowed_in": [
     "modal",
@@ -588,7 +590,7 @@
   },
   {
    "kind": "component",
-   "id": "field-text",
+   "id": "field",
    "type_key": null,
    "cn": "带后缀输入",
    "old_class": "field editing",
@@ -598,6 +600,7 @@
    "macro": null,
    "grid": null,
    "variants": [
+    "editing",
     "suffix"
    ],
    "measured": "unverified",
@@ -780,20 +783,22 @@
   },
   {
    "kind": "architecture",
-   "id": "modal-form",
+   "id": "modal-mask",
    "page_kind": "detail",
    "cn": "标准表单编辑态",
    "old_class": "modal-mask",
    "file": "c2-table-form.html",
    "name": "标准表单编辑态",
    "macro": null,
-   "variants": [],
+   "variants": [
+    "sf"
+   ],
    "measured": "unverified",
    "note": "overlay，仅明确要求时"
   },
   {
    "kind": "architecture",
-   "id": "modal-form",
+   "id": "modal-mask",
    "page_kind": "detail",
    "cn": "创建或编辑表单",
    "old_class": "modal-mask",
@@ -801,14 +806,14 @@
    "name": "创建或编辑表单",
    "macro": null,
    "variants": [
-    "create"
+    "fm"
    ],
    "measured": "unverified",
    "note": "overlay，仅明确要求时"
   },
   {
    "kind": "component",
-   "id": "modal-form-row",
+   "id": "row",
    "type_key": null,
    "cn": "表单字段行",
    "old_class": "row",
@@ -957,14 +962,16 @@
   },
   {
    "kind": "architecture",
-   "id": "modal-item",
+   "id": "modal-mask",
    "page_kind": "detail",
    "cn": "记录详情弹窗",
    "old_class": "modal-mask",
    "file": "c3-page-detail.html",
    "name": "记录详情弹窗",
    "macro": null,
-   "variants": [],
+   "variants": [
+    "item"
+   ],
    "measured": "measured",
    "note": "仅明确要求弹窗详情时"
   },
@@ -988,7 +995,7 @@
   },
   {
    "kind": "component",
-   "id": "stream",
+   "id": "fi",
    "type_key": "stream",
    "cn": "动态",
    "old_class": "fi",
@@ -1007,7 +1014,7 @@
     "page:detail",
     "row"
    ],
-   "note": "登记的是条目（.stream-item）；部件根 .stream"
+   "note": "动态条目（部件 stream 的一条）；类名保留 fi"
   },
   {
    "kind": "component",
@@ -1092,7 +1099,7 @@
   },
   {
    "kind": "architecture",
-   "id": "rich",
+   "id": "w-row",
    "page_kind": "workbench",
    "cn": "大标题 16 栏＋按钮组 8 栏同行",
    "old_class": "w-row",
@@ -2197,7 +2204,7 @@
    "id": "m-taskbar",
    "type_key": null,
    "cn": "任务办理区",
-   "old_class": "elapsed",
+   "old_class": "taskbar",
    "file": "c4-mobile.html",
    "name": "手机任务办理区",
    "group": "手机端",

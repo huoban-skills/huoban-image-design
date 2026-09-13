@@ -140,7 +140,7 @@ PROBE = r"""
   var BOTTOM = 48, RIGHT = 120;
   // 只查布局层（组件之间、组件到画布边缘）。组件内部的留白由数据量决定（图片格、
   // 列表行数、卡片字段多少），不是病，一律跳过；画布/窗口/浮层/导航按设计留边也跳过。
-  var SKIP = /\b(stage|window|float|side|tree|win-body|main|callout|hscroll|kanban-group|kanban-columns|w-card|comp|widget|kanban-item|record-card|field|f-value|modal|grid|page-header)\b/;
+  var SKIP = /\b(stage|window|mk-float|shell-side|tree|win-body|main|mk-callout|hscroll|kanban-group|kanban-columns|w-card|comp|widget|kanban-item|record-card|field|f-value|modal|grid|page-header)\b/;
   document.querySelectorAll('.stage').forEach(function (s) { s.style.zoom = 1; });
   var out = [];
   document.querySelectorAll('*').forEach(function (e) {
@@ -178,7 +178,7 @@ PROBE = r"""
   // 并排组件底部不齐：同一栅格行里两栏高度差过大，短的那栏下方会空出一块。
   // 这一项 SKIP 名单管不着——空白不在组件内部，而在组件之间，靠目检容易被“左右等高很整齐”的错觉盖过去。
   var uneven = [];
-  document.querySelectorAll('.item-page-grid, .value, .pains, .phase').forEach(function (g) {
+  document.querySelectorAll('.item-grid, .value, .pains, .phase').forEach(function (g) {
     var rows = {};
     [].forEach.call(g.children, function (c) {
       var r = c.getBoundingClientRect();
@@ -205,7 +205,7 @@ PROBE = r"""
     extra.push({ kind: 'clipped', over: win.scrollHeight - win.clientHeight });
   if (st) {
     var sr = st.getBoundingClientRect();
-    document.querySelectorAll('.float').forEach(function (fl) {
+    document.querySelectorAll('.mk-float').forEach(function (fl) {
       var fr = fl.getBoundingClientRect();
       if (fr.bottom > sr.bottom + 2) extra.push({ kind: 'float-out', over: Math.round(fr.bottom - sr.bottom) });
       if (fr.top < sr.top - 2) extra.push({ kind: 'float-out', over: Math.round(sr.top - fr.top) });

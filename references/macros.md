@@ -19,7 +19,7 @@ PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .
 ```
 属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
-.stage、has-float、.float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
+.stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
 例：
 <div class="stage">
 <hb-shell ws="永铭世纪" page="物资档案" nav="table" me="周">
@@ -74,7 +74,7 @@ PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .
 ```
 首行表头，列名后可接类型 :tag（彩色选项）:tags（多值，值用 / 分）:user（人员，多人用 / 分）:ops（行内按钮，名:图标:颜色，多个用 / 分）；统计 :sum=值 :avg= :max= :min= :count=。
 其后每行一条记录，列数必须与表头一致。# 分组值:颜色 插分组行；! 前缀＝选中行。
-属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、页签容器内时用），默认带 .table-view.grid-view 和横向滚动条。
+属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、页签容器内时用），默认带 .table-view.view-grid 和横向滚动条。
 例：
 <hb-grid total="1,217条">
 物资编号 | 品名 | 品类:tag | 当前库存:sum=4,386 | 建档人:user | 操作:ops
@@ -173,7 +173,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」
 
 ```
-属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .w-chart .wc-bd 高度时同步给）。
+属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .chart .wc-bd 高度时同步给）。
 每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card w-chart 卡，bare 只出 svg＋图例。
 例：
 <hb-bar title="近 6 个月出入库趋势" labels="3 月|4 月|5 月|6 月|7 月|8 月">
@@ -249,7 +249,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 详情页标题卡片信息区：字段名 | 值 | 类型
 
 ```
-标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .page-header-card 里、标题区之后。
+标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .header_card 里、标题区之后。
 例：
 出库类型 | 领用出库:orange
 申请人 | 陈晓东 | user

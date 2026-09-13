@@ -200,7 +200,7 @@ def m_nav(a, body):
             flush()
             c = cells(ln[1:])
             n = f'<span class="n">{esc(c[1])}</span>' if len(c) > 1 else ""
-            out.append(f'<div class="folder"><span class="fi">{ico("folder", tag="<hb-nav> ")}</span>{esc(c[0])}{n}<span class="more">{ico("more")}</span></div>')
+            out.append(f'<div class="shell-nav-folder"><span class="fi">{ico("folder", tag="<hb-nav> ")}</span>{esc(c[0])}{n}<span class="more">{ico("more")}</span></div>')
             continue
         is_sub = ln.startswith("-")
         if is_sub:
@@ -214,7 +214,7 @@ def m_nav(a, body):
         icon = c[1] if len(c) > 1 and c[1] else "app-s"
         color = c[2] if len(c) > 2 and c[2] else ""
         li = "li" + (f" ic-{color}" if color and not cur else "")
-        leaf = f'<div class="leaf{" current" if cur else ""}"><span class="{li}">{ico(icon, tag="<hb-nav> ")}</span>{esc(c[0])}</div>'
+        leaf = f'<div class="shell-nav-leaf{" current" if cur else ""}"><span class="{li}">{ico(icon, tag="<hb-nav> ")}</span>{esc(c[0])}</div>'
         (sub if is_sub else out).append(leaf)
     flush()
     return "<!--HB-NAV-->" + '<div class="tree">' + "".join(out) + "</div><!--/HB-NAV-->"
@@ -241,14 +241,14 @@ def m_shell(a, body):
     ) + f'<span class="more">{ico("more")}</span>'
     return f'''<div class="window theme-{theme}">
   <div class="win-body">
-    <div class="side">
+    <div class="shell-side">
       <div class="side-top"><span class="ws-logo">{esc(logo)}</span><span class="ws-name">{esc(ws)}</span><span class="plus">{ico("plus")}</span></div>
       <div class="ico-row">{icons_row}</div>
       {tree}
       <div class="bottom">{bottom_html}</div>
     </div>
     <div class="main">
-      <div class="top-bar">
+      <div class="shell-top-bar">
         <span class="menu">{ico("menu")}</span><span class="pg">{esc(page)}</span><span class="caret">▾</span>
         <div class="right">{ico("headset")}{ico("bell")}{ico("inbox")}{ico("help")}<span class="me">{esc(me)}</span></div>
       </div>
@@ -268,7 +268,7 @@ def m_views(a, body):
     if "noadd" not in a:
         out.append(f'<span class="add">{ico("plus")}{esc(a.get("add", "创建视图"))}</span>')
     out.append(f'<span class="ovf">{ico("more")}</span>')
-    return '<div class="views">' + "".join(out) + "</div>"
+    return '<div class="view-tabs">' + "".join(out) + "</div>"
 
 
 def m_tools(a, body):
@@ -301,7 +301,7 @@ def m_tools(a, body):
         right.append(f'<span class="btn-new">{esc(a["new"])}{dd}</span>')
     if right:
         out.append('<div class="right">' + "".join(right) + "</div>")
-    return '<div class="tools">' + "".join(out) + "</div>"
+    return '<div class="view-tools">' + "".join(out) + "</div>"
 
 
 def m_grid(a, body):
@@ -333,7 +333,7 @@ def m_grid(a, body):
     table = f'<table><tr>{"".join(ths)}</tr>{"".join(rows)}{tfoot}</table>'
     if "bare" in a:
         return f'<div class="grid">{table}</div>'
-    return f'<div class="table-view grid-view"><div class="grid">{table}<div class="hscroll"><i></i></div></div></div>'
+    return f'<div class="table-view view-grid"><div class="grid">{table}<div class="hscroll"><i></i></div></div></div>'
 
 
 def card_head(a, tagname):
@@ -368,7 +368,7 @@ def m_pivot(a, body):
     table = f"<table><tr>{ths}</tr>{''.join(rows)}</table>"
     if "bare" in a:
         return table
-    return f'<div class="w-card w-pivot">{card_head(a, "hb-pivot")}{table}</div>'
+    return f'<div class="w-card chart_table">{card_head(a, "hb-pivot")}{table}</div>'
 
 
 def spark_svg(vals):
@@ -408,10 +408,10 @@ def m_stats(a, body):
         vl = esc(value) + (f"<small>{esc(unit)}</small>" if unit else "")
         if mode == "center":
             tr = f'<div class="st-trend{" " + trend if trend else ""}"></div>' if trend is not None else ""
-            out.append(f'<div class="w-card w-stat center"><div class="st-lb">{esc(label)}</div><div class="st-vl">{vl}</div>{tr}</div>')
+            out.append(f'<div class="w-card chart_single center"><div class="st-lb">{esc(label)}</div><div class="st-vl">{vl}</div>{tr}</div>')
         else:
             sp = spark_svg(spark) if spark else ""
-            out.append(f'<div class="w-card w-stat strip"><div class="st-bd"><div class="st-lb">{esc(label)}</div><div class="st-vl">{vl}</div></div>{sp}</div>')
+            out.append(f'<div class="w-card chart_single strip"><div class="st-bd"><div class="st-lb">{esc(label)}</div><div class="st-vl">{vl}</div></div>{sp}</div>')
     n = len(ls)
     cls = "w-row" + (f" stats-{n}" if n in (4, 5, 6) else "")
     return f'<div class="{cls}">' + "".join(out) + "</div>"
@@ -429,7 +429,7 @@ def m_tasks(a, body):
         act = "" if label == "-" else f'<div class="t-act"><span class="b line">{esc(label)}</span></div>'
         out.append(f'<div class="task"><div class="t-bd"><div class="t-title">{title}{time}</div>{node}</div>{act}</div>')
     hd = f'<div class="ws-hd">{esc(a.get("title", ""))}</div>' if a.get("title") else ""
-    return f'<div class="w-sub">{hd}{"".join(out)}</div>'
+    return f'<div class="procedure_task">{hd}{"".join(out)}</div>'
 
 
 def m_shortcuts(a, body):
@@ -438,7 +438,7 @@ def m_shortcuts(a, body):
         c = cells(ln)
         icon = c[1] if len(c) > 1 and c[1] else "app-s"
         out.append(f'<div class="sc"><span class="sc-ic">{ico(icon, tag="<hb-shortcuts> ")}</span>{esc(c[0])}</div>')
-    return (f'<div class="w-card w-shortcut">{card_head(a, "hb-shortcuts")}'
+    return (f'<div class="w-card button shortcuts">{card_head(a, "hb-shortcuts")}'
             f'<div class="wc-bd sc-list">{"".join(out)}</div></div>')
 
 
@@ -448,7 +448,7 @@ def m_filters(a, body):
         c = cells(ln)
         icon = c[1] if len(c) > 1 and c[1] else "f-select"
         out.append(f'<div class="w-filter">{esc(c[0])} {ico(icon, cls="ico cal", tag="<hb-filters> ")}</div>')
-    return '<div class="w-filters">' + "".join(out) + "</div>"
+    return '<div class="filter">' + "".join(out) + "</div>"
 
 
 def m_banner(a, body):
@@ -460,9 +460,9 @@ def m_banner(a, body):
         if "date" in a or "time" in a:
             dt = f'<div class="ban-dt"><b>{esc(str(a.get("date", "")))}</b><span>{esc(str(a.get("time", "")))}</span></div>'
         img = f'<div class="ban-img">{a["img"] if isinstance(a.get("img"), str) and "<" in a["img"] else ""}</div>' if "img" in a else ""
-        return f'<div class="w-banner card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
+        return f'<div class="rich hero card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
     p = f"<p>{esc(ls[1])}</p>" if len(ls) > 1 else ""
-    cls = "w-banner" + (" bg-solid" if "solid" in a else "")
+    cls = "rich hero" + (" bg-solid" if "solid" in a else "")
     return f'<div class="{cls}"><h1>{esc(ls[0])}</h1>{p}</div>'
 
 
@@ -546,7 +546,7 @@ def chart_card(a, inner, legend, tagname, par="none"):
     svg = f'<svg viewBox="0 0 {W} {H}" preserveAspectRatio="{par}" xmlns="http://www.w3.org/2000/svg">{"".join(inner)}</svg>'
     if "bare" in a:
         return svg + legend
-    return f'<div class="w-card w-chart">{card_head(a, tagname)}<div class="wc-bd">{svg}</div>{legend}</div>'
+    return f'<div class="w-card chart">{card_head(a, tagname)}<div class="wc-bd">{svg}</div>{legend}</div>'
 
 
 def m_bar(a, body):
@@ -668,7 +668,7 @@ def m_steps(a, body):
         cls = "preceding" if i < cur else "current" if i == cur else "following"
         out.append(f'<span class="{cls}">{esc(name)}</span>')
     span = a.get("span", "24")
-    return f'<div class="option-steps span-{span}">' + "".join(out) + "</div>"
+    return f'<div class="item-steps span-{span}">' + "".join(out) + "</div>"
 
 
 # ── 独立自定义详情页 ──────────────────────────────────────────────────────
@@ -690,7 +690,7 @@ def m_itembar(a, body):
     sys_ = "" if "nosys" in a else (
         '<span class="b text">编辑</span>' + "".join(ico(i) for i in ("copy", "share", "print", "history", "more"))
         + f'<span class="close">{ico("close")}</span>')
-    return (f'<div class="item-page-toolbar"><div class="item-page-nav">{ico("prev")}{ico("next")}</div>'
+    return (f'<div class="item-toolbar"><div class="item-page-nav">{ico("prev")}{ico("next")}</div>'
             f'<div class="item-page-record-title">{esc(title)} <span class="caret">▾</span></div>'
             f'<div class="item-page-shortcuts">{"".join(btns)}</div>'
             f'<div class="item-page-system-actions">{sys_}</div></div>')
@@ -702,7 +702,7 @@ def m_hcard(a, body):
         raise ExpandError("<hb-hcard> 缺 title（主标题）")
     sub = f'<div class="page-header-subtitle">{esc(a["sub"])}</div>' if a.get("sub") else ""
     info = m_info(a, body) if lines(body) else ""
-    return (f'<div class="w-card page-header-card span-{a.get("span", "24")}"><div class="page-header-heading">'
+    return (f'<div class="w-card header_card span-{a.get("span", "24")}"><div class="page-header-heading">'
             f'<div class="page-header-title">{esc(title)}</div>{sub}</div>{info}</div>')
 
 
@@ -713,10 +713,10 @@ def m_tabcard(a, body):
     if "pill" in a:
         # 胶囊底块只在居中时成立；靠左的页签在产品里是下划线式，不带底块
         tabs = tabs.replace('<span class="on">', '<span class="wt-tab on">').replace("<span>", '<span class="wt-tab">')
-        card = (f'<div class="w-card w-tabs"><div class="wt-nav center">{tabs}</div>'
+        card = (f'<div class="w-card tabs pill"><div class="wt-nav center">{tabs}</div>'
                 f'<div class="wt-body">{body.strip()}</div></div>')
     else:
-        card = (f'<div class="w-card page-tabs-card"><div class="page-tabs-nav"><div class="page-tabs-list">{tabs}</div></div>'
+        card = (f'<div class="w-card tabs"><div class="page-tabs-nav"><div class="page-tabs-list">{tabs}</div></div>'
                 f'<div class="page-tabs-body">{body.strip()}</div></div>')
     return f'<div class="span-{a["span"]}">{card}</div>' if "span" in a else card
 
@@ -749,7 +749,7 @@ def m_flow(a, body):
         links = f'<div class="flowbox-links">{esc(link)}</div>' if link else ""
         boxes.append(f'<div class="flowbox"><div class="flowbox-head"><span class="n-ic">{ico(icon)}</span><strong>{esc(node)}</strong></div>'
                      f'<div class="flowbox-body">{body_}{tm}</div>{links}</div>')
-    return (f'<div class="flow-msg"><div class="flow-msg-body"><span class="app-ic">{ico("grid-s")}</span><span><b>{esc(name)}</b>{by}</span></div>{cancel}</div>'
+    return (f'<div class="process"><div class="flow-msg-body"><span class="app-ic">{ico("grid-s")}</span><span><b>{esc(name)}</b>{by}</span></div>{cancel}</div>'
             f'<div class="flowbox-timeline">{"".join(boxes)}</div><div class="flow-foot">{esc(a.get("foot", "查看详细记录"))}</div>')
 
 
@@ -771,14 +771,14 @@ def m_screen(a, body):
     if not title:
         raise ExpandError("<hb-screen> 缺 title（大屏页面名）")
     sub = f"<small>{esc(a['sub'])}</small>" if a.get("sub") else ""
-    logo = f'<div class="sc-logo">{esc(a["logo"])}</div>' if a.get("logo") else ""
+    logo = f'<div class="screen-logo">{esc(a["logo"])}</div>' if a.get("logo") else ""
     dt = ""
     if a.get("date"):
         week = f"<span>{esc(a['week'])}</span>" if a.get("week") else ""
         time = f"<small>{esc(a['time'])}</small>" if a.get("time") else ""
-        dt = f'<div class="sc-dt"><b>{esc(a["date"])}</b>{week}{time}</div>'
-    head = f'<div class="sc-head{" band" if "band" in a else ""}">{logo}<h1>{esc(title)}{sub}</h1>{dt}</div>'
-    return f'<div class="screen theme-{theme} bg-{bg}">{head}<div class="sc-grid">{body.strip()}</div></div>'
+        dt = f'<div class="screen-dt"><b>{esc(a["date"])}</b>{week}{time}</div>'
+    head = f'<div class="screen-head{" band" if "band" in a else ""}">{logo}<h1>{esc(title)}{sub}</h1>{dt}</div>'
+    return f'<div class="screen theme-{theme} bg-{bg}">{head}<div class="screen-grid">{body.strip()}</div></div>'
 
 
 def m_skpi(a, body):
@@ -793,7 +793,7 @@ def m_skpi(a, body):
             raise ExpandError(f"<hb-skpi> 每行「指标名 | 值 | 单位 | up/down」：{ln}")
         unit = f"<small>{esc(c[2])}</small>" if len(c) > 2 and c[2] else ""
         st = c[3].strip() if len(c) > 3 and c[3].strip() in ("up", "down") else ""
-        out.append(f'<div class="sc-kpi frame-{frame} sp-{span}{" " + st if st else ""}"><div class="lb">{esc(c[0])}</div><div class="vl">{esc(c[1])}{unit}</div></div>')
+        out.append(f'<div class="screen-kpi frame-{frame} sp-{span}{" " + st if st else ""}"><div class="lb">{esc(c[0])}</div><div class="vl">{esc(c[1])}{unit}</div></div>')
     return "".join(out)
 
 
@@ -809,8 +809,8 @@ def m_scard(a, body):
     rs = f" rs-{a['rs']}" if a.get("rs") else ""
     acts = "" if "noacts" in a else f'<span class="acts">{ico("linkout")}{ico("more")}</span>'
     ticker = " sc-ticker" if "ticker" in a else ""
-    return (f'<div class="sc-card frame-{frame} sp-{span}{rs}"><div class="sc-hd {hd}">{esc(title)}{acts}</div>'
-            f'<div class="sc-bd{ticker}">{body.strip()}</div></div>')
+    return (f'<div class="screen-card frame-{frame} sp-{span}{rs}"><div class="screen-hd {hd}">{esc(title)}{acts}</div>'
+            f'<div class="screen-bd{ticker}">{body.strip()}</div></div>')
 
 
 def m_sbars(a, body):
@@ -820,8 +820,8 @@ def m_sbars(a, body):
         if len(c) < 2:
             raise ExpandError(f"<hb-sbars> 每行「名称 | 百分比」：{ln}")
         pct = num_of(c[1])
-        out.append(f'<div class="sc-bar"><div class="t"><span>{esc(c[0])}</span><span>{esc(c[1])}</span></div><div class="r"><i style="width:{pct:g}%"></i></div></div>')
-    return '<div class="sc-bars">' + "".join(out) + "</div>"
+        out.append(f'<div class="screen-bar"><div class="t"><span>{esc(c[0])}</span><span>{esc(c[1])}</span></div><div class="r"><i style="width:{pct:g}%"></i></div></div>')
+    return '<div class="screen-bars">' + "".join(out) + "</div>"
 
 
 def visual_globe():
@@ -869,7 +869,7 @@ def m_svisual(a, body):
     if a.get("img") and isinstance(a["img"], str):
         inner = f'<img src="{a["img"]}" alt="">'
     inner = inner or visual_globe()
-    return f'<div class="sc-visual sp-{span}{rs}">{inner}</div>'
+    return f'<div class="screen-visual sp-{span}{rs}">{inner}</div>'
 
 
 # ── 卡片与看板 ──────────────────────────────────────────────────────────
@@ -911,7 +911,7 @@ def m_kanban(a, body):
         out.append(f'<section class="kanban-group"><header class="line-{col["color"]}">{tag(col["name"], col["color"])}{cnt}'
                    f'<span class="add">{ico("plus")}</span><span class="more">{ico("more")}</span></header>'
                    f'<div class="kanban-list">{"".join(cards)}</div></section>')
-    return f'<div class="table-view kanban-view"><div class="kanban-columns">{"".join(out)}</div></div>'
+    return f'<div class="table-view view-kanban"><div class="kanban-columns">{"".join(out)}</div></div>'
 
 
 def m_cards(a, body):
@@ -922,14 +922,14 @@ def m_cards(a, body):
         dl = "".join(f"<dt>{esc(k)}</dt><dd>{render_val(v, 'text', 'hb-cards')}</dd>" for k, v in fields)
         ops = f'<div class="ci-ops">{render_val(c[2], "ops", "hb-cards")}</div>' if len(c) > 2 and c[2] else ""
         out.append(f'<article class="record-card"><b>{esc(c[0])}</b><dl>{dl}</dl>{ops}</article>')
-    return f'<div class="table-view record-card-grid-view"><div class="record-card-grid">{"".join(out)}</div></div>'
+    return f'<div class="table-view view-cards"><div class="record-card-grid">{"".join(out)}</div></div>'
 
 
 # ── 手机端（2026-09-03 H5 实测结构，类名见 assets/c4-mobile.html）──────────
 def m_phone(a, body):
     bar = ""
     if "nobar" not in a:
-        bar = f'<div class="wxbar"><span class="bk">{ico("prev")}</span><span class="tt">{esc(a.get("title", ""))}</span><span class="dots">···</span></div>'
+        bar = f'<div class="m-topbar"><span class="bk">{ico("prev")}</span><span class="tt">{esc(a.get("title", ""))}</span><span class="dots">···</span></div>'
     cls = "phone" + (" h-fix" if "fix" in a else "")
     return f'<div class="{cls}">{bar}{body.strip()}</div>'
 
@@ -953,7 +953,7 @@ def m_mhome(a, body):
         name = ln[1:].strip() if sub else ln
         icon = "grid-s" if sub else "folder"
         rows.append(f'<div class="sfr{" sub" if sub else ""}">{ico(icon)}{esc(name)}</div>')
-    return (f'<div class="stabs">{tabs}</div><div class="ssearch">{ico("search")}{esc(a.get("search", "搜索"))}</div>'
+    return (f'<div class="m-home">{tabs}</div><div class="ssearch">{ico("search")}{esc(a.get("search", "搜索"))}</div>'
             f'<div class="sfold">{"".join(rows)}</div>')
 
 
@@ -962,7 +962,7 @@ def m_vbar(a, body):
     cnt = f'<small>{esc(str(a["count"]))}</small>' if "count" in a else ""
     icon = a.get("icon", "grid-s")
     right = "" if "nosearch" in a else f'<span class="vic">{ico("table")}</span><span class="vic">{ico("search")}</span>'
-    return f'<div class="vbar"><span class="vbtn">{ico(icon, tag="<hb-vbar> ")}{view}{cnt}<span class="dd">▾</span></span><span class="sp"></span>{right}</div>'
+    return f'<div class="m-viewbar"><span class="vbtn">{ico(icon, tag="<hb-vbar> ")}{view}{cnt}<span class="dd">▾</span></span><span class="sp"></span>{right}</div>'
 
 
 def slot_val(v):
@@ -999,12 +999,12 @@ def m_ocards(a, body):
     cards = "".join(out)
     if "bare" in a:
         return cards
-    fab = f'<div class="fab">{ico("plus")}</div>' if "fab" in a else ""
+    fab = f'<div class="m-fab">{ico("plus")}</div>' if "fab" in a else ""
     pager = ""
     if "pager" in a:
         pp = f'<span class="pp">{esc(a["pager"])} ▾</span>' if isinstance(a["pager"], str) else ""
         pager = f'<div class="mpager"><span class="pg">‹</span><span class="pg on">1</span><span class="pg">›</span>{pp}</div>'
-    return f'<div class="plist">{cards}</div>{fab}{pager}'
+    return f'<div class="m-cards">{cards}</div>{fab}{pager}'
 
 
 MTOOL_ICONS = {"列统计": "fields", "字段设置": "settings", "分组": "group", "筛选": "filter", "排序": "sort",
@@ -1040,12 +1040,12 @@ def m_mtool(a, body):
         if on:
             cls.append("on")
         out.append(f'<span{" class=\"" + " ".join(cls) + "\"" if cls else ""}>{ico(icon, tag="<hb-mtool> ")}{esc(label)}</span>')
-    wrap = "apptab" if mode == "app" else ("mtool obar" if mode == "obar" else "mtool")
+    wrap = "apptab" if mode == "app" else ("m-tool obar" if mode == "obar" else "m-tool")
     return f'<div class="{wrap}">' + "".join(out) + "</div>"
 
 
 def rec_field(c, edit):
-    """'字段名 | 值 | 类型' → .fld；前缀 ! 高亮块。"""
+    """'字段名 | 值 | 类型' → .m-field；前缀 ! 高亮块。"""
     name = c[0]
     hl = name.startswith("!")
     if hl:
@@ -1085,7 +1085,7 @@ def rec_field(c, edit):
             v = esc(val)
         dd = '<span class="dd">▾</span>' if typ == "sel" else ""
         fv = f'<div class="fv{ecls}">{v}{dd}</div>'
-    return f'<div class="fld{" hl" if hl else ""}">{fl}{fv}</div>'
+    return f'<div class="m-field{" hl" if hl else ""}">{fl}{fv}</div>'
 
 
 def m_rec(a, body):
@@ -1098,18 +1098,18 @@ def m_rec(a, body):
             c = cells(ln[1:])
             tabs = "".join(f'<span{" class=\"on\"" if i == 0 else ""}>{esc(t)}</span>' for i, t in enumerate(c[:-1] if len(c) > 1 and "来自" in c[-1] else c))
             bd = f'<div class="sv">{esc(c[-1])}</div>' if len(c) > 1 and "来自" in c[-1] else ""
-            out.append(f'<div class="stab"><div class="stab-hd">{tabs}</div><div class="stab-bd">{bd}</div></div>')
+            out.append(f'<div class="m-subtabs"><div class="stab-hd">{tabs}</div><div class="stab-bd">{bd}</div></div>')
         else:
             out.append(rec_field(cells(ln), edit))
     title = f'<div class="rtitle">{esc(a.get("title", ""))}</div>' if a.get("title") else ""
     qr = "" if "noqr" in a else f'<div class="rqr">{ico("f-barcode")}二维码</div>'
     elapsed = f'<div class="elapsed">耗时 {esc(a["elapsed"])}</div>' if "elapsed" in a else ""
-    return f'{elapsed}<div class="rec">{title}{qr}{"".join(out)}</div>'
+    return f'{elapsed}<div class="m-rec">{title}{qr}{"".join(out)}</div>'
 
 
 def m_fbar(a, body):
     sq = f'<span class="sq">{ico("more")}</span>' if "more" in a else ""
-    return f'<div class="fbar">{sq}<span class="b cancel">{esc(a.get("cancel", "取消"))}</span><span class="b save">{esc(a.get("save", "保存"))}</span></div>'
+    return f'<div class="m-savebar">{sq}<span class="b cancel">{esc(a.get("cancel", "取消"))}</span><span class="b save">{esc(a.get("save", "保存"))}</span></div>'
 
 
 def m_taskbar(a, body):
@@ -1121,7 +1121,7 @@ def m_taskbar(a, body):
     for ln in lines(body):
         btns.extend(cells(ln))
     tb = "".join(f'<span class="b solid">{esc(b)}</span>' for b in btns if b)
-    return (f'<div class="taskbar"><div class="th"><span class="av">{esc(who[:1])}</span><span class="tn">{esc(who)}{sub}</span>'
+    return (f'<div class="m-taskbar"><div class="th"><span class="av">{esc(who[:1])}</span><span class="tn">{esc(who)}{sub}</span>'
             f'<span class="more">{ico("expand")}</span></div><div class="tb">{tb}</div></div>')
 
 
@@ -1138,10 +1138,10 @@ def m_ptasks(a, body):
         dd = '<span class="dd">▾</span>' if btn == "办理" else ""
         cards.append(f'<div class="pcard"><div class="ph"><span class="av">{esc(c[0][:1])}</span><span class="who">{esc(c[0])}</span><span class="when">{esc(c[1])}</span>'
                      f'<span class="src">{ico("grid-s")}</span></div><div class="pt">{esc(c[2])}</div><div class="pn">任务：{esc(c[3])}</div>'
-                     f'<div class="pa"><span class="b line">{esc(btn)}{dd}</span></div></div>')
+                     f'<div class="portal-app"><span class="b line">{esc(btn)}{dd}</span></div></div>')
     app = m_mtool({"mode": "app"}, "") if "app" in a else ""
-    return (f'<div class="ptabs">{tabs}</div><div class="pfilter"><span class="cnt">{cnt}</span><span class="sp"></span>'
-            f'<span class="b text">批量</span><span class="vic on">{ico("filter")}</span></div><div class="plist">{"".join(cards)}</div>{app}')
+    return (f'<div class="m-ptasks">{tabs}</div><div class="pfilter"><span class="cnt">{cnt}</span><span class="sp"></span>'
+            f'<span class="b text">批量</span><span class="vic on">{ico("filter")}</span></div><div class="m-cards">{"".join(cards)}</div>{app}')
 
 
 def m_wpage(a, body):
@@ -1171,7 +1171,7 @@ def m_wpage(a, body):
             raise ExpandError(f"<hb-wpage> 行要以 #（横幅）/ sc:（快捷方式）/ tabs:（页签）/ sub:（任务子区）开头：{ln}")
     if tabs_html or sub_html:
         out.append(f'<div class="wcard">{tabs_html}{sub_html}</div>')
-    return f'<div class="wpage">{"".join(out)}</div>'
+    return f'<div class="m-workbench">{"".join(out)}</div>'
 
 
 def m_chat(a, body):
@@ -1205,7 +1205,7 @@ def m_chat(a, body):
         else:
             msg.append(f'<div class="md2">{esc(ln)}</div>')
     close()
-    return '<div class="chat">' + "".join(out) + "</div>"
+    return '<div class="m-chat">' + "".join(out) + "</div>"
 
 
 def m_conn(a, body):
@@ -1277,7 +1277,7 @@ GROUPS = [
 DOCS = {
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
-.stage、has-float、.float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
+.stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
 例：
 <div class="stage">
 <hb-shell ws="永铭世纪" page="物资档案" nav="table" me="周">
@@ -1305,7 +1305,7 @@ DOCS = {
 <hb-tools search="搜索品名或编号" new="新建物资">字段 | 筛选:1 | 排序 | 导入 | 打印二维码:print</hb-tools>""",
 "hb-grid": """首行表头，列名后可接类型 :tag（彩色选项）:tags（多值，值用 / 分）:user（人员，多人用 / 分）:ops（行内按钮，名:图标:颜色，多个用 / 分）；统计 :sum=值 :avg= :max= :min= :count=。
 其后每行一条记录，列数必须与表头一致。# 分组值:颜色 插分组行；! 前缀＝选中行。
-属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、页签容器内时用），默认带 .table-view.grid-view 和横向滚动条。
+属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、页签容器内时用），默认带 .table-view.view-grid 和横向滚动条。
 例：
 <hb-grid total="1,217条">
 物资编号 | 品名 | 品类:tag | 当前库存:sum=4,386 | 建档人:user | 操作:ops
@@ -1353,7 +1353,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 <hb-tasks title="待我办理的流程">
 出库审批 · CK-20260824-0037 | 1.4 小时前 | 陈晓东 扫码创建 · 待仓库主管审批
 </hb-tasks>""",
-"hb-bar": """属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .w-chart .wc-bd 高度时同步给）。
+"hb-bar": """属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .chart .wc-bd 高度时同步给）。
 每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card w-chart 卡，bare 只出 svg＋图例。
 例：
 <hb-bar title="近 6 个月出入库趋势" labels="3 月|4 月|5 月|6 月|7 月|8 月">
@@ -1413,7 +1413,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 仓库主管审批 | 周敏 执行中 | 8月24日 09:40 | 1.4小时 | 催办
 启动事件 | 陈晓东 扫码创建了「CK-20260824-0037 领用出库单」 | 8月24日 09:12
 </hb-flow>""",
-"hb-info": """标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .page-header-card 里、标题区之后。
+"hb-info": """标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .header_card 里、标题区之后。
 例：
 出库类型 | 领用出库:orange
 申请人 | 陈晓东 | user

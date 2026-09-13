@@ -24,14 +24,14 @@
       <div class="modal-side">
         <div class="side-tabs"><!-- 组件：动态/评论页签 --></div>
         <div class="feed"><!-- 组件：动态流 --></div>
-        <div class="comment-box"><!-- 组件：评论框 --></div>
+        <div class="comment"><!-- 组件：评论框 --></div>
       </div>
     </div>
   </div>
 </template>
 
 <template data-component="内容卡片" data-cn="弹窗内容卡片" data-group="记录详情">
-  <div class="widget-card">
+  <div class="modal-card">
     <div class="wc-hd"><!-- 卡片标题 --></div>
     <div class="wc-bd"><!-- 字段或其他已收录组件 --></div>
   </div>
@@ -48,7 +48,7 @@
 </template>
 
 <template data-component="评论框" data-type="comment" data-cn="评论" data-group="记录详情">
-  <div class="comment-box">
+  <div class="comment">
     <div class="ipt"><!-- 评论输入区 --></div>
     <div class="ops"><!-- 附件与发送操作 --></div>
   </div>
@@ -63,7 +63,7 @@
 </template>
 
 <template data-component="横幅部件" data-type="rich" data-cn="富文本（大标题预设，横幅）" data-group="工作台" data-measured="工作台/看板/数据分析页顶部的介绍：页面名称＋一句话介绍，左对齐（禁止居中）；默认无背景，标题直接坐在页底上靠字号和留白立住；用户要背景时加 bg-solid 铺一块干净纯色，禁止网格、环纹、斜纹、点阵这类几何纹理装饰；按钮不放横幅内部，横幅宽度可缩，与右侧的快捷按钮部件同行排">
-  <div class="w-banner">
+  <div class="rich hero">
     <h1><!-- 页面名称 --></h1>
     <p><!-- 一句话介绍：系统定位描述，学产品官方横幅口吻，说清这页管什么给谁用 --></p>
   </div>
@@ -72,7 +72,7 @@
 <template data-component="横幅-背景图卡片" data-type="rich" data-cn="富文本（大标题预设，背景图卡片式）" data-group="工作台"
           data-measured="2026-09-04 app.huoban.com 两个工作台页实测：白卡 r9 高 120、内距 20，整卡铺一张背景图（cover，客户上传，左浅右图）；页面名 30/500 ink-85 在左上；下一行日期 16/600 ink-85 ＋ 竖分隔 ＋ 时间 14/400，行高 20，距标题 18"
           data-note="示意图里背景图用占位：右侧 .ban-img 放图片位（无实物图时留渐变，不放灰色图标）；日期时间写当天，营销图可省时间只留日期。按钮不进横幅">
-  <div class="w-banner card">
+  <div class="rich hero card">
     <div class="ban-body">
       <h1><!-- 页面名称 --></h1>
       <div class="ban-dt"><b><!-- 2026年09月04日 --></b><span><!-- 16:51:17 --></span></div>
@@ -84,19 +84,19 @@
 <!-- 顶部介绍带操作按钮时的排法：横幅让宽，按钮走同行右侧的快捷按钮部件（横排），不塞进横幅里 -->
 <template data-architecture="横幅带操作按钮" data-cn="大标题 16 栏＋按钮组 8 栏同行">
   <div class="w-row">
-    <div class="w-banner"><h1><!-- 页面名称 --></h1><p><!-- 一句话介绍 --></p></div>
-    <div class="w-card shortcut-widget"><!-- 快捷按钮，见「快捷按钮」组件 --></div>
+    <div class="rich hero"><h1><!-- 页面名称 --></h1><p><!-- 一句话介绍 --></p></div>
+    <div class="w-card button"><!-- 快捷按钮，见「快捷按钮」组件 --></div>
   </div>
 </template>
 
 <template data-component="筛选部件" data-type="filter" data-cn="筛选组件" data-group="页面部件" data-measured="独立部件白卡：白底圆角9、高40、右缘可带日历/下拉图标；不与页底融合（2026-08-10 实测）">
-  <div class="w-filters">
+  <div class="filter">
     <div class="w-filter"><!-- 筛选项 --></div>
   </div>
 </template>
 
 <template data-component="快捷方式" data-type="button" data-cn="按钮（快捷方式版式）" data-group="工作台">
-  <div class="w-card w-shortcut">
+  <div class="w-card button shortcuts">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="wc-bd sc-list">
       <div class="sc"><span class="sc-ic"><svg class="ico"><use href="#i-app-s"/></svg></span><!-- 快捷入口名称 --></div> <!-- 快捷方式的彩色应用图标，同 c1 第 57 行的可选集 -->
@@ -105,7 +105,7 @@
 </template>
 
 <template data-component="单指标-居中大数" data-type="chart_single" data-cn="单指标" data-group="统计">
-  <div class="w-card w-stat center">
+  <div class="w-card chart_single center">
     <div class="st-lb"><!-- 指标名称 --></div>
     <div class="st-vl"><!-- 指标值 --></div>
     <div class="st-trend"></div>
@@ -113,7 +113,7 @@
 </template>
 
 <template data-component="单指标-左文右图" data-type="chart_single" data-cn="单指标" data-group="统计">
-  <div class="w-card w-stat strip">
+  <div class="w-card chart_single strip">
     <div class="st-bd">
       <div class="st-lb"><!-- 指标名称 --></div>
       <div class="st-vl"><!-- 指标值 --></div>
@@ -123,7 +123,7 @@
 </template>
 
 <template data-component="页签容器" data-type="tabs" data-cn="标签页" data-group="容器" data-measured="页签栏高40；卡片圆角9；内容高度按页面配置">
-  <div class="w-card page-tabs-card">
+  <div class="w-card tabs">
     <div class="page-tabs-nav">
       <div class="page-tabs-list"><span class="on"><!-- 当前页签名称 --></span><!-- 其他页签名称 --></div>
     </div>
@@ -134,7 +134,7 @@
 <template data-component="页签容器-胶囊式" data-type="tabs" data-cn="标签页（胶囊式）" data-group="容器"
           data-measured="2026-09-04 app.huoban.com 自定义页面实测（page-widget-tabs）：白卡 r9 阴影同其他部件；页签行上下留 20、无下边线；页签 40 高 pad 0 16 字 16，未选 500/ink-65，选中 600/主色并垫一条 40 高 r9 主色 20% 底条（ink-bar）；页签间距 8；内容区 pad 20"
           data-note="对齐是配置项：nav 用 justify-content 靠左或居中，实测两个工作台页都居中；页签按角色工作流程从左到右编排或按业务分类（见 principles/workbench.md）。详情页那种下划线页签是另一组件（页签容器 / 独立详情页的 page-tabs-card）">
-  <div class="w-card w-tabs">
+  <div class="w-card tabs pill">
     <div class="wt-nav center">
       <span class="wt-tab on"><!-- 当前页签 --></span>
       <span class="wt-tab"><!-- 页签 --></span>
@@ -144,7 +144,7 @@
 </template>
 
 <template data-component="待办或流程任务子区" data-type="procedure_task" data-cn="我处理的（流程待办列表）" data-group="流程">
-  <div class="w-sub">
+  <div class="procedure_task">
     <div class="ws-hd"><!-- 子区名称与筛选 --></div>
     <div class="task"><!-- 任务条目：左侧标题＋节点说明，右侧办理按钮 .t-act > .b.line -->
       <div class="t-bd"></div><div class="t-act"><span class="b line">办理</span></div>
@@ -153,7 +153,7 @@
 </template>
 
 <template data-component="图表部件" data-type="chart_*" data-cn="图表" data-group="图表">
-  <div class="w-card w-chart">
+  <div class="w-card chart">
     <div class="wc-hd"><!-- 图表名称与操作 --></div>
     <div class="wc-bd"><svg></svg></div> <!-- 图表绘图区：手绘，颜色必须用 var() 见 SKILL.md -->
     <div class="legend"><!-- 图例 --></div>
@@ -161,7 +161,7 @@
 </template>
 
 <template data-component="统计表" data-type="chart_table" data-cn="透视表" data-group="表格">
-  <div class="w-card w-pivot">
+  <div class="w-card chart_table">
     <div class="wc-hd"><!-- 统计表名称与操作 --></div>
     <table><!-- 维度、指标与数据行 --></table>
   </div>
@@ -180,7 +180,7 @@
 </template>
 
 <template data-component="工作区入口" data-cn="工作区入口" data-group="企业门户">
-  <div class="pa">
+  <div class="portal-app">
     <span class="pa-ic"><svg class="ico"><use href="#i-app-s"/></svg></span>
     <span class="pa-nm"><!-- 工作区名称 --></span>
   </div>
@@ -188,21 +188,21 @@
 
 <!-- ══════════ 十二、内容组件目录 ══════════ -->
 <template data-component="富文本" data-type="rich" data-cn="富文本" data-group="内容">
-  <div class="w-card content-widget rich-widget">
+  <div class="w-card content-widget rich">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="wc-bd rich-body"><!-- 富文本内容 --></div>
   </div>
 </template>
 
 <template data-component="图片" data-type="image" data-cn="单图" data-group="内容">
-  <div class="w-card content-widget image-widget">
+  <div class="w-card content-widget image">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <a class="image-link"><img src="" alt=""/></a>
   </div>
 </template>
 
 <template data-component="轮播图" data-type="carousel" data-cn="轮播" data-group="内容">
-  <div class="w-card content-widget carousel-widget">
+  <div class="w-card content-widget carousel">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="carousel">
       <div class="slides"><!-- 轮播项 --></div>
@@ -214,7 +214,7 @@
 </template>
 
 <template data-component="组图" data-type="image_list" data-cn="组图" data-group="内容">
-  <div class="w-card content-widget image-list-widget">
+  <div class="w-card content-widget image_list">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="image-mosaic"><!-- 组图项 --></div>
   </div>
@@ -222,21 +222,21 @@
 
 <!-- 图文列表合法版式名称：版式1排行、版式2左图右文、版式3主图加文章行、版式4左文右图、版式5上图下文、版式7多列图片卡 -->
 <template data-component="图文列表" data-type="image_text_list" data-cn="图文列表" data-group="内容">
-  <div class="w-card content-widget graphic-list-widget">
+  <div class="w-card content-widget image_text_list">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div><!-- 按已实测版式选择对应结构 class --></div>
   </div>
 </template>
 
 <template data-component="表格列表" data-type="table_item_list" data-cn="表格列表" data-group="内容">
-  <div class="w-card content-widget table-item-list-widget">
+  <div class="w-card content-widget table_item_list">
     <div class="wc-hd"><!-- 组件名称与操作 --></div>
     <div class="grid"><!-- 复用 c2 网格结构 --></div>
   </div>
 </template>
 
 <template data-component="快捷表单" data-type="fast_form" data-cn="快捷表单" data-group="内容">
-  <div class="w-card content-widget fast-form-widget">
+  <div class="w-card content-widget fast_form">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="fast-form-body">
       <!-- 复用 c2 字段结构 -->
@@ -246,14 +246,14 @@
 </template>
 
 <template data-component="任务清单" data-type="rich" data-cn="富文本（任务清单预设）" data-group="内容">
-  <div class="w-card content-widget rich-widget rich-checklist">
+  <div class="w-card content-widget rich checklist">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="rich-body"><ul class="checklist"><!-- role=checkbox 条目 --></ul></div>
   </div>
 </template>
 
 <template data-component="嵌入" data-type="embed" data-cn="嵌入" data-group="内容">
-  <div class="w-card content-widget embed-widget">
+  <div class="w-card content-widget embed">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="embed-frame"><iframe src="" title=""></iframe></div>
   </div>
@@ -261,7 +261,7 @@
 
 <!-- ══════════ 十三、原生组件目录 ══════════ -->
 <template data-component="大幅富文本" data-type="rich" data-cn="富文本（大标题预设）" data-group="原生组件">
-  <div class="rich-hero"><!-- 标志、标题、副标题、搜索或操作 --></div>
+  <div class="rich hero"><!-- 标志、标题、副标题、搜索或操作 --></div>
 </template>
 
 <template data-component="装饰" data-type="decoration" data-cn="装饰" data-group="原生组件">
@@ -269,7 +269,7 @@
 </template>
 
 <template data-component="多进度条" data-type="progress_bar" data-cn="进度条" data-group="统计">
-  <div class="w-card multi-progress-card">
+  <div class="w-card progress_bar">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="progress-row">
       <span><!-- 指标名称 --></span><b><!-- 当前值与目标值 --></b>
@@ -279,24 +279,24 @@
 </template>
 
 <template data-component="日期时间-背景型" data-type="timer" data-cn="时间组件" data-group="日期">
-  <div class="datetime-hero"><!-- 标题、日期与时间 --></div>
+  <div class="timer hero"><!-- 标题、日期与时间 --></div>
 </template>
 
 <template data-component="日期时间-上下型" data-type="timer" data-cn="时间组件" data-group="日期">
-  <div class="w-card datetime-time-date">
+  <div class="w-card timer stack">
     <time class="time"></time><time class="date"></time>
   </div>
 </template>
 
 <!-- 快捷按钮合法版式名称：横排、竖排小图标、竖排裸图标 -->
 <template data-component="快捷按钮" data-type="button" data-cn="按钮" data-group="按钮">
-  <div class="w-card shortcut-widget">
+  <div class="w-card button">
     <div class="shortcut"><span class="shortcut-icon"><svg class="ico"><use href="#i-app-s"/></svg></span><span><!-- 入口名称 --></span></div>
   </div>
 </template>
 
 <template data-component="我发起的流程" data-type="procedure_process" data-cn="我发起的" data-group="流程">
-  <div class="w-card procedure-process-widget">
+  <div class="w-card procedure_process">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="process-filters"><!-- 状态筛选 --></div>
     <div class="process-list"><!-- 流程记录或空状态 --></div>
@@ -304,14 +304,14 @@
 </template>
 
 <template data-component="多项汇总" data-type="multi_stats" data-cn="多项统计" data-group="统计">
-  <div class="w-card multi-stats-widget">
+  <div class="w-card multi_stats">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="multi-stat-row"><span><!-- 指标名称 --></span><b class="pill"><!-- 指标值 --></b></div>
   </div>
 </template>
 
 <template data-component="分类小计" data-type="subtotal" data-cn="分类汇总" data-group="统计">
-  <div class="w-card subtotal-widget">
+  <div class="w-card subtotal">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="subtotal-head"><!-- 总计 --></div>
     <div class="subtotal-row"><!-- 分类名称与数值 --></div>
@@ -319,7 +319,7 @@
 </template>
 
 <template data-component="日历-带日程" data-type="calendar" data-cn="日历" data-group="日历">
-  <div class="w-card calendar-agenda-widget">
+  <div class="w-card calendar agenda">
     <div class="calendar-toolbar"><!-- 月份与导航 --></div>
     <div class="calendar-grid"><!-- 星期与日期网格 --></div>
     <div class="agenda-list"><!-- 日程列表或空状态 --></div>
@@ -327,7 +327,7 @@
 </template>
 
 <template data-component="日历-单月视图" data-type="calendar" data-cn="日历（小日历）" data-group="日历">
-  <div class="calendar-month-view">
+  <div class="calendar month">
     <div class="calendar-view-tools"><!-- 视图操作 --></div>
     <div class="calendar-toolbar"><!-- 月份与导航 --></div>
     <div class="calendar-grid month-grid"><!-- 7列×6行日期网格 --></div>
@@ -343,10 +343,10 @@
 5. 标题卡片只承载摘要信息，不放按钮；按钮放记录功能区。
 -->
 <template data-architecture="独立自定义详情页" data-cn="独立自定义详情页" data-default-for="详情页" data-source="伙伴云真实自定义详情页">
-  <main class="custom-detail-page">
+  <main class="item-page">
     <!-- 组件：记录功能区（默认包含，2026-08-10 实测确认：自定义详情页自带此栏，无论弹窗或独立形态） -->
     <div class="item-page-canvas">
-      <div class="item-page-grid">
+      <div class="item-grid">
         <!-- 可选组件：标题卡片，占宽 24 -->
         <!-- 可选组件：选项字段-步骤样式，占宽 24 -->
         <!-- 常见布局：页签容器占宽 8＋页签容器占宽 16；这是栅格组合，不是专用侧栏/主卡组件 -->
@@ -357,7 +357,7 @@
 </template>
 
 <template data-component="记录功能区" data-cn="记录功能区" data-group="自定义详情页" data-use="自定义详情页默认包含（弹窗与独立形态皆有，实测确认）" data-measured="高 56、白底、下边线 1px rgba(0,0,0,.08)、左右内边距 16；标题 16/500；快捷按钮高 32 圆角 6，实底／彩色线框／置灰三态并存（实测同一页同时出现绿实底、红线框、灰置灰）；右侧系统操作：编辑、复制、分享、打印、历史、更多、关闭">
-  <div class="item-page-toolbar">
+  <div class="item-toolbar">
     <div class="item-page-nav"><svg class="ico"><use href="#i-prev"/></svg><svg class="ico"><use href="#i-next"/></svg></div>
     <div class="item-page-record-title"><!-- 记录主标题 --> <span class="caret">▾</span></div>
     <div class="item-page-shortcuts"><!-- 业务快捷按钮：.b.solid 彩色实底 / .b.line 线框 / 加 .dis 置灰 --></div>
@@ -366,7 +366,7 @@
 </template>
 
 <template data-component="标题卡片" data-type="header_card" data-cn="页头卡片" data-group="自定义详情页" data-rule="不放按钮；操作按钮属于记录功能区" data-measured="卡片高180、内边距20、圆角9；标题20/600；副标题14；关键字段标签12、值14">
-  <div class="w-card page-header-card span-24">
+  <div class="w-card header_card span-24">
     <div class="page-header-heading">
       <div class="page-header-title"><!-- 主标题 --></div>
       <div class="page-header-subtitle"><!-- 副标题或编号 --></div>
@@ -382,7 +382,7 @@
 </template>
 
 <template data-component="选项字段-步骤样式" data-cn="选项字段步骤条" data-group="自定义详情页" data-measured="容器高 40 圆角 9；每段箭头形 clip-path（切口 10px、段间叠合 -10px、padding 0 20）；已过段＝主色 25% 底＋ink-45 字，当前段＝主色实底白字，未来段＝白底 ink-65。它是选项字段的展示样式，不是独立阶段组件">
-  <div class="option-steps span-24">
+  <div class="item-steps span-24">
     <span class="preceding"><!-- 当前值之前的选项 --></span>
     <span class="current"><!-- 当前选项 --></span>
     <span class="following"><!-- 当前值之后的选项 --></span>
@@ -390,7 +390,7 @@
 </template>
 
 <template data-component="详情页24栅格" data-cn="详情页栅格画布" data-group="自定义详情页" data-measured="24列；列间距20；组件纵向间距20">
-  <div class="item-page-grid">
+  <div class="item-grid">
     <div class="span-8"><!-- 已收录组件 --></div>
     <div class="span-16"><!-- 已收录组件 --></div>
     <div class="span-24"><!-- 已收录组件 --></div>
@@ -400,7 +400,7 @@
 <template data-component="流程页签" data-type="process" data-cn="流程执行记录" data-group="记录详情"
           data-use="带流程的记录详情右栏（记录详情弹窗 modal-side，或独立自定义详情页的配套流程展示区）：替代 动态feed＋评论框 整段；页签顺序固定 流程/动态/评论、流程在前"
           data-measured="2026-08-20 app.huoban.com 真实 DOM 实测（hb-flow-message / hb-flowbox-timeline / hb-flowbox）：页签行 流程/动态/评论；头部白块＝圆形应用图标32＋流程名13/500＋发起人·时间12/ink-45＋居中「撤销流程」行32；timeline 浅灰底 pad16、节点卡倒序（白卡 r6、1px rgba(0,0,0,.04) 边、卡间12）；卡＝head32（thumb24 r6＋节点名12/500）＋状态行12（执行中橙/同意绿/驳回红）＋时间行12灰（日期＋⏱耗时）＋可选「催办」links 行；面板底部「查看详细记录」32 居中">
-  <div class="flow-msg">
+  <div class="process">
     <div class="flow-msg-body">
       <span class="app-ic"><svg class="ico"><use href="#i-grid-s"/></svg></span>
       <span><b><!-- 流程名称 --></b><small><!-- 发起人 · 发起时间 --></small></span>

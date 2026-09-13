@@ -30,7 +30,7 @@
 
 <template data-component="一级顶栏" data-cn="一级顶栏" data-group="产品壳层"
           data-measured="只覆盖右侧内容区，高 56、padding 0 12；菜单图标＋当前页面名 15/500＋展开图标；右侧系统图标组 gap 18＋头像 28">
-  <div class="top-bar">
+  <div class="shell-top-bar">
     <span class="menu"><svg class="ico"><use href="#i-menu"/></svg></span>
     <span class="pg"><!-- 当前页面名称 --></span>
     <span class="caret"><!-- 展开图标 --></span>
@@ -40,7 +40,7 @@
 
 <template data-component="左侧导航" data-cn="左侧导航" data-group="产品壳层"
           data-measured="248 宽通顶；顶部 56 高工作区块（标志 32 圆形＋名称 16/500＋新建）；其下图标行 44、导航树 padding 12 8、底部条 48">
-  <div class="side">
+  <div class="shell-side">
     <div class="side-top">
       <span class="ws-logo"><!-- 工作区标志 --></span>
       <span class="ws-name"><!-- 工作区名称 --></span>
@@ -61,14 +61,14 @@
 </template>
 
 <template data-component="导航页面项" data-cn="导航页面项" data-group="左侧导航">
-  <div class="leaf">
+  <div class="shell-nav-leaf">
     <span class="li"><svg class="ico"><use href="#i-app-s"/></svg></span> <!-- 表/页面的彩色应用图标，按业务选：app-s grid-s board-s chart-s trend-s pie-s check-s fire-s factory-s box-s star-s -->
     <!-- 页面名称 -->
   </div>
 </template>
 
 <template data-component="导航文件夹" data-cn="导航文件夹" data-group="左侧导航">
-  <div class="folder">
+  <div class="shell-nav-folder">
     <span class="fi"><svg class="ico"><use href="#i-folder"/></svg></span>
     <!-- 文件夹名称 -->
     <span class="n"><!-- 子项数量 --></span>
@@ -81,9 +81,9 @@
 </template>
 
 <template data-component="营销浮层" data-cn="营销浮层" data-group="画布" data-default="off">
-  <div class="float"><!-- 已收录组件 --></div>
+  <div class="mk-float"><!-- 已收录组件 --></div>
 </template>
 
 <template data-component="营销标注" data-cn="营销标注" data-group="画布" data-default="off">
-  <div class="callout"><!-- 业务价值说明 --></div>
+  <div class="mk-callout"><!-- 业务价值说明 --></div>
 </template>
