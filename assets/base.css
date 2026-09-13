@@ -143,7 +143,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .shell-top-bar .right { margin-left: auto; display: flex; align-items: center; gap: 18px; }
 .me {
   width: 28px; height: 28px; border-radius: 50%; flex: none;
-  background: #4CAF7D; color: #fff; font-size: 12px;
+  background: var(--c-green); color: #fff; font-size: 12px;
   display: inline-flex; align-items: center; justify-content: center;
 }
 
@@ -674,7 +674,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .chart_table th { height: 34px; font-weight: 400; color: var(--ink-65); border: 1px solid rgba(0,0,0,.08); padding: 0 12px; text-align: left; }
 .chart_table td { height: 33px; border: 1px solid rgba(0,0,0,.08); padding: 0 12px; }
 .chart_table .dim { background: var(--tag-bg); }
-.databar { display: inline-block; background: rgba(228,115,115,.7); padding: 1px 4px; border-radius: 2px; }
+.databar { display: inline-block; background: color-mix(in srgb, var(--c-red) 70%, transparent); padding: 1px 4px; border-radius: 2px; }
 
 /* 内容部件通用壳与快捷表单（c3 内容组件） */
 .content-widget { overflow: hidden; }
@@ -1071,7 +1071,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .fv .ph { color: var(--ink-25); }
 .phone .fv .dd { margin-left: auto; color: var(--ink-45); font-size: 10px; }
 .phone .fv .unit { margin-left: auto; color: var(--ink-45); }
-.phone .m-field.hl { background: var(--field-hl, #A5F2E5); border-radius: 6px; padding: 6px 1px 1px; margin-top: 13px; }
+.phone .m-field.hl { background: var(--field-hl, var(--tint-teal)); border-radius: 6px; padding: 6px 1px 1px; margin-top: 13px; }
 .phone .m-field.hl .fv { background: rgba(255,255,255,.65); }
 .phone .m-field.hl .fv.edit { background: rgba(255,255,255,.65); border: 0; }
 .phone .fv.opts { padding: 8px 10px; gap: 8px; }
@@ -1150,7 +1150,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .wtabs span { display: inline-flex; align-items: center; font-size: 16px; color: var(--ink-65); position: relative; }
 .phone .wtabs .on { color: var(--ink-85); font-weight: 500; }
 .phone .wtabs .on::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--primary); }
-.phone .wsub { margin: 20px; background: #F7F7F7; border-radius: 9px; min-height: 300px; }
+.phone .wsub { margin: 20px; background: var(--page-bg); border-radius: 9px; min-height: 300px; }
 .phone .wsh { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-85); box-shadow: 0 0 0 1px rgba(0,0,0,.04); border-radius: 9px 9px 0 0; }
 .phone .wsh .chips { margin-left: auto; display: inline-flex; gap: 4px; }
 .phone .chip { height: 24px; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 400; color: var(--ink-85); line-height: 16px; }
