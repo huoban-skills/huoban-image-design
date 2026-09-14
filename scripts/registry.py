@@ -135,7 +135,7 @@ def coverage():
     reg = load()
     root = SKILL / "references" / "principles"
     guide = (root / "component-guide.md").read_text(encoding="utf-8")
-    docs = {"workbench": "workbench.md", "dashboard": "dashboard.md", "detail": "item-detail.md"}
+    docs = {"workbench": "workbench.md", "dashboard": "dashboard.md", "detail": "item-detail.md", "screen": "screen.md"}
     bad = 0
     for kind, doc in docs.items():
         text = (root / doc).read_text(encoding="utf-8")
