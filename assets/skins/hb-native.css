@@ -16,7 +16,7 @@
   --card-bg: #FFFFFF;
   --line: #EBEBEB;
   --field-bg: #F5F6F8;   /* 字段值框灰底（实测） */
-  --filter-bg: #F7F7F7;  /* 筛选部件底（实测） */
+  --filter-bg: #F7F7F7;  /* 筛选组件底（实测） */
   --tag-bg: rgba(0, 0, 0, .08);
   --ink-85: rgba(0, 0, 0, .85);
   --ink-65: rgba(0, 0, 0, .65);

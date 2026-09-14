@@ -3,16 +3,16 @@
 
 来源：2026-09-04 app.huoban.com 实测三类大屏页——客户搭的「生产车间大屏」「项目管理数字大屏」，
    官方模板「黑金金融」「深青未来」。大屏＝自定义页面「超宽」模式＋深色＋整页背景图＋卡片装饰框，
-   部件仍是工作台/看板那套（单指标、图表、统计表、进度条、日期时间、标题）。
+   组件仍是工作台/看板那套（单指标、图表、统计表、进度条、日期时间、标题）。
    产品里的背景、标题条、装饰框都是搭建者上传的图片（border-image）；本 skill 不带这些图，
    用 CSS 画等价几何（base.css「数据大屏」一节），背景用 assets/screens/ 里的四张 SVG，颜色随 theme 变。
 
 本文件是架构与组件目录，不含业务示例：
-1. .screen 是画布，宽随 .stage（1640），最低高 922（16:9），内距 20，部件间距 20；用 .sc-grid 24 栅格排布，列跨度 sp-N。
+1. .screen 是画布，宽随 .stage（1640），最低高 922（16:9），内距 20，组件间距 20；用 .sc-grid 24 栅格排布，列跨度 sp-N。
 2. 主题三选一挂在 .screen 上：theme-blue（科技蓝，默认）/ theme-teal（深青）/ theme-gold（黑金）；背景四选一：bg-earth 星空地球 / bg-city 城市夜景 / bg-grid 科技网格 / bg-gold 黑金菱格。
 3. 装饰框三选一挂在指标框和图表卡上：frame-bracket 四角括号 / frame-round 圆角发光 / frame-none 无框；同一张图只用一种。
 4. 图表卡标题条三选一：tag 斜切标签（深青）/ chevron 雁翎居中（黑金）/ line 左标题渐变底线（科技蓝）；同一张图只用一种。
-5. 放进 .screen 的既有部件（chart_single、chart、chart_table、图表 SVG）自动走深色 token，不用改类名。
+5. 放进 .screen 的既有组件（chart_single、chart、chart_table、图表 SVG）自动走深色 token，不用改类名。
 6. 大屏是营销图里的"大屏模式看板"，不套产品壳（.window/左侧导航/顶栏）；用户明确要"演示模式截图"就这样交付。
 7. 布局按 Z 型：顶部标题条，上排结果指标，中间大视觉位或主图，两侧对比图，底部明细/播报（见 principles/dashboard.md 大屏一节）。
 -->

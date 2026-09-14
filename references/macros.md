@@ -22,10 +22,10 @@
 ```
 
 ### hb-row
-24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放部件宏，最多 4 个
+24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个
 
 ```
-24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放部件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
+24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放组件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
 例：
 <hb-row spans="16|8">
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
@@ -34,7 +34,7 @@
 ```
 
 ### hb-float
-营销浮层：属性 side=right|left、top、w、title；体内放底层没有的部件（bare 模式）
+营销浮层：属性 side=right|left、top、w、title；体内放底层没有的组件（bare 模式）
 
 ```
 营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西：bare 模式的宏（hb-grid bare、hb-ocards bare）或 extract_templates.py 提的模板；不复制底层已有内容；最多两张卡。
@@ -147,10 +147,10 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 
-## 自定义页面部件（工作台 / 看板 / 数据分析页）
+## 自定义页面组件（工作台 / 看板 / 数据分析页）
 
 ### hb-banner
-横幅部件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）
+横幅组件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）
 
 ```
 第一行页面名称，第二行一句话介绍（口吻规则见 SKILL.md 步骤 4）；属性 solid 铺纯色背景。
@@ -162,7 +162,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00
 ```
 
 ### hb-filters
-筛选部件：筛选文本 | 图标
+筛选组件：筛选文本 | 图标
 
 ```
 行：筛选文本 | 图标，图标默认 f-select（日期用 f-date）。

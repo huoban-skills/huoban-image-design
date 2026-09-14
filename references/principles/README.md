@@ -9,14 +9,14 @@
 | [list-view.md](list-view.md) | 列表和视图页：视图引擎选型、工具栏、表格列与行、看板／日历／甘特 |
 | [form.md](form.md) | 普通表单与表单编辑页：字段类型与展示形态、列数与分组、必填与校验 |
 | [item-detail.md](item-detail.md) | 自定义详情页：记录功能区、页头卡片、步骤条、字段组双栏、页签容器 |
-| [workbench.md](workbench.md) | 工作台：角色入口定位、按角色问题选部件、首屏顺序、栅格配方 |
-| [dashboard.md](dashboard.md) | 看板／数据分析页／大屏：指标到部件、顺序与栅格、色彩、大屏 |
+| [workbench.md](workbench.md) | 工作台：角色入口定位、按角色问题选组件、首屏顺序、栅格配方 |
+| [dashboard.md](dashboard.md) | 看板／数据分析页／大屏：指标到组件、顺序与栅格、色彩、大屏 |
 
 ## 组件选取（画工作台、看板、详情页时读）
 
 | 文件 | 内容 |
 |---|---|
-| [dashboard-chart-selection.md](dashboard-chart-selection.md) | 按分析场景选官方组件：38 个部件的用途、举例、边界 |
+| [dashboard-chart-selection.md](dashboard-chart-selection.md) | 按分析场景选官方组件：38 个组件的用途、举例、边界 |
 | [dashboard-data-story.md](dashboard-data-story.md) | 看板定位、四问法、指标体系（指标拆不清时读） |
 
 ## 通用原则（所有图都读）

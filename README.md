@@ -26,10 +26,10 @@
 ## 架构
 
 ```
-登记表  assets/registry.json      官方部件 type ↔ 类名 ↔ 宏 ↔ 栅格默认尺寸 ↔ 采集状态（唯一名录，registry.py 校验）
+登记表  assets/registry.json      官方组件 type ↔ 类名 ↔ 宏 ↔ 栅格默认尺寸 ↔ 采集状态（唯一名录，registry.py 校验）
 结构    assets/c1-shell.html       产品壳、顶栏、导航            ┐
-        assets/c2-table-form.html  表格、字段、表单、业务视图      │ 模板带 data-type（官方部件）
-        assets/c3-page-detail.html 详情页、弹窗、工作台/看板部件   │ 与 data-measured（实测注释）
+        assets/c2-table-form.html  表格、字段、表单、业务视图      │ 模板带 data-type（官方组件）
+        assets/c3-page-detail.html 详情页、弹窗、工作台/看板组件   │ 与 data-measured（实测注释）
         assets/c4-mobile.html      手机端 H5                    │
         assets/c5-screen.html      数据大屏                     ┘
 骨架样式 assets/base.css            尺寸布局，无颜色
@@ -45,7 +45,7 @@
 
 ## 三条硬约束
 
-- **不自造组件**：只画登记表里有的部件，未采集的先告知用户。
+- **不自造组件**：只画登记表里有的组件，未采集的先告知用户。
 - **尺寸是实测的**：顶栏 56、侧栏 248、行高 35、标签 20 来自真实产品。
 - **颜色不写死**：一律走皮肤 token，`check.py` 把写死色值列为 Blocker。
 

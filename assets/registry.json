@@ -487,7 +487,7 @@
     "page:detail",
     "row"
    ],
-   "note": "c2 里是表单折叠分组；与官方页面部件 field_group 是否同物待实测"
+   "note": "c2 里是表单折叠分组；与官方页面组件 field_group 是否同物待实测"
   },
   {
    "kind": "component",
@@ -1014,7 +1014,7 @@
     "page:detail",
     "row"
    ],
-   "note": "动态条目（部件 stream 的一条）；类名保留 fi"
+   "note": "动态条目（组件 stream 的一条）；类名保留 fi"
   },
   {
    "kind": "component",
@@ -1061,7 +1061,7 @@
    "cn": "富文本（大标题预设，横幅）",
    "old_class": "w-banner",
    "file": "c3-page-detail.html",
-   "name": "横幅部件",
+   "name": "横幅组件",
    "group": "工作台",
    "macro": "hb-cover",
    "grid": null,
@@ -1119,8 +1119,8 @@
    "cn": "筛选组件",
    "old_class": "w-filters",
    "file": "c3-page-detail.html",
-   "name": "筛选部件",
-   "group": "页面部件",
+   "name": "筛选组件",
+   "group": "页面组件",
    "macro": "hb-filters",
    "grid": [
     4,
@@ -1294,7 +1294,7 @@
    "cn": "图表",
    "old_class": "w-card w-chart",
    "file": "c3-page-detail.html",
-   "name": "图表部件",
+   "name": "图表组件",
    "group": "图表",
    "macro": "hb-bar/hb-line/hb-donut",
    "grid": [
@@ -1567,7 +1567,7 @@
     "page:workbench",
     "row"
    ],
-   "note": "产品是否有独立任务清单部件待实测；官方说文档/便签/任务清单/大标题都是 rich 预设"
+   "note": "产品是否有独立任务清单组件待实测；官方说文档/便签/任务清单/大标题都是 rich 预设"
   },
   {
    "kind": "component",
@@ -2380,7 +2380,7 @@
    "allowed_in": [
     "page:screen"
    ],
-   "note": "是否 image 部件待实测（产品里是搭建者上传图片）"
+   "note": "是否 image 组件待实测（产品里是搭建者上传图片）"
   },
   {
    "kind": "component",
@@ -2792,7 +2792,7 @@
    "kind": "atom",
    "id": "w-card",
    "type_key": null,
-   "cn": "部件白卡外壳",
+   "cn": "组件白卡外壳",
    "old_class": "w-card",
    "file": null,
    "name": null,

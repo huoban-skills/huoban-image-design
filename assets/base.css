@@ -88,7 +88,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .mk-float.left { justify-self: start; }
 .stage.auto .float-title { font-size: 13px; font-weight: 500; color: var(--ink-45); margin-bottom: 8px; }
 .stage.auto.product .window { border-radius: 0; border: 0; }
-/* hb-row spans：按跨度比例分配（flex-grow），部件自身宽度不撑开 */
+/* hb-row spans：按跨度比例分配（flex-grow），组件自身宽度不撑开 */
 .w-row > .span-2 { flex: 2 1 0%; } .w-row > .span-3 { flex: 3 1 0%; } .w-row > .span-4 { flex: 4 1 0%; }
 .w-row > .span-5 { flex: 5 1 0%; } .w-row > .span-6 { flex: 6 1 0%; } .w-row > .span-7 { flex: 7 1 0%; }
 .w-row > .span-8 { flex: 8 1 0%; } .w-row > .span-9 { flex: 9 1 0%; } .w-row > .span-10 { flex: 10 1 0%; }
@@ -544,9 +544,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .ci-row { color: var(--ink-65); padding: 3px 0; }
 .ci-ops { margin-top: 10px; display: flex; white-space: nowrap; overflow: hidden; }
 
-/* ── 十 自定义页面部件 ── */
+/* ── 十 自定义页面组件 ── */
 .page { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; background: var(--page-bg); }
-.page > * { flex: none; } /* 部件按内容高度排布，不被压缩重叠 */
+.page > * { flex: none; } /* 组件按内容高度排布，不被压缩重叠 */
 /* 页面标题区：工作台/看板/数据分析页顶部的「页面名称＋一句话介绍」。
    左对齐；默认无背景，标题直接坐在页底上。要背景就加 bg-solid 铺一块干净纯色，
    几何纹理装饰（网格/环纹/斜纹/点阵/光晕）已废弃，别再加回来 */
@@ -573,7 +573,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .rich.title.card .ban-img { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; }
 .rich.title.card .ban-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .rich.title.card .ban-img:empty { display: none; }
-/* 横幅与同行部件（如快捷按钮）：按钮不进横幅内部，横幅让宽、右侧部件按内容宽 */
+/* 横幅与同行组件（如快捷按钮）：按钮不进横幅内部，横幅让宽、右侧组件按内容宽 */
 .w-row:has(> .rich.title) { align-items: center; }
 .w-row > .rich.title { flex: 1 1 auto; min-width: 0; }
 .w-row > .rich.title + * { flex: 0 0 auto; }
@@ -651,7 +651,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .t-no2, .t-node { color: var(--ink-45); font-size: 13px; margin-top: 3px; }
 /* 流程任务行右侧的办理按钮（2026-09-04 实测：次要按钮 68×32，r6，1px 浅边） */
 .task .t-act { margin-left: auto; align-self: center; padding-left: 12px; }
-/* 图表部件 */
+/* 图表组件 */
 .chart .wc-bd { height: 240px; display: flex; align-items: center; justify-content: center; }
 .chart .wc-bd svg { width: 100%; height: 100%; }
 .legend { display: flex; justify-content: center; align-items: center; gap: 18px; padding: 6px 12px 14px; font-size: 13px; color: var(--ink-65); }
@@ -660,7 +660,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .legend .sw-2 { background: var(--c-blue); }
 .legend .sw-3 { background: var(--c-purple); }
 .legend .view-pager { color: var(--ink-45); }
-/* 筛选部件行：每个筛选是独立部件白卡（实测白底圆角 9、40 高），不与页底融合；--filter-bg 弃用转备用 */
+/* 筛选组件行：每个筛选是独立组件白卡（实测白底圆角 9、40 高），不与页底融合；--filter-bg 弃用转备用 */
 .filter { display: flex; gap: 20px; }
 .w-filter {
   flex: 1; height: 40px; border-radius: 9px; background: var(--card-bg);
@@ -669,16 +669,16 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .w-filter.ph { color: var(--ink-25); }
 .w-filter .cal { margin-left: auto; color: var(--ink-45); }
-/* 统计表部件（交叉表） */
+/* 统计表组件（交叉表） */
 .chart_table table { border-collapse: collapse; width: 100%; }
 .chart_table th { height: 34px; font-weight: 400; color: var(--ink-65); border: 1px solid rgba(0,0,0,.08); padding: 0 12px; text-align: left; }
 .chart_table td { height: 33px; border: 1px solid rgba(0,0,0,.08); padding: 0 12px; }
 .chart_table .dim { background: var(--tag-bg); }
 .databar { display: inline-block; background: color-mix(in srgb, var(--c-red) 70%, transparent); padding: 1px 4px; border-radius: 2px; }
 
-/* 内容部件通用壳与快捷表单（c3 内容组件） */
+/* 内容组件通用壳与快捷表单（c3 内容组件） */
 .content-widget { overflow: hidden; }
-/* 图文列表部件（c3 内容组件）：封面＋标题＋摘要的网格 */
+/* 图文列表组件（c3 内容组件）：封面＋标题＋摘要的网格 */
 .image_text_list { overflow: hidden; }
 .graphic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 14px 16px 18px; }
 .graphic-item { display: block; }
@@ -698,7 +698,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* 表单内提示条：说明提交后系统会自动做什么（自动化价值的常见表达位） */
 .form-hint { margin: 10px 16px 0; padding: 8px 10px; background: var(--accent-bg); border-radius: 6px; font-size: 12px; color: var(--primary-deep); line-height: 1.6; }
 
-/* ── 十三 长尾部件（要点样式，细节按注释实测值补） ── */
+/* ── 十三 长尾组件（要点样式，细节按注释实测值补） ── */
 .progress_bar { padding-bottom: 8px; }
 .progress-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 8px 16px; align-items: center; }
 .progress-row b small { color: var(--ink-45); font-weight: 400; }
@@ -770,7 +770,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .calendar-grid .days .dnum.today { display: inline-block; background: var(--primary); color: #fff; border-radius: 4px; padding: 2px 6px; height: auto; margin: 4px; }
 .calendar-event { margin: 0 4px; }
 .calendar-event { display: block; font-size: 12px; background: var(--primary-soft); color: var(--primary); border-radius: 4px; padding: 2px 6px; margin-top: 3px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* 日历视图容器（c2 业务视图 / c3 日历部件共用） */
+/* 日历视图容器（c2 业务视图 / c3 日历组件共用） */
 .view-calendar { background: var(--card-bg); }
 .calendar.month { display: flex; flex-direction: column; height: 100%; background: var(--card-bg); }
 .calendar-grid.month-grid { flex: 1; min-height: 0; }
@@ -859,7 +859,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .image-list img, .image-list figure { background: var(--field-bg); border-radius: 6px; min-height: 62px; }
 .image-list figcaption { font-size: 12px; color: var(--ink-45); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* 内容部件：图片 / 轮播 / 组图（双列卡内容区实测 458×240） */
+/* 内容组件：图片 / 轮播 / 组图（双列卡内容区实测 458×240） */
 .image .image-link { display: block; margin: 0 16px 16px; }
 .image img, .slide img, .mosaic-item img { display: block; width: 100%; height: 100%; background: var(--field-bg); border-radius: 8px; border: 0; }
 .carousel { position: relative; margin: 0 16px 16px; height: 240px; border-radius: 9px; overflow: hidden; background: var(--field-bg); }
@@ -877,7 +877,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .mosaic-item > span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 12px 8px; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.45)); font-size: 13px; }
 .mosaic-item small { display: block; opacity: .85; font-size: 12px; }
 
-/* 内容部件：富文本 / 任务清单 / 嵌入 */
+/* 内容组件：富文本 / 任务清单 / 嵌入 */
 .rich .rich-body { padding: 4px 16px 16px; line-height: 1.8; font-size: 14px; }
 .rich-body h1 { font-size: 20px; margin-bottom: 8px; }
 .rich-body h3 { font-size: 15px; margin: 10px 0 6px; }
@@ -890,13 +890,13 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .embed .embed-frame { margin: 0 16px 16px; height: 200px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--field-bg); }
 .embed-frame iframe { width: 100%; height: 100%; border: 0; }
 
-/* 内容部件：表格列表（复用 .grid）、图文列表变体已在上方 */
+/* 内容组件：表格列表（复用 .grid）、图文列表变体已在上方 */
 .table_item_list .grid { border-top: 1px solid var(--line); }
 /* 名录容器修饰类：无独立样式，仅作组件识别标记 */
 .carousel, .image_list, .checklist { display: block; }
 .button.shortcuts { display: block; }
 
-/* 原生部件：日期时间两种形态 / 装饰 / 流程 / 快捷按钮 / 日历带日程 */
+/* 原生组件：日期时间两种形态 / 装饰 / 流程 / 快捷按钮 / 日历带日程 */
 .timer.hero { border-radius: 9px; background: var(--banner-bg); color: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
 .timer.hero h1 { font-size: 22px; font-weight: 500; }
 .timer.hero .datetime b { font-size: 16px; margin-right: 10px; }
@@ -1181,7 +1181,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .tapdot { position: absolute; top: 4px; right: 10px; width: 18px; height: 18px; border-radius: 50%; background: var(--c-orange); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
 
 /* ══════════════════ 数据大屏（2026-09-04 app.huoban.com 三个大屏页实测：生产车间大屏、项目管理数字大屏、官方模板黑金金融/深青未来）══════════════════
-   大屏＝自定义页面「超宽」模式＋深色＋背景图＋卡片装饰框。部件仍是工作台那套，放进 .screen 后走这里的深色 token；
+   大屏＝自定义页面「超宽」模式＋深色＋背景图＋卡片装饰框。组件仍是工作台那套，放进 .screen 后走这里的深色 token；
    实测：画布内距 20、24 栅格间距 20；标题条 80 高、页面名 26～30/500～700 白 85%；右上日期 16/600 白＋星期＋时间 14；
    指标框 159×100：指标名 14 白 45%、值 32/500 白 85% 居中；卡片底 rgba(0,0,0,.65)；图表卡标题条 40 高、标题 16/500。
    产品里的装饰框和标题条是搭建者上传的图片（border-image），本 skill 用 CSS 画等价几何：四角括号框、圆角发光框、斜切标签条、金色雁翎条。 */

@@ -7,7 +7,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 产出"长得像伙伴云产品"的界面示意图：用骨架宏拼装真实产品实测组件，不自由发挥。输入是出图需求或 huoban-solution-report 的图需求单；**交付物是单文件 HTML**（`源文件/图名.html`，离线可开、自适应），PNG／SVG 只在用户或报告明确要时用 export.py 另出。只画伙伴云产品界面，海报/流程图/ER 图/网站不在本 skill。
 
-核心资产：**登记表**（assets/registry.json，官方部件 type ↔ 类名 ↔ 宏，唯一名录）＋**结构**（assets/c1～c5 实测架构，模板带官方 `data-type`）＋**骨架样式**（base.css）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）＋**宏**（scripts/expand.py，模型只填内容）。
+核心资产：**登记表**（assets/registry.json，官方组件 type ↔ 类名 ↔ 宏，唯一名录）＋**结构**（assets/c1～c5 实测架构，模板带官方 `data-type`）＋**骨架样式**（base.css）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）＋**宏**（scripts/expand.py，模型只填内容）。
 
 ## 页面类型路由（唯一真相源）
 
@@ -108,7 +108,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 | 约束 | 内容 |
 | --- | --- |
-| 不自造组件 | 只画登记表（assets/registry.json）里有的部件；`registry.py --list 页面类型` 看该页可用部件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
+| 不自造组件 | 只画登记表（assets/registry.json）里有的组件；`registry.py --list 页面类型` 看该页可用组件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
 | 尺寸是实测的 | 顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24 来自真实产品，改了就不像 |
 | 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画 |

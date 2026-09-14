@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""类名迁移：把 1.x 的组件根类改成 2.0 登记表里的名字（有官方部件的用官方 type key）。
+"""类名迁移：把 1.x 的组件根类改成 2.0 登记表里的名字（有官方组件的用官方 type key）。
 
 用法：
     python3 scripts/migrate_classes.py --dry-run            # 只统计每个文件会改多少处

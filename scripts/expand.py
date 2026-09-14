@@ -1410,7 +1410,7 @@ def m_float(a, body):
     w = str(a.get("w", "356")).rstrip("px")
     n_cards = len(re.findall(r'class="w-card', body))
     if n_cards > 2:
-        warn(f"浮层里放了 {n_cards} 个部件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
+        warn(f"浮层里放了 {n_cards} 个组件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
     title = f'<div class="float-title">{esc(a["title"])}</div>' if a.get("title") else ""
     return (f'<div class="mk-float{" left" if side == "left" else ""}" data-side="{side}" '
             f'style="--float-top:{top}px;--float-w:{w}px">{title}{body.strip()}</div>')
@@ -1424,13 +1424,13 @@ def m_row(a, body):
         items.append(expand(raw) if name else raw)
     if spans:
         if len(spans) != len(items):
-            raise ExpandError(f'<hb-row spans="{a["spans"]}"> 有 {len(spans)} 段，体内却有 {len(items)} 个部件，两者要一样多')
+            raise ExpandError(f'<hb-row spans="{a["spans"]}"> 有 {len(spans)} 段，体内却有 {len(items)} 个组件，两者要一样多')
         total = sum(int(s) for s in spans)
         if total != 24:
             raise ExpandError(f'<hb-row spans="{a["spans"]}"> 跨度加起来是 {total}，必须等于 24（常用 12|12、16|8、8|16、8|8|8、13|11）')
         items = [f'<div class="span-{s}">{it}</div>' for s, it in zip(spans, items)]
     if len(items) > 4:
-        warn(f"hb-row 里并排了 {len(items)} 个部件：一行最多 4 个，图表行只放 2～3 个")
+        warn(f"hb-row 里并排了 {len(items)} 个组件：一行最多 4 个，图表行只放 2～3 个")
     return '<div class="w-row">' + "".join(items) + "</div>"
 
 
@@ -1566,8 +1566,8 @@ def render_page(kind):
 
 MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
-    "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放部件宏，最多 4 个"),
-    "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的部件（bare 模式）"),
+    "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
+    "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的组件（bare 模式）"),
     "hb-duo": (m_duo, "手机双屏对照壳：体内两个 hb-phone 夹一个 hb-conn"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -1578,8 +1578,8 @@ MACROS = {
     "hb-stats": (m_stats, "单指标一行：指标名 | 值 | 单位 | spark:1,2,3 或 trend:red；mode=center|strip"),
     "hb-tasks": (m_tasks, "待办子区：标题 | 时间 | 节点说明；属性 title"),
     "hb-shortcuts": (m_shortcuts, "快捷方式：名称 | 图标；属性 title"),
-    "hb-filters": (m_filters, "筛选部件：筛选文本 | 图标"),
-    "hb-banner": (m_banner, "横幅部件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
+    "hb-filters": (m_filters, "筛选组件：筛选文本 | 图标"),
+    "hb-banner": (m_banner, "横幅组件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
     "hb-line": (m_line, "折线图卡：同 hb-bar"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
@@ -1623,7 +1623,7 @@ GROUPS = [
     ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-duo"]),
     ("产品壳（PC）", ["hb-shell", "hb-nav"]),
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
-    ("自定义页面部件（工作台 / 看板 / 数据分析页）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
+    ("自定义页面组件（工作台 / 看板 / 数据分析页）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
     ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-steps", "hb-tabcard", "hb-flow"]),
     ("数据大屏（2026-09-04 实测，c5-screen.html）", ["hb-screen", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
@@ -1632,7 +1632,7 @@ GROUPS = [
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
-"hb-row": """24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放部件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
+"hb-row": """24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放组件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
 例：
 <hb-row spans="16|8">
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>

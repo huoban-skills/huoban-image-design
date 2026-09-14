@@ -3,7 +3,7 @@
 
 用法：
     python3 scripts/registry.py --check            # 三向核对：登记表 ↔ 结构文件 ↔ base.css
-    python3 scripts/registry.py --list [页面类型]   # 按页面类型列可用部件（id、官方名、宏）
+    python3 scripts/registry.py --list [页面类型]   # 按页面类型列可用组件（id、官方名、宏）
     python3 scripts/registry.py --find 关键词       # 按 id / 官方 type / 中文名 / 旧类名查
 
 --check 报三类问题：

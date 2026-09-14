@@ -58,11 +58,11 @@
 <template data-architecture="工作台或数据分析页" data-cn="自定义页面（工作台／数据看板）">
   <div class="page flat">
   <!-- 层次二选一：加 flat＝页底白＋组件描边（默认），不加＝页底浅灰＋组件纯白浮起。见 SKILL.md 硬约束 -->
-    <!-- 首位固定是横幅部件（页面名称＋一句话介绍），其后按需求插入独立组件；其余部件无默认顺序 -->
+    <!-- 首位固定是横幅组件（页面名称＋一句话介绍），其后按需求插入独立组件；其余组件无默认顺序 -->
   </div>
 </template>
 
-<template data-component="横幅部件" data-type="rich" data-cn="富文本（大标题预设，横幅）" data-group="工作台" data-measured="工作台/看板/数据分析页顶部的介绍：页面名称＋一句话介绍，左对齐（禁止居中）；默认无背景，标题直接坐在页底上靠字号和留白立住；用户要背景时加 bg-solid 铺一块干净纯色，禁止网格、环纹、斜纹、点阵这类几何纹理装饰；按钮不放横幅内部，横幅宽度可缩，与右侧的快捷按钮部件同行排">
+<template data-component="横幅组件" data-type="rich" data-cn="富文本（大标题预设，横幅）" data-group="工作台" data-measured="工作台/看板/数据分析页顶部的介绍：页面名称＋一句话介绍，左对齐（禁止居中）；默认无背景，标题直接坐在页底上靠字号和留白立住；用户要背景时加 bg-solid 铺一块干净纯色，禁止网格、环纹、斜纹、点阵这类几何纹理装饰；按钮不放横幅内部，横幅宽度可缩，与右侧的快捷按钮组件同行排">
   <div class="rich title">
     <h1><!-- 页面名称 --></h1>
     <p><!-- 一句话介绍：系统定位描述，学产品官方横幅口吻，说清这页管什么给谁用 --></p>
@@ -81,7 +81,7 @@
   </div>
 </template>
 
-<!-- 顶部介绍带操作按钮时的排法：横幅让宽，按钮走同行右侧的快捷按钮部件（横排），不塞进横幅里 -->
+<!-- 顶部介绍带操作按钮时的排法：横幅让宽，按钮走同行右侧的快捷按钮组件（横排），不塞进横幅里 -->
 <template data-architecture="横幅带操作按钮" data-cn="大标题 16 栏＋按钮组 8 栏同行">
   <div class="w-row">
     <div class="rich title"><h1><!-- 页面名称 --></h1><p><!-- 一句话介绍 --></p></div>
@@ -89,7 +89,7 @@
   </div>
 </template>
 
-<template data-component="筛选部件" data-type="filter" data-cn="筛选组件" data-group="页面部件" data-measured="独立部件白卡：白底圆角9、高40、右缘可带日历/下拉图标；不与页底融合（2026-08-10 实测）">
+<template data-component="筛选组件" data-type="filter" data-cn="筛选组件" data-group="页面组件" data-measured="独立组件白卡：白底圆角9、高40、右缘可带日历/下拉图标；不与页底融合（2026-08-10 实测）">
   <div class="filter">
     <div class="w-filter"><!-- 筛选项 --></div>
   </div>
@@ -132,14 +132,14 @@
 </template>
 
 <template data-component="页签容器-胶囊式" data-type="tabs" data-cn="标签页（胶囊式）" data-group="容器"
-          data-measured="2026-09-04 app.huoban.com 自定义页面实测（page-widget-tabs）：白卡 r9 阴影同其他部件；页签行上下留 20、无下边线；页签 40 高 pad 0 16 字 16，未选 500/ink-65，选中 600/主色并垫一条 40 高 r9 主色 20% 底条（ink-bar）；页签间距 8；内容区 pad 20"
+          data-measured="2026-09-04 app.huoban.com 自定义页面实测（page-widget-tabs）：白卡 r9 阴影同其他组件；页签行上下留 20、无下边线；页签 40 高 pad 0 16 字 16，未选 500/ink-65，选中 600/主色并垫一条 40 高 r9 主色 20% 底条（ink-bar）；页签间距 8；内容区 pad 20"
           data-note="对齐是配置项：nav 用 justify-content 靠左或居中，实测两个工作台页都居中；页签按角色工作流程从左到右编排或按业务分类（见 principles/workbench.md）。详情页那种下划线页签是另一组件（页签容器 / 独立详情页的 page-tabs-card）">
   <div class="w-card tabs pill">
     <div class="wt-nav center">
       <span class="wt-tab on"><!-- 当前页签 --></span>
       <span class="wt-tab"><!-- 页签 --></span>
     </div>
-    <div class="wt-body"><!-- 页签内容：已收录部件 --></div>
+    <div class="wt-body"><!-- 页签内容：已收录组件 --></div>
   </div>
 </template>
 
@@ -152,7 +152,7 @@
   </div>
 </template>
 
-<template data-component="图表部件" data-type="chart_*" data-cn="图表" data-group="图表">
+<template data-component="图表组件" data-type="chart_*" data-cn="图表" data-group="图表">
   <div class="w-card chart">
     <div class="wc-hd"><!-- 图表名称与操作 --></div>
     <div class="wc-bd"><svg></svg></div> <!-- 图表绘图区：手绘，颜色必须用 var() 见 SKILL.md -->

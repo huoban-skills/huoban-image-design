@@ -182,7 +182,7 @@ def check(path, render=False, allow_local=False):
     for m in re.finditer(r'<div class="mk-float[^"]*"[^>]*>', body):
         n = len(re.findall(r'class="w-card', body[m.end():m.end() + 8000]))
         if n > SCALE["float_cards"][1]:
-            add("Medium", "scale-limit", f"浮层里 {n} 张部件卡：浮层只强调一两个底层没有的东西", line_of(body, m.start()))
+            add("Medium", "scale-limit", f"浮层里 {n} 张组件卡：浮层只强调一两个底层没有的东西", line_of(body, m.start()))
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -238,7 +238,7 @@ def acceptance(path):
     kind = re.search(r'data-kind="(\w+)"', body)
     name = Path(path).stem
     lines = [f"验收 {name}",
-             f"1 需求单落全 （图上部件：{'、'.join(cn[c] for c in used) or '—'}；页面类型 {kind.group(1) if kind else '手写外壳'}）对照需求单逐项打勾后填",
+             f"1 需求单落全 （图上组件：{'、'.join(cn[c] for c in used) or '—'}；页面类型 {kind.group(1) if kind else '手写外壳'}）对照需求单逐项打勾后填",
              f"2 组件都是真的 {'通过：类名全在登记表与 base.css 里' if used else '待填'}",
              "3 层次关系对 待填（对照 data-measured：白卡浮灰底还是透明融入）",
              "4 对齐与选型 待填（状态色红绿灯、按钮主次、表单列数一致、图表选型）",
