@@ -19,28 +19,19 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 表单弹窗 / 编辑态 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗与编辑态尺寸未实测，交付说明注明 |
 | 详情页 / 详情界面 | detail | item-detail、component-guide | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench、component-guide | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
-| 看板 / 数据分析页 | dashboard | dashboard、component-guide；指标拆不清时读 dashboard-data-story | 横幅 → 筛选 → 单指标 → 图表行 → 透视表 |
+| 数据看板 | dashboard | dashboard、component-guide | 横幅 → 筛选 → 单指标 → 图表行 → 透视表 |
 | 数据大屏 | screen | dashboard（大屏一节）、component-guide | 体内只放 hb-screen；不套壳、无浮层 |
-| 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-duo 双屏；不套 .window |
+| 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-flow 多屏流程（2～3 屏）；不套 .window |
 
 新造或调整皮肤时另读 visual-color 与 skin/custom-skin。
 
 ## 执行步骤
 
-### 1. 判输入，定样式
+### 1. 追问并确认需求单（闸门）
 
-按 [references/skin/routing.md](references/skin/routing.md) 判定输入物、选皮肤、定壳层主题；仅在沿用已有样式提色值或新造皮肤时再读 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
+按 [references/intake.md](references/intake.md) 分三轮追问：画布类型、页面类型与端、角色、样式；再按页面类型问那一支；最后问浮层、横幅与层次、数据文案。每问带推荐答案，用户说过的不再问。三轮问完汇成需求单，**没拿到用户确认，不进入步骤 2。**
 
-### 2. 确认图需求单（闸门）
-
-**清单没拿到用户确认，不进入步骤 3。** 多张图列成一个清单一次确认；用户没表态的项不替他决定。格式对内对外一致（huoban-solution-report 的调用也是这个格式）：
-
-- **画布类型**：营销类（放进报告／给客户讲解，一张图，可加浮层）／产品设计类（用户照着搭，一个系统，无浮层）。由用户定，不自行判断；需求单没写明就回去问。
-- **页面类型**与**端**：路由表的"用户说的"一列；PC（默认）／手机端。手机端另确认单屏还是双屏、要不要企微会话那一屏；手机竖图嵌报告时限宽居中（约 360px）。
-- **要呈现的字段和数据**：用用户业务的真实字段名，数据编得像真的。
-- **自定义页面另加**（工作台/看板/详情页）：层次白底描边还是浅底白卡（默认白底描边）；横幅无背景／纯色／背景图卡片（默认无背景）。营销类另加：浮层要突出什么。
-
-### 3. 写骨架片段
+### 2. 写骨架片段
 
 先看槽位表，再只取要用的宏的语法：
 
@@ -60,7 +51,7 @@ python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘�
 
 写内容时按页面原则文档定选取与数量；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。图表柱/折/环写 `hb-bar`/`hb-line`/`hb-donut` 由脚本算坐标；其余图表类型未采集，先告知用户。
 
-### 4. 拼装
+### 3. 拼装
 
 ```bash
 python3 scripts/build.py --skin dawn-blue --content stage.html --output "源文件/图名.html" --title "图名"
@@ -68,11 +59,11 @@ python3 scripts/build.py --skin dawn-blue --content stage.html --output "源文�
 
 固定顺序拼皮肤、base.css、icons.svg、内容、fit.js；`canvas="product"` 自动全屏。展开失败会指出第几行、缺什么、可用什么，照提示改片段重跑；"提示："开头的是规模与顺序建议，不阻断。改过公共资产后重跑即重拼。
 
-### 5. 对照判据
+### 4. 对照判据
 
 拼完按页面类型路由里的必读原则，逐条过该篇的"检查清单"一节。
 
-### 6. 检查与验收
+### 5. 检查与验收
 
 ```bash
 python3 scripts/check.py "源文件/图名.html"             # 静态：色值、组件与 token 存在性、结构禁令、规模上限
@@ -82,7 +73,7 @@ python3 scripts/check.py "源文件/图名.html" --acceptance # 起草十条人�
 
 **Blocker 必须清零**，High 逐条处理（本图样式里的新类默认 High，确属一次性布局加 `--allow-local`）。然后按 [references/canvas/verify-export.md](references/canvas/verify-export.md) 的人工验收表逐图回报十条结论，有一条没过不交付。
 
-### 7. 交付
+### 6. 交付
 
 默认交付 `源文件/图名.html`。用户或报告明确要 PNG／SVG 时：
 

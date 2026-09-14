@@ -547,7 +547,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* ── 十 自定义页面组件 ── */
 .page { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; background: var(--page-bg); }
 .page > * { flex: none; } /* 组件按内容高度排布，不被压缩重叠 */
-/* 页面标题区：工作台/看板/数据分析页顶部的「页面名称＋一句话介绍」。
+/* 页面标题区：工作台/数据看板顶部的「页面名称＋一句话介绍」。
    左对齐；默认无背景，标题直接坐在页底上。要背景就加 bg-solid 铺一块干净纯色，
    几何纹理装饰（网格/环纹/斜纹/点阵/光晕）已废弃，别再加回来 */
 .rich.title { padding: 4px 4px 0; }

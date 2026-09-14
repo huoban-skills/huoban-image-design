@@ -1046,7 +1046,7 @@
    "cn": "自定义页面（工作台／数据看板）",
    "old_class": "page flat",
    "file": "c3-page-detail.html",
-   "name": "工作台或数据分析页",
+   "name": "工作台或数据看板",
    "macro": "hb-page",
    "variants": [
     "flat"
@@ -1990,11 +1990,11 @@
    "kind": "architecture",
    "id": "duo",
    "page_kind": "mobile",
-   "cn": "手机双屏对照",
+   "cn": "手机流程壳（2～3 屏）",
    "old_class": "stage",
    "file": "c4-mobile.html",
    "name": "手机双屏对照",
-   "macro": "hb-duo",
+   "macro": "hb-flow",
    "variants": [],
    "measured": "measured",
    "note": null
