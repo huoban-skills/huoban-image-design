@@ -24,7 +24,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组与待办 → 页签 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | dashboard（大屏一节） | 体内只放 hb-screen；不套壳、无浮层 |
-| 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-screens 多屏流程（2～3 屏）；不套 .window |
+| 手机端（上面任一页面的手机版） | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-screens 多屏流程（2～3 屏），不套产品壳；页面内容用手机宏：列表页 hb-vbar＋hb-ocards、详情页 hb-rec、工作台 hb-wpage、流程办理 hb-taskbar／hb-ptasks、企微会话 hb-chat |
 
 要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 visual-color 与 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
 
