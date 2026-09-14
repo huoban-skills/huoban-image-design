@@ -1429,7 +1429,6 @@
       "variants": [],
       "measured": "unverified",
       "allowed_in": [
-        "page:workbench",
         "row"
       ],
       "note": null
@@ -1451,7 +1450,6 @@
       "variants": [],
       "measured": "unverified",
       "allowed_in": [
-        "page:workbench",
         "row"
       ],
       "note": null
@@ -1473,7 +1471,6 @@
       "variants": [],
       "measured": "unverified",
       "allowed_in": [
-        "page:workbench",
         "row"
       ],
       "note": "官方八种版式 l1～l8，结构位未收录"
@@ -1520,7 +1517,6 @@
       "variants": [],
       "measured": "unverified",
       "allowed_in": [
-        "page:workbench",
         "row",
         "float"
       ],
@@ -1576,7 +1572,7 @@
       "kind": "component",
       "id": "rich",
       "type_key": "rich",
-      "cn": "富文本（大标题预设）",
+      "cn": "富文本（大幅）",
       "old_class": "rich-hero",
       "file": "c3-page-detail.html",
       "name": "大幅富文本",
@@ -1940,7 +1936,10 @@
       "allowed_in": [
         "page:detail"
       ],
-      "note": "箭头式分段步骤条，通栏 24×3；段色取自绑定选项字段自身的颜色"
+      "note": "箭头式分段步骤条，通栏 24×3；段色取自绑定选项字段自身的颜色",
+      "aliases": [
+        "步骤条"
+      ]
     },
     {
       "kind": "component",
@@ -1983,7 +1982,6 @@
         "page:workbench",
         "page:dashboard",
         "page:detail",
-        "page:screen",
         "page:mobile"
       ],
       "note": "element_map 里的 cover 元素，不是组件；不占栅格，放页面最前"

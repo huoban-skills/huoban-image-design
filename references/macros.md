@@ -608,7 +608,7 @@ theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/r
 
 ```
 大屏组件卡：40 高标题条（左侧斜切铭牌）＋ 内容区。属性 title 组件名（必填）、span 列宽（默认 6）、rs 行数（默认 16，高 20rs−20）。
-体内放 hb-area / hb-line / hb-bar / hb-donut 的 bare 输出、hb-sbars 进度条、hb-list 表格列表或手绘 SVG；图表系列色自动走大屏固定配色。
+体内放 hb-area / hb-line / hb-bar / hb-donut / hb-biaxial / hb-funnel / hb-scatter / hb-map 的 bare 输出、hb-sbars 进度条、hb-list 表格列表或手绘 SVG；图表系列色自动走大屏固定配色。
 例：
 <hb-scard title="近 30 日出入库趋势" span="12" rs="26">
 <hb-line bare labels="1|5|10|15|20|25|30">

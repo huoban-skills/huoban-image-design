@@ -112,7 +112,8 @@ def list_(page):
         tk = e.get("type_key") or "—"
         mc = e.get("macro") or "—"
         st = {"measured": "实测", "imitated": "仿写", "unverified": "未核"}.get(e.get("measured"), "")
-        print(f"{e['id']:<22} {tk:<20} {e['cn']:<18} 宏 {mc:<18} {st}")
+        nm = f"｜{e['name']}" if e.get("name") and e["name"] != e["cn"] else ""
+        print(f"{e['id']:<22} {tk:<20} {e['cn']}{nm:<18} 宏 {mc:<18} {st}")
     print(f"共 {len(rows)} 项")
 
 

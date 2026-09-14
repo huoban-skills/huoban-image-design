@@ -14,7 +14,7 @@
 
 ## 用法
 
-直接说要画什么即可，skill 会先问出图需求（用途、要讲清哪几件事和主角、配色），拟需求单并逐图补细节，确认后，然后写骨架片段、拼装、检查、验收、交付。
+直接说要画什么即可，skill 会先问出图需求（用途、要讲清哪几件事和主角、配色），拟需求单并逐图补细节，确认后写骨架片段、拼装、检查、验收、交付。
 
 ```
 画一张排产工作台的界面示意图
@@ -33,16 +33,16 @@
         assets/c4-mobile.html      手机端 H5                    │
         assets/c5-screen.html      数据大屏                     ┘
 骨架样式 assets/base.css            尺寸布局，无颜色
-皮肤    assets/skins/*.css         纯色彩 token，9 套
+皮肤    assets/skins/*.css         纯色彩 token，8 套
 版式    assets/layout-gallery.html 各页面版式线框示意（人看，浏览器打开），与页面原则的版式表同步
-宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 50 余个组件宏；模型只填内容，外壳与栅格由脚本产出
+宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 60 个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
 配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；`--render` 有 Chrome 时加渲染检查；`--acceptance` 起草验收表）、`export.py`（PNG／SVG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
 
 ## 皮肤
 
-9 套：报告同名皮肤（与 huoban-solution-report 同名同气质）＋功能皮肤（产品原生蓝、科技暗黑）。选型在 `references/skin/routing.md`，清单以 `assets/skins/` 为准；客户有品牌色时按 `references/skin/custom-skin.md` 现造。
+8 套：报告同名皮肤（与 huoban-solution-report 同名同气质）＋功能皮肤（产品原生蓝、科技暗黑）。选型在 `references/skin/routing.md`，清单以 `assets/skins/` 为准；客户有品牌色时按 `references/skin/custom-skin.md` 现造。
 
 ## 三条硬约束
 

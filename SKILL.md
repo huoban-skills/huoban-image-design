@@ -14,16 +14,16 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 页面类型路由（唯一真相源）
 
-先判页面类型，再按这一行取骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles 与 visual-color；多张营销配图另读 anti-sameness。
+先判页面类型，在下表找到对应行，取它的骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles 与 visual-color；多张营销配图另读 anti-sameness。
 
 | 用户说的 | `<hb-page kind>` | 必读页面原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
-| 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗随视口减 48×60，字段区一到四列等分 |
+| 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗随视口减 48 宽减 60 高，字段区一到四列等分 |
 | 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组与待办 → 页签 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
-| 数据大屏 | screen | screen | 体内只放 hb-screen；不套壳、无浮层 |
+| 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端（上面任一页面的手机版） | mobile | 对应页面篇＋c4 注释 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
 
 要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 visual-color 与 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
@@ -53,7 +53,7 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 - 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏。
 - 并排用 `<hb-row spans="16|8">`；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。
 - 外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
-- 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图、表单编辑页）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
+- 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
 ```bash
 python3 scripts/extract_templates.py assets/c2-table-form.html --list
@@ -62,12 +62,14 @@ python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘�
 
 - 组件选取与数量按页面原则文档；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。
 - 图表写 `hb-bar`／`hb-line`／`hb-donut`／`hb-area`／`hb-hbar`／`hb-biaxial`／`hb-funnel`／`hb-scatter`／`hb-map`，坐标由脚本算；地图不画国界，用网点阵占位或客户提供的地图图片。
+- 表单编辑页和弹窗详情走手写外壳：片段最外层是 c1 的 `.stage`，`.stage` 必须写死 height；本图补充样式另写 `page.css`，步骤 3 用 `--extra-style` 传入。
 - 完成标准：每张图一个片段；`python3 scripts/expand.py stage.html` 没有报错、提示都处理过。
 
 ### 3. 拼装
 
 ```bash
 python3 scripts/build.py --skin dawn-blue --content stage.html --output "源文件/图名.html" --title "图名"
+python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style page.css --output "源文件/图名.html" --title "图名"   # 手写外壳时
 ```
 
 - 脚本按固定顺序拼皮肤、base.css、icons.svg、内容、fit.js；`canvas="product"` 自动全屏。
@@ -133,7 +135,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 | 约束 | 内容 |
 | --- | --- |
 | 不自造组件 | 只画登记表里有的组件；`registry.py --list workbench`（kind 值或中文页面类型；表单编辑页不走登记表，按 c2 模板）看该页可用组件与采集状态 |
-| 未采集先告知 | 登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
+| 未核与仿写要告知 | 登记表标"未核"的形态先告知用户，确认后按注释就近仿写；标"仿写"的在交付说明里注明；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
 | 哪些尺寸照实测 | 组件内部尺寸（顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24）照真实产品，改了就不像 |
 | 组件宽高自适应 | 组件占几栏、多高按布局和画面自适应；实测记录里的 w×h 只是样板的一次配置 |

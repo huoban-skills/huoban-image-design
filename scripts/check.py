@@ -39,7 +39,7 @@ PERSON_PATTERNS = [re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)")
 PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报", "周会", "周期", "周边", "周转", "金额", "马上", "于今")
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
-SCALE = {"grid_rows": (8, 14), "stats_per_row": (3, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
+SCALE = {"grid_rows": (6, 14), "stats_per_row": (3, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
 
 
 def load_known_classes():
@@ -62,7 +62,7 @@ def load_registry_ids():
 
 
 def split_doc(text):
-    styles = re.findall(r"<style[^>]*>(.*?)</style>", text, flags=re.S)
+    styles = [re.sub(r"/\*.*?\*/", "", s, flags=re.S) for s in re.findall(r"<style[^>]*>(.*?)</style>", text, flags=re.S)]
     body = re.sub(r"<style[^>]*>.*?</style>", "", text, flags=re.S)
     body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
     body = re.sub(r"<script>.*?</script>", "", body, flags=re.S)
@@ -112,7 +112,9 @@ def check(path, render=False, allow_local=False):
     known = load_known_classes()
     reg_ids = load_registry_ids()
     base_css = re.sub(r"/\*.*?\*/", "", (ASSETS / "base.css").read_text(encoding="utf-8"), flags=re.S)
-    extra_css = styles.replace(base_css.strip(), "")          # 皮肤＋本图补充样式＋片段自带 <style>
+    extra_css = styles                                        # 去掉 base.css 与皮肤后＝本图补充样式＋片段自带 <style>
+    for chunk in [base_css] + [re.sub(r"/\*.*?\*/", "", p.read_text(encoding="utf-8"), flags=re.S) for p in sorted((ASSETS / "skins").glob("*.css"))]:
+        extra_css = extra_css.replace(chunk.strip(), "")
     local = set(re.findall(r"\.([A-Za-z][\w-]*)", extra_css)) - known
     used = set()
     for m in re.finditer(r'class="([^"]+)"', body):

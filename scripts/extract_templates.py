@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""从结构文件（assets/c1～c4）按名精确提取 <template>，实现按需读取，不整读文件。
+"""从结构文件（assets/c1～c5）按名精确提取 <template>，实现按需读取，不整读文件。
 
 用法：
     python3 scripts/extract_templates.py --list                      # 全部结构文件的架构/组件目录
@@ -14,7 +14,7 @@
   名字不存在直接报错并列出该文件的可用名。
 - 输出自动带上：文件头部说明注释、模板紧邻的前置注释、模板标签上的全部
   data-* 属性（data-measured 实测注释是层次关系的判据，禁止剥离）。
-- 只读不写：结构正本永远是 assets/c1～c4，本脚本不修改它们。
+- 只读不写：结构正本永远是 assets/c1～c5，本脚本不修改它们。
 """
 import argparse
 import re

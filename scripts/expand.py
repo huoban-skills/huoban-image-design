@@ -1873,7 +1873,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "screen": dict(
         cn="数据大屏",
-        allowed={"hb-screen", "hb-cover"},
+        allowed={"hb-screen"},
         required=["hb-screen"],
         order=["hb-cover", "hb-screen"],
         doc=("只放一个 hb-screen，不套产品壳、不放浮层。体内按官方骨架排：左列 hb-scol（6 栏：指标框 ×2 → 面积图 → 饼图）"
@@ -2036,7 +2036,7 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
     allowed = spec["allowed"]
     for n in (first_screen if first_screen is not None else deep):
         if n in spec.get("first_screen_ban", set()):
-            warn(f"<hb-page kind=\"{kind}\"> 顶层放了 <{n}>：{spec['cn']}首屏不放图表与筛选，要放收进 <hb-tabcard> 或页面末尾")
+            warn(f"<hb-page kind=\"{kind}\"> 顶层放了 <{n}>：{spec['cn']}首屏不放图表与筛选，要放就收进 <hb-tabcard> 或放页面末尾")
     for n in names:
         if n not in allowed:
             raise ExpandError(f"<hb-page kind=\"{kind}\"> 顶层不能放 <{n}>；{spec['cn']}顶层可用：{'、'.join(sorted(allowed))}。"
@@ -2081,6 +2081,15 @@ def m_page(a, body):
     names = [n for n, _ in parts if n]
     deep = list(names)          # 「必有」用：容器体内的宏也算出现过
     first_screen = list(names)   # 首屏禁令用：并排行仍在首屏，页签容器里的不算
+    _ban = spec.get("first_screen_ban", set())
+    _tail = 0
+    for _n in reversed(first_screen):
+        if _n in _ban or _n == "hb-float":
+            _tail += 1
+        else:
+            break
+    if _tail:
+        first_screen = first_screen[:len(first_screen) - _tail]   # 页面末尾的图表不算首屏
     for n, raw in parts:
         if n in ("hb-row", "hb-tabcard"):
             inner = TAG_RE.match(raw).group(3) or ""
@@ -2162,8 +2171,8 @@ def render_page(kind):
     spec = PAGE_SLOTS[kind]
     lines_ = [f"[{spec['cn']}] <hb-page kind=\"{kind}\">", spec["doc"],
               f"必有：{'、'.join(spec['required']) or '无'}；顺序：{' → '.join(spec['order'])}",
-              "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"])),
-              "hb-page 通用属性：canvas=marketing|product（默认 marketing）、ws/page/nav/me/theme/logo/bottom（产品壳，同 hb-shell）、level=flat|card（自定义页面层次，默认 flat）、cut=高度px（窗口截到主要内容为止，默认按内容撑高）",
+              "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"]) if n != "hb-duo"),
+              "hb-page 通用属性：canvas=marketing|product（默认 marketing）、ws/page/nav/me/theme/logo/bottom（产品壳，同 hb-shell）、level=flat|card（页面底色，默认 flat）、cut=高度px（窗口截到主要内容为止，默认按内容撑高）",
               "", "最小示例：", spec["example"], "",
               "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(n for n in spec["allowed"] if n != "hb-float")) + " hb-row hb-float"]
     return "\n".join(lines_)
@@ -2568,7 +2577,7 @@ theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/r
 本月出库 | 217 | 件 | up
 </hb-skpi>""",
 "hb-scard": """大屏组件卡：40 高标题条（左侧斜切铭牌）＋ 内容区。属性 title 组件名（必填）、span 列宽（默认 6）、rs 行数（默认 16，高 20rs−20）。
-体内放 hb-area / hb-line / hb-bar / hb-donut 的 bare 输出、hb-sbars 进度条、hb-list 表格列表或手绘 SVG；图表系列色自动走大屏固定配色。
+体内放 hb-area / hb-line / hb-bar / hb-donut / hb-biaxial / hb-funnel / hb-scatter / hb-map 的 bare 输出、hb-sbars 进度条、hb-list 表格列表或手绘 SVG；图表系列色自动走大屏固定配色。
 例：
 <hb-scard title="近 30 日出入库趋势" span="12" rs="26">
 <hb-line bare labels="1|5|10|15|20|25|30">
