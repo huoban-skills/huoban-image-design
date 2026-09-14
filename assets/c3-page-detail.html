@@ -37,20 +37,30 @@
   </div>
 </template>
 
-<template data-component="动态条目" data-type="stream" data-cn="动态" data-group="记录详情">
-  <div class="fi">
-    <span class="ic"><svg class="ico"><use href="#i-edit"/></svg></span> <!-- 系统变更条目的铅笔图标 -->
-    <div class="bd">
-      <div class="mt"><!-- 来源与时间 --></div>
-      <div class="ct"><!-- 动态内容 --></div>
+<template data-component="动态条目" data-type="stream" data-cn="动态" data-group="记录详情"
+          data-measured="2026-09-14 进销存 v6.0 订单详情页实测：卡片白底 r9 有阴影、无标题行（is_name_show false）；内容区上下 20；每条 padding 0 20、条间距 16，单行条 40、三行条 72；左侧 20 宽（人＝20 圆头像，系统／自动化＝20 铅笔图标 ink-45），正文距左 26；标题行 20 高「人名 · 时间」12/18.86/ink-65，内容行每行 16 高 12/16/ink-85、距标题 4">
+  <div class="w-card w-stream">
+    <div class="fd-list">
+      <div class="fd-item">
+        <span class="av"><!-- 人工动态＝头像；系统／自动化动态换成 <span class="fd-ic"> 铅笔图标 --></span>
+        <div class="fd-bd">
+          <div class="fd-t"><!-- 人名 · 相对时间 --></div>
+          <div class="fd-c"><div><!-- 字段变更一行一条 --></div></div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<template data-component="评论框" data-type="comment" data-cn="评论" data-group="记录详情">
-  <div class="comment">
-    <div class="ipt"><!-- 评论输入区 --></div>
-    <div class="ops"><!-- 附件与发送操作 --></div>
+<template data-component="评论框" data-type="comment" data-cn="评论" data-group="记录详情"
+          data-measured="2026-09-14 项目管理 v2.0「项目档案」实测：标题行 40（可带自定义底色）；列表壳与动态共用；空态＝48 圆图标（bg rgba(0,0,0,.04)）＋「暂无评论」16/24/500/ink-65；底部发布条 68，bg rgba(0,0,0,.04)、圆角 6、左右缩进 20、padding-top 8：输入行 22（占位「写评论，@ 提及某人」）＋按钮行 @ 与附件各 20，右侧发送 20 圆">
+  <div class="w-card w-comment">
+    <div class="wc-hd"><!-- 组件名称 --></div>
+    <div class="fd-list"><!-- 条目同「动态条目」；一条都没有时换成 <div class="empty"> 空态 --></div>
+    <div class="cm-publish">
+      <div class="cm-ipt"><!-- 评论输入区占位 --></div>
+      <div class="cm-ops"><!-- @ 与附件图标 --><span class="cm-send"><!-- 发送 --></span></div>
+    </div>
   </div>
 </template>
 
@@ -228,10 +238,12 @@
   </div>
 </template>
 
-<template data-component="表格列表" data-type="table_item_list" data-cn="表格列表" data-group="内容">
+<template data-component="表格列表" data-type="table_item_list" data-cn="表格列表" data-group="内容"
+          data-measured="2026-09-14 ERP v7.1 库管工作台实测（全工作区 64 个，最常用组件）：白卡 r9 有阴影；标题行 40（标题 16/500 左距 16，右侧搜索／更多／新增各 24、间距 4、最右距边 8）；表体表头行 32（14/ink-65）、数据行 35（14/20/ink-85，行号+勾选列固定 76）；底部分页条 40、padding 10 20，页码 24×24 r6 12/24，当前页底 rgba(主色,.08)、字＝主色 500">
   <div class="w-card content-widget table_item_list">
-    <div class="wc-hd"><!-- 组件名称与操作 --></div>
+    <div class="wc-hd"><!-- 组件名称 --><span class="acts"><!-- 搜索／新建／导出等 24 图标 --></span></div>
     <div class="grid"><!-- 复用 c2 网格结构 --></div>
+    <div class="til-foot"><span class="til-count"><!-- 共 N 条 --></span><span class="til-pager"><!-- 页码 .pg，当前页 .pg.on --></span></div>
   </div>
 </template>
 
@@ -268,12 +280,20 @@
   <div class="decoration"><svg></svg></div> <!-- 装饰图形：自由绘制 -->
 </template>
 
-<template data-component="多进度条" data-type="progress_bar" data-cn="进度条" data-group="统计">
+<template data-component="多进度条" data-type="progress_bar" data-cn="进度条" data-group="统计"
+          data-measured="2026-09-14 Project Management「Chart」页实测：一个组件内可放多条，内容区 padding 10 20，两种形态每条都占 40。bar_type=newStyle：条体 32 高 r6，底层铺主题色淡底、上层按百分比裁切实色，名称与百分比嵌在条内，被覆盖那段文字转白（实测 82% → 333/406）。bar_type=normal：文字行 24（padding-top 4，名称左／百分比右，14/20）＋条区 16（padding 6 0）内含 4 高 r10 细条。条色按序列轮转，实测 #3D97F2 / #2FBA2F / 黄">
   <div class="w-card progress_bar">
     <div class="wc-hd"><!-- 组件名称 --></div>
-    <div class="progress-row">
-      <span><!-- 指标名称 --></span><b><!-- 当前值与目标值 --></b>
-      <i><em></em></i>
+    <div class="pg-list">
+      <div class="pg-row pg-bar"><!-- style="--pct:82%;--pg:var(--c-purple)" -->
+        <span class="pg-track"></span><span class="pg-fill"></span>
+        <span class="pg-txt"><span class="pg-name"></span><span class="pg-num"></span></span>
+        <span class="pg-txt light"><span class="pg-name"></span><span class="pg-num"></span></span>
+      </div>
+      <div class="pg-row pg-text"><!-- 普通样式：文字行在上、细条在下 -->
+        <span class="pg-txt"><span class="pg-name"></span><span class="pg-num"></span></span>
+        <span class="pg-track"><i></i></span>
+      </div>
     </div>
   </div>
 </template>
@@ -295,22 +315,31 @@
   </div>
 </template>
 
-<template data-component="我发起的流程" data-type="procedure_process" data-cn="我发起的" data-group="流程">
+<template data-component="我发起的流程" data-type="procedure_process" data-cn="我发起的" data-group="流程"
+          data-measured="2026-09-14 ERP v7.1 库管工作台实测（8×16 → 419×300）：标题行 40，右侧只有漏斗筛选按钮 24，没有分段切换（那是「我处理的」才有）；列表行 80 高、三行字号 14/12/12，45%/65% 两档灰；实测账号下三个实例都是空态">
   <div class="w-card procedure_process">
     <div class="wc-hd"><!-- 组件名称 --></div>
-    <div class="process-filters"><!-- 状态筛选 --></div>
-    <div class="process-list"><!-- 流程记录或空状态 --></div>
+    <div class="proc-list">
+      <div class="proc">
+        <div class="proc-t1"><!-- 流程名 --><span class="proc-time"><!-- 时间 --></span></div>
+        <div class="proc-t2"><!-- 单据 --></div>
+        <div class="proc-t3"><!-- 当前节点 --><span class="tag"><!-- 状态 --></span></div>
+      </div>
+      <!-- 一条都没有时换成 <div class="proc-empty">暂无</div> -->
+    </div>
   </div>
 </template>
 
-<template data-component="多项汇总" data-type="multi_stats" data-cn="多项统计" data-group="统计">
+<template data-component="多项汇总" data-type="multi_stats" data-cn="多项统计" data-group="统计"
+          data-measured="2026-09-14 ERP v7.1 库管工作台实测（8×16 → 419×300）：白卡 r9，标题行 40（16/500）；内容区 padding 0 20；每条 40 高，左标题 14/20/ink-85 右距 16，右侧数值胶囊 20 高 r10 padding 0 8 白字 14/20；胶囊色按条目顺序六色轮转（#FFA526 #2FBA2F #F25555 #FFCA28 #9161F2 #F25589）">
   <div class="w-card multi_stats">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="multi-stat-row"><span><!-- 指标名称 --></span><b class="pill"><!-- 指标值 --></b></div>
   </div>
 </template>
 
-<template data-component="分类小计" data-type="subtotal" data-cn="分类汇总" data-group="统计">
+<template data-component="分类小计" data-type="subtotal" data-cn="分类汇总" data-group="统计"
+          data-measured="2026-09-14 Project Management「Chart」页实测（竖版 4×18 → 169×340，横版 12×6 → 547×100）：合计行 40 高 padding 0 20，「共计」与合计值都是 fw700 14/22；明细列表 padding 0 20 10，每条 40 高，左名称 14/22、右数值左距 16 右对齐；没有分隔线、没有色块胶囊——与多项统计的差别就在这里">
   <div class="w-card subtotal">
     <div class="wc-hd"><!-- 组件名称 --></div>
     <div class="subtotal-head"><!-- 总计 --></div>
