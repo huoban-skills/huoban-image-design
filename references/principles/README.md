@@ -27,4 +27,3 @@
 | [assets/layout-gallery.html](../../assets/layout-gallery.html) | 各页面版式的线框示意（看板 5、工作台 3、详情页 2），改版式表时同步改 |
 | [anti-sameness.md](anti-sameness.md) | 防千篇一律：数据毛边、非理想态、版式错开（多张营销配图必读） |
 
-实测记录在 [../measured/](../measured/)，是页面原则里产品事实的出处。

@@ -60,6 +60,5 @@
 - `references/canvas/` — 画布规范（营销/产品设计）、检查与验收、导出
 - `references/skin/` — 皮肤选型与制作
 - `references/macros.md` — 宏语法全文（由 `expand.py --doc all` 生成，出图时按需 `--page`／`--doc` 取，不整读）
-- `references/measured/` — 实测记录
 - `tests/` — 回归片段与基线（`scripts/regress.py`）
 - `CHANGELOG/` — 版本记录

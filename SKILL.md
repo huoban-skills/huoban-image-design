@@ -105,4 +105,4 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 | 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画 |
 | 组件底色优先级 | 纯白 ＞ 很浅的背景色 ＞ 深色块；深色只留给一级顶栏、状态标签 |
 | 只写业务结论 | 示意图内容不留设计过程的痕迹 |
-| Skill 资产是唯一结构真相源 | 新实采的界面结构直接沉淀到对应的 assets/c1～c5、base.css 和 registry.json；实测记录写 references/measured/ |
+| Skill 资产是唯一结构真相源 | 新实采的界面结构直接沉淀到对应的 assets/c1～c5、base.css 和 registry.json |
