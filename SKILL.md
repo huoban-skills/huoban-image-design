@@ -12,42 +12,9 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 - 输出：单文件 HTML（`源文件/图名.html`，离线可开、自适应）；PNG／SVG 只在用户或报告明确要时另出。
 - 边界：只画伙伴云产品界面；海报、流程图、ER 图、网站不在本 skill。
 
-## 依赖关系
+## 页面类型路由（唯一真相源）
 
-资产（build.py 自动拼入，模型不整读）：
-
-| 资产 | 用途 |
-| --- | --- |
-| assets/registry.json | 官方组件 type、中文名、类名、宏、采集状态的唯一名录 |
-| assets/c1～c5 | 实测架构，模板带官方 `data-type`；没有宏的组件按名提模板 |
-| assets/base.css、assets/skins/ | 骨架样式与 9 套皮肤 |
-
-脚本：
-
-| 脚本 | 用途 | 步骤 |
-| --- | --- | --- |
-| scripts/expand.py | `--page` 看槽位表，`--doc` 取宏语法 | 2 |
-| scripts/registry.py | `--list <kind>` 列该页可用组件与采集状态 | 2 |
-| scripts/extract_templates.py | 按名提取模板 | 2 |
-| scripts/build.py | 拼装单文件 HTML | 3 |
-| scripts/check.py | 静态检查、渲染检查、起草验收表 | 5 |
-| scripts/export.py | 导出 PNG／SVG | 6 |
-
-文档（按步骤读）：
-
-| 文档 | 步骤 |
-| --- | --- |
-| [references/intake.md](references/intake.md)：追问维度、问法格式、需求单模板 | 1 |
-| [references/skin/routing.md](references/skin/routing.md)：皮肤选择；新造或调整皮肤再读 [references/skin/custom-skin.md](references/skin/custom-skin.md) 与 visual-color | 1 |
-| [references/canvas/marketing.md](references/canvas/marketing.md) 或 [references/canvas/product-design.md](references/canvas/product-design.md)：按需求单的画布类型二选一 | 2 |
-| references/principles/visual-four-principles.md、visual-color.md：所有图必读 | 2 |
-| references/principles/anti-sameness.md：多张营销配图读 | 2 |
-| references/principles/component-guide.md：选图表类型或拿不准该用哪个组件时读 | 2 |
-| 页面原则一篇：按下表路由 | 2、4 |
-| [references/canvas/verify-export.md](references/canvas/verify-export.md)：人工验收十条表 | 5 |
-| [references/canvas/export.md](references/canvas/export.md)：导出细节与沙箱降级 | 6 |
-
-页面类型路由（唯一真相源）：先判页面类型，再按这一行取骨架 kind 和必读页面原则。
+先判页面类型，再按这一行取骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles 与 visual-color；多张营销配图另读 anti-sameness。
 
 | 用户说的 | `<hb-page kind>` | 必读页面原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
@@ -58,6 +25,8 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | dashboard（大屏一节） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-screens 多屏流程（2～3 屏）；不套 .window |
+
+要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 visual-color 与 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
 
 ## 执行流程
 
