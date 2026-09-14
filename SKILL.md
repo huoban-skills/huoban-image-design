@@ -16,7 +16,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 用户说的 | `<hb-page kind>` | 必读原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
-| 表单弹窗 / 编辑态 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗与编辑态尺寸未实测，交付说明注明 |
+| 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；尺寸未实测，交付说明注明 |
 | 详情页 / 详情界面 | detail | item-detail、component-guide | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench、component-guide | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
 | 数据看板 | dashboard | dashboard、component-guide | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
@@ -42,7 +42,7 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 
 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏；并排用 `<hb-row spans="16|8">`；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 
-宏没覆盖的组件（甘特/日历/任务/透视视图、表单弹窗、流程页签细节）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
+宏没覆盖的组件（甘特/日历/任务/透视视图、表单编辑页、流程页签细节）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
 ```bash
 python3 scripts/extract_templates.py assets/c2-table-form.html --list
