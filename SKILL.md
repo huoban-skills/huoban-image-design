@@ -17,13 +17,13 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | --- | --- | --- | --- |
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
 | 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；尺寸未实测，交付说明注明 |
-| 详情页 / 详情界面 | detail | item-detail、component-guide | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
-| 工作台 | workbench | workbench、component-guide | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
-| 数据看板 | dashboard | dashboard、component-guide | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
-| 数据大屏 | screen | dashboard（大屏一节）、component-guide | 体内只放 hb-screen；不套壳、无浮层 |
+| 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
+| 工作台 | workbench | workbench | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
+| 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
+| 数据大屏 | screen | dashboard（大屏一节） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-screens 多屏流程（2～3 屏）；不套 .window |
 
-新造或调整皮肤时另读 visual-color 与 skin/custom-skin。
+要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 visual-color 与 skin/custom-skin。
 
 ## 执行步骤
 

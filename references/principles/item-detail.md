@@ -46,7 +46,7 @@
 
 不放的组件：横幅（富文本 大标题预设；详情页的标题在记录功能区，不另放横幅）、筛选组件 筛选、与本记录无关的图表、按钮组 快捷方式格子（操作在记录功能区）。
 
-组件本身怎么选、举例见 [component-guide.md](component-guide.md)。
+选图表类型或拿不准该用哪个组件时，查 [component-guide.md](component-guide.md)。
 
 ## 3. 色彩
 

@@ -1,6 +1,6 @@
 # 界面设计原则（索引）
 
-画图前按 SKILL.md 的原则路由表读：所有图读通用两篇（visual-four-principles、visual-color），多张营销配图另读 anti-sameness；再按页面类型读对应一篇；工作台、看板、详情页另读组件选取。
+画图前按 SKILL.md 的原则路由表读：所有图读通用两篇（visual-four-principles、visual-color），多张营销配图另读 anti-sameness；再按页面类型读对应一篇；选图表类型或拿不准该用哪个组件时查组件辞典。
 
 ## 页面原则（按页面类型读一篇）
 
@@ -16,7 +16,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [component-guide.md](component-guide.md) | 组件辞典：官方组件的适用与举例；不管放哪放几个 |
+| [component-guide.md](component-guide.md) | 组件辞典：官方组件的适用与举例；不管放哪放几个 | 选图表类型或拿不准用哪个组件时读 |
 
 ## 通用原则（所有图都读）
 

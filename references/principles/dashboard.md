@@ -62,7 +62,7 @@
 
 不放的组件：按钮组 快捷方式／我处理的 待办／快捷表单（这些是工作台的）、富文本公告、单图（大屏中央视觉位除外）。
 
-组件本身怎么选、举例见 [component-guide.md](component-guide.md)。
+选图表类型或拿不准该用哪个组件时，查 [component-guide.md](component-guide.md)。
 
 ## 3. 色彩
 
