@@ -128,7 +128,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.has-float .window { width: 1440px; } /* 有浮层时窗口收窄 200，浮层探出补满 1640 */
 .stage.has-float.float-left .window { margin-left: 200px; } /* 浮层放左侧时窗口右移，浮层从左缘探出 */
 .mk-float { position: absolute; z-index: 3; } /* 位置每图自定（1.x 手写外壳时） */
-/* ── 2.0 骨架宏画布（hb-page 产出 .stage.auto）：高度按内容撑，不再手写 .stage{height} ── */
+/* ── 2.0 骨架宏画布（hb-page 产出 .stage.auto）：高度按内容撑，不再手写 .stage 的 height ── */
 .stage.auto { height: auto; }
 .stage.auto .window { position: relative; height: auto; }
 .stage.auto .window.cut { overflow: hidden; }            /* cut=px 时窗口截到指定高度 */
@@ -584,7 +584,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 
 /* ── 八 创建/编辑表单弹窗 ── */
 .form-modal, .standard-form-modal {
-  position: absolute; inset: 30px 24px 24px; z-index: 6;
+  position: absolute; inset: 30px 24px 30px; z-index: 6;
   background: var(--card-bg); border-radius: 12px; overflow: hidden;
   box-shadow: var(--shadow-window); display: flex; flex-direction: column;
 }
@@ -596,7 +596,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .fm-ops, .sf-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .sf-actions svg { width: 16px; height: 16px; color: var(--ink-45); }
 .sf-actions .edit { color: var(--ink-65); display: inline-flex; gap: 5px; align-items: center; }
-.fm-bd, .sf-bd { flex: 1; overflow: hidden; padding: 20px 24px; }
+.fm-bd, .sf-bd { flex: 1; overflow: hidden; padding: 16px; }
 .row { display: grid; gap: 16px; margin-bottom: 14px; }
 .row.cols-2, .cols-2 { grid-template-columns: 1fr 1fr; }
 .row.cols-3, .cols-3 { grid-template-columns: 1fr 1fr 1fr; }

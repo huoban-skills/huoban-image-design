@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="hb-skill" content="huoban-image-design 2.0">
-<title>fig2-分仓分库位库存</title>
+<title>fig12-表单编辑页</title>
 <style>
 /* 皮肤：藏蓝金。沉稳商务、纸感（navy #24466B / gold #A67C3D）。
    适用：通用政企/制造类商务场景。与 huoban-solution-report 同名皮肤同气质，报告配图用它自动同色系。
@@ -1673,113 +1673,49 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 <symbol id="i-at" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/></symbol>
 <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 4.4-3.4 7.5-8 8.6C7.4 20.5 4 17.4 4 13V7z"/></symbol>
 </svg>
-<style>
-.stage { height: 688px; }
-.mk-float { left: 0; top: 300px; width: 330px; z-index: 7; }
-.stage.has-float.float-left .window { margin-left: 268px; width: 1372px; }
-</style>
-<div class="stage has-float float-left">
-  <div class="window theme-band">
-    <div class="win-body">
-      <div class="shell-side">
-        <div class="side-top">
-          <span class="ws-logo">云</span>
-          <span class="ws-name">云图贸易</span>
-          <span class="plus"><svg class="ico"><use href="#i-plus"/></svg></span>
-        </div>
-        <div class="ico-row">
-          <i><svg class="ico"><use href="#i-home"/></svg></i>
-          <i class="on"><svg class="ico"><use href="#i-table"/></svg></i>
-          <i><svg class="ico"><use href="#i-doc"/></svg></i>
-          <i><svg class="ico"><use href="#i-flow"/></svg></i>
-        </div>
-        <div class="tree">
-          <div class="group">物资台账</div>
-          <div class="shell-nav-leaf"><span class="li ic-blue"><svg class="ico"><use href="#i-app-s"/></svg></span>物资档案</div>
-          <div class="shell-nav-leaf current"><span class="li"><svg class="ico"><use href="#i-grid-s"/></svg></span>库存明细</div>
-          <div class="shell-nav-leaf"><span class="li ic-teal"><svg class="ico"><use href="#i-box-s"/></svg></span>仓库与库位</div>
-          <div class="group">出入库</div>
-          <div class="shell-nav-leaf"><span class="li ic-orange"><svg class="ico"><use href="#i-check-s"/></svg></span>出库单</div>
-          <div class="shell-nav-leaf"><span class="li ic-purple"><svg class="ico"><use href="#i-trend-s"/></svg></span>入库单</div>
-          <div class="shell-nav-leaf"><span class="li ic-yellow"><svg class="ico"><use href="#i-chart-s"/></svg></span>盘点单</div>
-        </div>
-        <div class="bottom">
-          <span><svg class="ico"><use href="#i-settings"/></svg> 管理</span>
-          <span><svg class="ico"><use href="#i-users"/></svg> 成员</span>
-          <span class="more"><svg class="ico"><use href="#i-more"/></svg></span>
-        </div>
+<style>.stage{height:900px}</style>
+<div class="stage">
+<div class="window theme-band">
+  <div class="win-body">
+    <div class="shell-side">
+      <div class="side-top"><span class="ws-logo">云</span><span class="ws-name">云图贸易</span><span class="plus"><svg class="ico"><use href="#i-plus"/></svg></span></div>
+      <div class="ico-row"><i><svg class="ico"><use href="#i-home"/></svg></i><i class="on"><svg class="ico"><use href="#i-table"/></svg></i><i><svg class="ico"><use href="#i-doc"/></svg></i><i><svg class="ico"><use href="#i-flow"/></svg></i></div>
+      <div class="tree"><div class="group">物资台账</div><div class="shell-nav-leaf"><span class="li"><svg class="ico"><use href="#i-table"/></svg></span>物资档案</div><div class="shell-nav-leaf"><span class="li"><svg class="ico"><use href="#i-grid-s"/></svg></span>库存明细</div><div class="group">出入库</div><div class="shell-nav-leaf current"><span class="li"><svg class="ico"><use href="#i-check"/></svg></span>出库单</div><div class="shell-nav-leaf"><span class="li"><svg class="ico"><use href="#i-box-s"/></svg></span>入库单</div></div>
+      <div class="bottom"><span><svg class="ico"><use href="#i-settings"/></svg> 管理</span><span><svg class="ico"><use href="#i-users"/></svg> 成员</span><span class="more"><svg class="ico"><use href="#i-more"/></svg></span></div>
+    </div>
+    <div class="main">
+      <div class="shell-top-bar">
+        <span class="menu"><svg class="ico"><use href="#i-menu"/></svg></span><span class="pg">出库单</span><span class="caret">▾</span>
+        <div class="right"><svg class="ico"><use href="#i-headset"/></svg><svg class="ico"><use href="#i-bell"/></svg><svg class="ico"><use href="#i-inbox"/></svg><svg class="ico"><use href="#i-help"/></svg><span class="me">周</span></div>
       </div>
-      <div class="main">
-        <div class="shell-top-bar">
-          <span class="menu"><svg class="ico"><use href="#i-menu"/></svg></span>
-          <span class="pg">库存明细</span>
-          <span class="caret">▾</span>
-          <div class="right">
-            <svg class="ico"><use href="#i-headset"/></svg>
-            <svg class="ico"><use href="#i-bell"/></svg>
-            <svg class="ico"><use href="#i-inbox"/></svg>
-            <svg class="ico"><use href="#i-help"/></svg>
-            <span class="me">周</span>
-          </div>
-        </div>
-        <div class="view-tabs">
-          <span class="v on"><svg class="ico"><use href="#i-grid-s"/></svg>按存放点分组</span>
-          <span class="v"><svg class="ico"><use href="#i-grid-s"/></svg>库存总表</span>
-          <span class="add"><svg class="ico"><use href="#i-plus"/></svg>创建视图</span>
-          <span class="ovf"><svg class="ico"><use href="#i-more"/></svg></span>
-        </div>
-        <div class="view-box">
-          <div class="view-tools">
-            <span class="tool"><svg class="ico"><use href="#i-fields"/></svg>字段</span>
-            <span class="tool on"><svg class="ico"><use href="#i-group"/></svg>分组 1</span>
-            <span class="tool"><svg class="ico"><use href="#i-filter"/></svg>筛选</span>
-            <span class="tool"><svg class="ico"><use href="#i-export"/></svg>导出</span>
-            <div class="right">
-              <span class="search"><svg class="ico"><use href="#i-search"/></svg><span class="ph">搜索品名</span></span>
-              <span class="btn-new">调整库存<span class="dd">▾</span></span>
-            </div>
-          </div>
-          <div class="table-view view-grid">
-            <div class="grid">
-              <table>
-                <tr>
-                  <th class="ck"><span class="cb"></span></th><th class="idx"></th>
-                  <th>品名</th><th>品类</th><th>库位</th><th>单位</th><th>期初库存</th><th>当前库存</th><th>库存状态</th><th>库位负责人</th>
-                </tr>
-                <tr class="group"><td colspan="99"><span class="caret">▾</span><span class="tag c-red">城建大厦酒窖 · 6 条</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">1</td><td>七燕酒庄干红 750ml</td><td><span class="tag c-red">酒品</span></td><td>3 号酒柜 2 层</td><td>瓶</td><td>108</td><td>95</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">周</span>周敏</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">2</td><td>茅台飞天 53° 500ml</td><td><span class="tag c-red">酒品</span></td><td>3 号酒柜 1 层</td><td>瓶</td><td>40</td><td>36</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">周</span>周敏</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">3</td><td>拉菲古堡红葡萄酒 750ml</td><td><span class="tag c-red">酒品</span></td><td>5 号酒柜 1 层</td><td>瓶</td><td>12</td><td>8</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">周</span>周敏</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">4</td><td>轩尼诗李察干邑 700ml</td><td><span class="tag c-red">酒品</span></td><td>5 号酒柜 3 层</td><td>瓶</td><td>6</td><td>2</td><td><span class="tag c-orange">库存偏低</span></td><td><span class="user"><span class="av">周</span>周敏</span></td></tr>
-                <tr class="group"><td colspan="99"><span class="caret">▾</span><span class="tag c-blue">北京办公室 · 5 条</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">5</td><td>武夷山大红袍（特级）</td><td><span class="tag c-green">茶叶</span></td><td>A 区储物柜 01</td><td>罐</td><td>30</td><td>24</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">陈</span>陈晓东</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">6</td><td>云南普洱生茶饼 357g</td><td><span class="tag c-green">茶叶</span></td><td>A 区储物柜 01</td><td>饼</td><td>20</td><td>17</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">陈</span>陈晓东</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">7</td><td>轩尼诗李察干邑 700ml</td><td><span class="tag c-red">酒品</span></td><td>A 区储物柜 03</td><td>瓶</td><td>3</td><td>1</td><td><span class="tag c-red">库存不足</span></td><td><span class="user"><span class="av">陈</span>陈晓东</span></td></tr>
-                <tr class="group"><td colspan="99"><span class="caret">▾</span><span class="tag c-purple">珍藏品库 · 8 条</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">8</td><td>和田玉山水摆件</td><td><span class="tag c-purple">珍藏品</span></td><td>1 号房 展柜甲</td><td>件</td><td>1</td><td>1</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">李</span>李文彬</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">9</td><td>紫檀木雕笔筒</td><td><span class="tag c-purple">珍藏品</span></td><td>1 号房 展柜乙</td><td>件</td><td>2</td><td>2</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">李</span>李文彬</span></td></tr>
-                <tr><td class="ck"><span class="cb"></span></td><td class="idx">10</td><td>爱马仕 Birkin 30 手袋</td><td><span class="tag c-orange">奢侈品</span></td><td>6 号房 展柜甲</td><td>只</td><td>1</td><td>1</td><td><span class="tag c-green">正常</span></td><td><span class="user"><span class="av">李</span>李文彬</span></td></tr>
-                <tfoot>
-                  <tr><td colspan="3">1,217条</td><td></td><td></td><td></td><td><span>求和</span><b>4,912</b></td><td><span>求和</span><b>4,386</b></td><td></td><td></td></tr>
-                </tfoot>
-              </table>
-              <div class="hscroll"><i></i></div>
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="view-tabs"><span class="v on"><svg class="ico"><use href="#i-grid-s"/></svg>全部出库单</span><span class="v"><svg class="ico"><use href="#i-grid-s"/></svg>待审批</span><span class="add"><svg class="ico"><use href="#i-plus"/></svg>创建视图</span><span class="ovf"><svg class="ico"><use href="#i-more"/></svg></span></div>
+<div class="table-view view-grid"><div class="grid"><table><tr><th class="ck"><span class="cb"></span></th><th class="idx"></th><th>出库单号</th><th>物资</th><th>数量</th><th>领用人</th><th>状态</th></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">1</td><td>CK-20260824-0037</td><td>茅台飞天 53° 500ml</td><td>12</td><td><span class="user"><span class="av">周</span>周敏</span></td><td><span class="tag c-orange">待审批</span></td></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">2</td><td>CK-20260823-0036</td><td>武夷山大红袍</td><td>6</td><td><span class="user"><span class="av">陈</span>陈晓东</span></td><td><span class="tag c-green">已出库</span></td></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">3</td><td>CK-20260822-0035</td><td>中秋礼盒 A 款</td><td>40</td><td><span class="user"><span class="av">李</span>李文彬</span></td><td><span class="tag c-green">已出库</span></td></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">4</td><td>CK-20260821-0034</td><td>五粮液 52° 500ml</td><td>8</td><td><span class="user"><span class="av">周</span>周敏</span></td><td><span class="tag c-red">已驳回</span></td></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">5</td><td>CK-20260820-0033</td><td>明前龙井 250g</td><td>15</td><td><span class="user"><span class="av">陈</span>陈晓东</span></td><td><span class="tag c-green">已出库</span></td></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">6</td><td>CK-20260819-0032</td><td>A4 复印纸 70g</td><td>30</td><td><span class="user"><span class="av">李</span>李文彬</span></td><td><span class="tag c-green">已出库</span></td></tr><tr><td class="ck"><span class="cb"></span></td><td class="idx">7</td><td>CK-20260818-0031</td><td>劳保手套 12 副装</td><td>24</td><td><span class="user"><span class="av">周</span>周敏</span></td><td><span class="tag c-green">已出库</span></td></tr></table><div class="hscroll"><i></i></div></div></div>
     </div>
   </div>
-  <div class="mk-float">
-    <div class="w-card multi_stats">
-      <div class="wc-hd tint-teal"><svg class="ico ic-teal"><use href="#i-box-s"/></svg>仓库与库位配置</div>
-      <div class="multi-stat-row"><span>城建大厦酒窖 · 周敏</span><b class="pill teal">10 柜 / 32 库位</b></div>
-      <div class="multi-stat-row"><span>北京办公室 · 陈晓东</span><b class="pill blue">4 柜 / 9 库位</b></div>
-      <div class="multi-stat-row"><span>珍藏品库 · 李文彬</span><b class="pill green">9 房 / 21 展柜</b></div>
-      <div class="multi-stat-row"><span>澳洲总部代管 · 张海涛</span><b class="pill yellow">2 间 / 6 库位</b></div>
-      <div class="form-hint">每个存放点指定负责人，该点发生出入库时对应负责人收到通知。</div>
+</div>
+<div class="modal-mask"></div>
+<div class="form-modal">
+  <div class="fm-hd">
+    <span class="fm-title">新建出库单</span>
+    <div class="fm-ops"><span class="b line">取消</span><span class="b line">保存并继续创建</span><span class="b solid">保存</span></div>
+  </div>
+  <div class="fm-bd">
+    <div class="field_group">基本信息 <span class="fold"><svg class="ico"><use href="#i-prev"/></svg></span></div>
+    <div class="row cols-4">
+      <div class="field editing"><div class="f-label">出库单号 <b class="req">*</b></div><input class="f-input" value="CK-20260915-0041"/></div>
+      <div class="field editing field-category"><div class="f-label">出库类型 <b class="req">*</b></div><div class="f-value option-list"><span class="tag">领用出库</span></div></div>
+      <div class="field editing"><div class="f-label">领用部门</div><input class="f-input" value="生产二部"/></div>
+      <div class="field editing"><div class="f-label">出库日期 <b class="req">*</b></div><input class="f-input" value="2026-09-15"/></div>
+    </div>
+    <div class="row cols-2">
+      <div class="field editing"><div class="f-label">领用人 <b class="req">*</b></div><input class="f-input" value="周敏"/></div>
+      <div class="field editing"><div class="f-label">交付仓库</div><input class="f-input" value="城建大厦酒窖"/></div>
+    </div>
+    <div class="row">
+      <div class="field editing"><div class="f-label">备注</div><input class="f-input" placeholder="请输入用途说明"/></div>
     </div>
   </div>
+</div>
 </div>
 <script>
 // 画布自适应。两种模式：
