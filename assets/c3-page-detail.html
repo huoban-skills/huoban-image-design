@@ -177,26 +177,7 @@
   </div>
 </template>
 
-<!-- ══════════ 十一、企业门户架构 ══════════ -->
-<template data-architecture="企业门户" data-cn="企业门户">
-  <div class="portal">
-    <div class="portal-top"><!-- 顶部入口 --></div>
-    <div class="portal-logo"><!-- 企业标志 --></div>
-    <h1 class="portal-name"><!-- 企业名称 --></h1>
-    <div class="portal-sub"><!-- 企业说明 --></div>
-    <div class="portal-apps"><!-- 组件：工作区入口 --></div>
-    <div class="portal-foot"><!-- 企业设置入口 --></div>
-  </div>
-</template>
-
-<template data-component="工作区入口" data-cn="工作区入口" data-group="企业门户">
-  <div class="portal-app">
-    <span class="pa-ic"><svg class="ico"><use href="#i-app-s"/></svg></span>
-    <span class="pa-nm"><!-- 工作区名称 --></span>
-  </div>
-</template>
-
-<!-- ══════════ 十二、内容组件目录 ══════════ -->
+<!-- ══════════ 十一、内容组件目录 ══════════ -->
 <template data-component="富文本" data-type="rich" data-cn="富文本" data-group="内容">
   <div class="w-card content-widget rich">
     <div class="wc-hd"><!-- 组件名称 --></div>
@@ -271,7 +252,7 @@
   </div>
 </template>
 
-<!-- ══════════ 十三、原生组件目录 ══════════ -->
+<!-- ══════════ 十二、原生组件目录 ══════════ -->
 <template data-component="大幅富文本" data-type="rich" data-cn="富文本（大标题预设）" data-group="原生组件">
   <div class="rich hero"><!-- 标志、标题、副标题、搜索或操作 --></div>
 </template>
@@ -363,20 +344,20 @@
   </div>
 </template>
 
-<!-- ══════════ 十四、独立自定义详情页架构（2026-08-07 伙伴云真实页面实测） ══════════
+<!-- ══════════ 十三、独立自定义详情页架构（2026-08-07 伙伴云真实页面实测） ══════════
 结构边界：
 1. 自定义详情页默认是一张独立内容画布，不复用产品壳，也不包在记录详情弹窗中。
 2. 独立详情页不出现一级顶栏、左侧导航、弹窗遮罩、弹窗标题栏或底部栏；顶部记录功能区默认包含（2026-08-10 复测）。
 3. 页面内容使用 24 栅格：画布上边距 48、左右内缩 96、组件间距 20；双栏可按 8/24＋16/24 组合。
-4. 标题卡片、选项字段步骤样式、页签容器都是真实组件；“详情侧栏卡/详情主内容卡/归档页签卡”只是布局角色，不是组件名称。
-5. 标题卡片只承载摘要信息，不放按钮；按钮放记录功能区。
+4. 页头卡片、选项字段步骤样式、页签容器都是真实组件；“详情侧栏卡/详情主内容卡/归档页签卡”只是布局角色，不是组件名称。
+5. 页头卡片只承载摘要信息，不放按钮；按钮放记录功能区。
 -->
 <template data-architecture="独立自定义详情页" data-cn="独立自定义详情页" data-default-for="详情页" data-source="伙伴云真实自定义详情页">
   <main class="item-page">
     <!-- 组件：记录功能区（默认包含，2026-08-10 实测确认：自定义详情页自带此栏，无论弹窗或独立形态） -->
     <div class="item-page-canvas">
       <div class="item-grid">
-        <!-- 可选组件：标题卡片，占宽 24 -->
+        <!-- 可选组件：页头卡片，占宽 24 -->
         <!-- 可选组件：选项字段-步骤样式，占宽 24 -->
         <!-- 常见布局：页签容器占宽 8＋页签容器占宽 16；这是栅格组合，不是专用侧栏/主卡组件 -->
         <!-- 可选组件：页签容器，占宽 24；页签内可放表格列表、字段、统计、流程等已收录组件 -->

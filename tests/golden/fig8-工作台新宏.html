@@ -1015,19 +1015,6 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .calendar.agenda .calendar-grid .days { grid-auto-rows: 44px; }
 .agenda-list { border-top: 1px solid var(--line); min-height: 96px; }
 
-/* 企业门户（全屏渐变底＋居中 logo 与企业名＋底部工作区入口） */
-.portal { height: 100%; background: var(--banner-bg); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 28px; }
-.portal-top { align-self: flex-start; display: flex; align-items: center; gap: 8px; opacity: .9; }
-.portal-logo { width: 128px; height: 128px; border-radius: 50%; background: #fff; margin-top: 48px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
-.portal-name { font-size: 34px; font-weight: 600; margin-top: 26px; }
-.portal-sub { font-size: 15px; opacity: .85; margin-top: 12px; }
-.portal-apps { display: flex; gap: 72px; margin-top: 96px; }
-.portal .portal-app { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.portal .pa-ic { width: 64px; height: 64px; border-radius: 16px; background: rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; }
-.portal .pa-ic .ico { width: 30px; height: 30px; }
-.portal .pa-nm { font-size: 14px; }
-.portal-foot { margin-top: auto; align-self: flex-start; opacity: .9; }
-
 /* ══ 十四 骨架层组件（2026-09-14 实测：ERP 演示 v7.1 / 项目管理 v2.0 / 进销存 v6.0 三个工作区的真实 DOM）══
    通用外壳：卡片形态＝白底、圆角 9、阴影 rgba(0,0,0,.08) 0 20px 40px 0；标题行 40 高，标题 16/500，左边距 16。
    common 形态（图表、日历、进度条、嵌入）＝没有白底那层，只剩标题行和内容区。 */
@@ -1365,7 +1352,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .pcard .src .ico { width: 18px; height: 18px; }
 .phone .pcard .pt { margin-top: 11px; font-size: 15px; color: var(--ink-85); line-height: 24px; }
 .phone .pcard .pn { margin-top: 3px; font-size: 13px; color: var(--ink-65); line-height: 20px; }
-.phone .pcard .portal-app { display: flex; justify-content: flex-end; margin-top: 14px; }
+.phone .pcard .pact { display: flex; justify-content: flex-end; margin-top: 14px; }
 .phone .pcard .b.line { height: 40px; padding: 0 11px; border-radius: 6px; border: 1px solid var(--primary); color: var(--primary); font-size: 15px; background: transparent; }
 .phone .pcard .b .dd { font-size: 10px; margin-left: 6px; }
 
@@ -1410,113 +1397,192 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .wmenu .mi.hot { color: var(--primary); font-weight: 700; }
 .phone .tapdot { position: absolute; top: 4px; right: 10px; width: 18px; height: 18px; border-radius: 50%; background: var(--c-orange); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
 
-/* ══════════════════ 数据大屏（2026-09-04 app.huoban.com 三个大屏页实测：生产车间大屏、项目管理数字大屏、官方模板黑金金融/深青未来）══════════════════
-   大屏＝自定义页面「超宽」模式＋深色＋背景图＋卡片装饰框。组件仍是工作台那套，放进 .screen 后走这里的深色 token；
-   实测：画布内距 20、24 栅格间距 20；标题条 80 高、页面名 26～30/500～700 白 85%；右上日期 16/600 白＋星期＋时间 14；
-   指标框 159×100：指标名 14 白 45%、值 32/500 白 85% 居中；卡片底 rgba(0,0,0,.65)；图表卡标题条 40 高、标题 16/500。
-   产品里的装饰框和标题条是搭建者上传的图片（border-image），本 skill 用 CSS 画等价几何：四角括号框、圆角发光框、斜切标签条、金色雁翎条。 */
+/* ══════════════════ 数据大屏（2026-09-14 app.huoban.com 官方六张样板实测：深青未来、蓝色科技、黑金金融、红色党建、青色自然）══════════════════
+   大屏＝普通的 24 栅格自定义页面（page_width=ultra），页面不缩放：列宽、行高、20 间距与其他页面完全一致，
+   行高公式同前：h 行的组件高 20h−20。实测骨架：
+     标题行（logo 3 ＋ 大标题 18 ＋ 时间 3，高 5）→ 分隔条 24×2 → 主体三列 6 ｜ 12 ｜ 6（各 38 行）→ 底部 12＋12（各 26 行）。
+   官方的整页背景、四角角标框、斜切标题铭牌都是上传的 PNG（border-image），CSS 里没有任何发光、滤镜或专用字体；
+   这里用纯 CSS 画等价几何：细网格纹理＋顶部光带做背景，四角 L 形角标做卡片框，clip-path 斜切做标题铭牌。
+   文字四档：主标题 30/700、指标值 32/500、卡片标题 16/500、标签 14；白字两档 85% / 45%。
+   图表系列色五个主题相同（实测 canvas 取色），写在 --screen-series-* / --screen-pie-* / --screen-bar-*。
+   皮肤要改这些 token 写 `body .screen { --screen-…: … }`：皮肤拼在 base.css 之前，同特异度盖不住。 */
+
+/* ── 画布：主题只改下面这组 token，结构与尺寸共用 ── */
 .screen {
-  --screen-accent: var(--primary);
-  --screen-card: rgba(0, 0, 0, .65);
-  --ink-85: rgba(255, 255, 255, .85); --ink-65: rgba(255, 255, 255, .65); --ink-45: rgba(255, 255, 255, .45); --ink-25: rgba(255, 255, 255, .25);
-  --line: rgba(255, 255, 255, .12); --tag-bg: rgba(255, 255, 255, .12); --field-bg: rgba(255, 255, 255, .06);
-  --card-bg: var(--screen-card); --page-bg: transparent; --primary: var(--screen-accent);
-  position: relative; padding: 20px; min-height: 922px; color: var(--ink-85);
-  background: #050a16 center / cover no-repeat; /* 背景由 build.py 按 bg-* 类注入 assets/screens/*.svg */
-  display: flex; flex-direction: column; gap: 20px;
+  --screen-bg: #0E1C25;                      /* 整页底色 */
+  --screen-wash: none;                       /* 底色之上的整屏渐变（红色党建用） */
+  --screen-net: rgba(255, 255, 255, .05);    /* 网格纹理线 */
+  --screen-beam: rgba(45, 211, 217, .34);    /* 顶部光带 */
+  --screen-edge: rgba(45, 211, 217, .35);    /* 卡片描边 */
+  --screen-corner: #2FD3D9;                  /* 四角 L 形角标 */
+  --screen-accent: #2FD3D9;                  /* 铭牌箭头、分隔条、视觉位线条 */
+  --screen-card: rgba(255, 255, 255, .03);   /* 卡片底 */
+  --screen-plate: rgba(45, 211, 217, .30);   /* 标题铭牌底 */
+  --screen-radius: 0px;                      /* 直角；浅色主题为 9 */
+  /* 图表系列色：五个主题一样 */
+  --screen-series-1: #5DA8E9; --screen-series-2: #B6C7D5;
+  --screen-pie-1: #B6C7D5; --screen-pie-2: #738A9B; --screen-pie-3: #3E84B4;
+  --screen-pie-4: #71A5CA; --screen-pie-5: #4B6374; --screen-pie-6: #2E4555;
+  --screen-bar-1: #5DA8E9; --screen-bar-2: #E9A33B; --screen-bar-3: #47B98A; --screen-bar-4: #E2685F;
+  /* 深色底下的文字与线，放进大屏的普通组件跟着走 */
+  --ink-85: rgba(255, 255, 255, .85); --ink-65: rgba(255, 255, 255, .65);
+  --ink-45: rgba(255, 255, 255, .45); --ink-25: rgba(255, 255, 255, .25);
+  --line: rgba(255, 255, 255, .12); --tag-bg: rgba(255, 255, 255, .10); --field-bg: rgba(255, 255, 255, .05);
+  --card-bg: transparent; --page-bg: transparent;
+  --primary: var(--screen-series-1);
+  --primary-08: rgba(93, 168, 233, .12); --primary-soft: rgba(93, 168, 233, .20);
+  position: relative; padding: 20px; color: var(--ink-85);
+  background-color: var(--screen-bg);
+  /* 顶部光带 ＋（可选的装饰底图）＋ 细网格纹理 ＋ 整屏渐变 */
+  background-image:
+    radial-gradient(120% 70% at 50% -18%, var(--screen-beam), transparent 62%),
+    var(--screen-photo, none),
+    repeating-linear-gradient(0deg, var(--screen-net) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, var(--screen-net) 0 1px, transparent 1px 40px),
+    var(--screen-wash);
+  background-size: 100% 460px, cover, auto, auto, cover;
+  background-position: 50% 0, 50% 50%, 0 0, 0 0, 50% 50%;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
 }
-.screen.theme-teal { --screen-accent: #2FD3D9; }
-.screen.theme-gold { --screen-accent: #E8C36A; --screen-card: rgba(0, 0, 0, .66); }
-.screen.theme-blue { --screen-accent: #4AA3FF; }
-.screen .w-card, .screen .chart_single, .screen .chart_table, .screen .chart { background: var(--screen-card); border: 1px solid color-mix(in srgb, var(--screen-accent) 35%, transparent); box-shadow: none; }
-.screen .chart_table th, .screen .chart_table td { border-color: var(--line); }
-.screen .chart_table .dim { background: var(--field-bg); }
-.screen .legend { color: var(--ink-65); }
-
-/* 24 栅格：大屏用 grid 排布，列跨度 sp-N（N 为 24 分之几）；未给跨度的子项占 4 */
-.screen-grid { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
-.screen-grid > * { grid-column: span 3; min-width: 0; }
-.screen-grid > .sp-2 { grid-column: span 2; } .screen-grid > .sp-3 { grid-column: span 3; } .screen-grid > .sp-4 { grid-column: span 4; }
-.screen-grid > .sp-6 { grid-column: span 6; } .screen-grid > .sp-8 { grid-column: span 8; } .screen-grid > .sp-12 { grid-column: span 12; }
-.screen-grid > .sp-16 { grid-column: span 16; } .screen-grid > .sp-18 { grid-column: span 18; } .screen-grid > .sp-24 { grid-column: span 24; }
-.screen-grid > .rs-2 { grid-row: span 2; } .screen-grid > .rs-3 { grid-row: span 3; }
-
-/* 标题条：80 高，页面名居中，两侧装饰线（实测两页都是图片标题条，这里用渐变线＋斜切） */
-.screen-head { position: relative; height: 80px; display: flex; align-items: center; justify-content: center; }
-.screen-head h1 { font-size: 30px; font-weight: 700; color: var(--ink-85); letter-spacing: 2px; position: relative; padding: 0 60px; text-shadow: 0 0 18px color-mix(in srgb, var(--screen-accent) 60%, transparent); }
-.screen-head h1 small { display: block; font-size: 14px; font-weight: 400; color: var(--ink-65); letter-spacing: 3px; text-align: center; margin-top: 4px; }
-.screen-head::before, .screen-head::after {
-  content: ""; position: absolute; top: 50%; height: 2px; width: 34%;
-  background: linear-gradient(90deg, transparent, var(--screen-accent) 40%, var(--screen-accent) 85%, transparent);
+/* 五套主题（深青未来 cyan / 蓝色科技 blue / 黑金金融 gold / 红色党建 red / 青色自然 light） */
+.screen.theme-cyan { }
+.screen.theme-blue {
+  --screen-bg: #071227; --screen-net: rgba(93, 168, 233, .07); --screen-beam: rgba(93, 168, 233, .30);
+  --screen-edge: rgba(93, 168, 233, .38); --screen-corner: #5DA8E9; --screen-accent: #5DA8E9; --screen-card: rgba(10, 26, 52, .55);
+  --screen-plate: rgba(93, 168, 233, .32);
 }
-.screen-head::before { left: 0; } .screen-head::after { right: 0; transform: scaleX(-1); }
-.screen-head.band { background: linear-gradient(180deg, color-mix(in srgb, var(--screen-accent) 22%, transparent), transparent 90%); clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%); }
-.screen-head.band::before, .screen-head.band::after { top: auto; bottom: 0; height: 1px; width: 100%; }
-.screen-head.band::after { transform: none; }
-.screen-dt { position: absolute; right: 0; top: 14px; text-align: right; color: var(--ink-85); }
-.screen-dt b { font-size: 16px; font-weight: 600; margin-right: 6px; }
-.screen-dt span { font-size: 16px; font-weight: 600; }
-.screen-dt small { display: block; font-size: 14px; font-weight: 400; color: var(--ink-65); margin-top: 4px; }
-.screen-logo { position: absolute; left: 0; top: 24px; font-size: 16px; font-weight: 500; color: var(--ink-85); }
+.screen.theme-gold {
+  --screen-bg: #000000; --screen-net: rgba(232, 195, 106, .06); --screen-beam: rgba(232, 195, 106, .20);
+  --screen-edge: rgba(232, 195, 106, .38); --screen-corner: #E8C36A; --screen-accent: #E8C36A; --screen-card: rgba(0, 0, 0, .65);
+  --screen-plate: rgba(232, 195, 106, .28);
+}
+.screen.theme-red {
+  --screen-bg: #8E1116; --screen-wash: linear-gradient(180deg, #C2202A 0%, #8E1116 55%, #5E0A0E 100%);
+  --screen-net: rgba(255, 255, 255, .06); --screen-beam: rgba(255, 214, 150, .22);
+  --screen-edge: rgba(240, 206, 138, .45); --screen-corner: #F0CE8A; --screen-accent: #F0CE8A; --screen-card: rgba(90, 8, 12, .38);
+  --screen-plate: rgba(240, 206, 138, .30);
+}
+.screen.theme-light .screen-kpi, .screen.theme-light .screen-card { box-shadow: 0 6px 18px rgba(16, 42, 66, .06); }
+.screen.theme-light {
+  --screen-bg: #EAF1F8; --screen-net: rgba(62, 132, 180, .08); --screen-beam: rgba(93, 168, 233, .34);
+  --screen-edge: rgba(62, 132, 180, .22); --screen-corner: transparent; --screen-accent: #3E84B4; --screen-card: rgba(255, 255, 255, .78);
+  --screen-plate: rgba(93, 168, 233, .26); --screen-radius: 9px;
+  --ink-85: rgba(0, 0, 0, .85); --ink-65: rgba(0, 0, 0, .60); --ink-45: rgba(0, 0, 0, .45); --ink-25: rgba(0, 0, 0, .25);
+  --line: rgba(0, 0, 0, .10); --tag-bg: rgba(0, 0, 0, .06); --field-bg: rgba(0, 0, 0, .04);
+}
 
-/* 指标框（实测 159×100，内容居中） */
-.screen-kpi { position: relative; height: 100px; padding: 20px 16px; background: var(--screen-card); text-align: center; }
-.screen-kpi .lb { font-size: 14px; color: var(--ink-45); line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.screen-kpi .vl { font-size: 32px; font-weight: 500; color: var(--ink-85); line-height: 38px; margin-top: 1px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* ── 24 栅格：列跨度 sp-N，行跨度 rs-N（一行 20 高，N 行的组件高 20N−20）── */
+.screen-grid { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); column-gap: 20px; row-gap: 0; grid-auto-rows: 20px; margin-bottom: -20px; }
+.screen-grid > * { grid-column: span 6; min-width: 0; margin-bottom: 20px; }
+.screen-grid > .sp-3 { grid-column: span 3; } .screen-grid > .sp-4 { grid-column: span 4; } .screen-grid > .sp-5 { grid-column: span 5; }
+.screen-grid > .sp-6 { grid-column: span 6; } .screen-grid > .sp-8 { grid-column: span 8; } .screen-grid > .sp-10 { grid-column: span 10; }
+.screen-grid > .sp-12 { grid-column: span 12; } .screen-grid > .sp-14 { grid-column: span 14; } .screen-grid > .sp-16 { grid-column: span 16; }
+.screen-grid > .sp-18 { grid-column: span 18; } .screen-grid > .sp-24 { grid-column: span 24; }
+/* 分栏：一列里的组件竖着排，列高由外层 rs-N 定，列内各组件的 rs-N 之和要等于它 */
+.screen-col { display: flex; flex-direction: column; gap: 20px; }
+.screen-col > * { flex: none; min-height: 0; }
+.screen-col > .grow { flex: 1; }
+/* rs-N：N 行 → 外层栅格里跨 N 行；分栏里高 20N−20 */
+.screen-grid > .rs-2 { grid-row: span 2; } .screen-col > .rs-2 { height: 20px; } .screen-grid > .rs-3 { grid-row: span 3; } .screen-col > .rs-3 { height: 40px; } .screen-grid > .rs-4 { grid-row: span 4; } .screen-col > .rs-4 { height: 60px; } .screen-grid > .rs-5 { grid-row: span 5; } .screen-col > .rs-5 { height: 80px; }
+.screen-grid > .rs-6 { grid-row: span 6; } .screen-col > .rs-6 { height: 100px; } .screen-grid > .rs-7 { grid-row: span 7; } .screen-col > .rs-7 { height: 120px; } .screen-grid > .rs-8 { grid-row: span 8; } .screen-col > .rs-8 { height: 140px; } .screen-grid > .rs-9 { grid-row: span 9; } .screen-col > .rs-9 { height: 160px; }
+.screen-grid > .rs-10 { grid-row: span 10; } .screen-col > .rs-10 { height: 180px; } .screen-grid > .rs-11 { grid-row: span 11; } .screen-col > .rs-11 { height: 200px; } .screen-grid > .rs-12 { grid-row: span 12; } .screen-col > .rs-12 { height: 220px; } .screen-grid > .rs-13 { grid-row: span 13; } .screen-col > .rs-13 { height: 240px; }
+.screen-grid > .rs-14 { grid-row: span 14; } .screen-col > .rs-14 { height: 260px; } .screen-grid > .rs-15 { grid-row: span 15; } .screen-col > .rs-15 { height: 280px; } .screen-grid > .rs-16 { grid-row: span 16; } .screen-col > .rs-16 { height: 300px; } .screen-grid > .rs-17 { grid-row: span 17; } .screen-col > .rs-17 { height: 320px; }
+.screen-grid > .rs-18 { grid-row: span 18; } .screen-col > .rs-18 { height: 340px; } .screen-grid > .rs-19 { grid-row: span 19; } .screen-col > .rs-19 { height: 360px; } .screen-grid > .rs-20 { grid-row: span 20; } .screen-col > .rs-20 { height: 380px; } .screen-grid > .rs-21 { grid-row: span 21; } .screen-col > .rs-21 { height: 400px; }
+.screen-grid > .rs-22 { grid-row: span 22; } .screen-col > .rs-22 { height: 420px; } .screen-grid > .rs-23 { grid-row: span 23; } .screen-col > .rs-23 { height: 440px; } .screen-grid > .rs-24 { grid-row: span 24; } .screen-col > .rs-24 { height: 460px; } .screen-grid > .rs-25 { grid-row: span 25; } .screen-col > .rs-25 { height: 480px; }
+.screen-grid > .rs-26 { grid-row: span 26; } .screen-col > .rs-26 { height: 500px; } .screen-grid > .rs-27 { grid-row: span 27; } .screen-col > .rs-27 { height: 520px; } .screen-grid > .rs-28 { grid-row: span 28; } .screen-col > .rs-28 { height: 540px; } .screen-grid > .rs-29 { grid-row: span 29; } .screen-col > .rs-29 { height: 560px; }
+.screen-grid > .rs-30 { grid-row: span 30; } .screen-col > .rs-30 { height: 580px; } .screen-grid > .rs-31 { grid-row: span 31; } .screen-col > .rs-31 { height: 600px; } .screen-grid > .rs-32 { grid-row: span 32; } .screen-col > .rs-32 { height: 620px; } .screen-grid > .rs-33 { grid-row: span 33; } .screen-col > .rs-33 { height: 640px; }
+.screen-grid > .rs-34 { grid-row: span 34; } .screen-col > .rs-34 { height: 660px; } .screen-grid > .rs-35 { grid-row: span 35; } .screen-col > .rs-35 { height: 680px; } .screen-grid > .rs-36 { grid-row: span 36; } .screen-col > .rs-36 { height: 700px; } .screen-grid > .rs-37 { grid-row: span 37; } .screen-col > .rs-37 { height: 720px; }
+.screen-grid > .rs-38 { grid-row: span 38; } .screen-col > .rs-38 { height: 740px; } .screen-grid > .rs-39 { grid-row: span 39; } .screen-col > .rs-39 { height: 760px; } .screen-grid > .rs-40 { grid-row: span 40; } .screen-col > .rs-40 { height: 780px; }
+
+/* ── 标题行：logo 3 ＋ 大标题 18 ＋ 时间 3 ── */
+.screen-head { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); column-gap: 20px; align-items: center; }
+.screen-logo:empty::before { display: none; }
+.screen-logo { grid-column: span 3; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 500; color: var(--ink-85); white-space: nowrap; }
+.screen-logo::before { content: ""; width: 14px; height: 14px; flex: none; background: var(--screen-accent); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%, 50% 18%, 22% 50%, 50% 82%, 78% 50%); }
+.screen-title { grid-column: span 18; text-align: center; position: relative; }
+.screen-title h1 { font-size: 30px; font-weight: 700; line-height: 42px; color: var(--ink-85); letter-spacing: 3px; }
+.screen-title small { display: block; font-size: 14px; font-weight: 400; letter-spacing: 4px; color: var(--ink-45); }
+.screen-title::before, .screen-title::after { content: ""; position: absolute; top: 50%; width: 15%; height: 1px; background: linear-gradient(90deg, transparent, var(--screen-edge)); }
+.screen-title::before { left: 0; } .screen-title::after { right: 0; transform: scaleX(-1); }
+.screen-dt { grid-column: span 3; text-align: right; white-space: nowrap; }
+.screen-dt b { font-size: 16px; font-weight: 500; color: var(--ink-85); }
+.screen-dt span, .screen-dt small { font-size: 14px; font-weight: 400; color: var(--ink-45); }
+.screen-dt span { margin-left: 6px; } .screen-dt small { display: block; }
+/* 分隔条 24×2：产品里是空的 decoration 组件，只起留白与分隔 */
+.screen-deco { position: relative; }
+.screen-deco::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent, var(--screen-edge) 10%, var(--screen-edge) 90%, transparent); }
+.screen-deco::after { content: ""; position: absolute; left: 50%; top: 50%; width: 96px; height: 6px; transform: translate(-50%, -50%); background: repeating-linear-gradient(112deg, var(--screen-accent) 0 2px, transparent 2px 8px); opacity: .7; }
+
+/* ── 卡片外壳：直角、半透明底、1px 描边、四角 L 形角标（浅色主题角标透明、卡片圆角 9）── */
+.screen-kpi, .screen-card { position: relative; background: var(--screen-card); border: 1px solid var(--screen-edge); border-radius: var(--screen-radius); }
+.screen-kpi::after, .screen-card::after {
+  content: ""; position: absolute; inset: -1px; pointer-events: none;
+  background:
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 0 0 / 14px 2px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 0 0 / 2px 14px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 100% 0 / 14px 2px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 100% 0 / 2px 14px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 0 100% / 14px 2px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 0 100% / 2px 14px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 100% 100% / 14px 2px no-repeat,
+    linear-gradient(var(--screen-corner), var(--screen-corner)) 100% 100% / 2px 14px no-repeat;
+}
+/* 指标框行：一行两个，各 3 栏、6 行（100 高） */
+.screen-kpis { display: flex; gap: 20px; }
+.screen-kpis > .screen-kpi { flex: 1; }
+.screen-kpi { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; text-align: center; overflow: hidden; }
+.screen-kpi .lb { font-size: 14px; line-height: 20px; color: var(--ink-45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.screen-kpi .vl { font-size: 32px; font-weight: 500; line-height: 40px; color: var(--ink-85); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .screen-kpi .vl small { font-size: 14px; font-weight: 400; color: var(--ink-45); margin-left: 4px; }
 .screen-kpi.up .vl { color: var(--c-green); } .screen-kpi.down .vl { color: var(--c-red); }
 
-/* 装饰框三态：四角括号（生产车间/项目管理）、圆角发光（黑金）、无框（深青只有标题条） */
-.frame-bracket {
-  --fb: var(--screen-accent);
-  background-image:
-    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb)),
-    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb)),
-    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb)),
-    linear-gradient(var(--fb), var(--fb)), linear-gradient(var(--fb), var(--fb));
-  background-repeat: no-repeat;
-  background-size: 16px 2px, 2px 16px, 16px 2px, 2px 16px, 16px 2px, 2px 16px, 16px 2px, 2px 16px;
-  background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fb) 30%, transparent);
-}
-.frame-round { border: 1px solid color-mix(in srgb, var(--screen-accent) 70%, transparent); border-radius: 10px; box-shadow: inset 0 0 14px color-mix(in srgb, var(--screen-accent) 22%, transparent); }
-.frame-none { background: transparent; }
+/* 图表卡：标题条 40 高，左侧斜切铭牌（clip-path）＋ 右侧渐弱斜纹 */
+.screen-card { display: flex; flex-direction: column; min-height: 0; }
+.screen-hd { height: 40px; flex: none; position: relative; display: flex; align-items: center; overflow: hidden; }
+.screen-hd .t { position: relative; z-index: 1; display: inline-flex; align-items: center; height: 40px; max-width: 78%; padding: 0 30px 0 14px; font-size: 16px; font-weight: 500; line-height: 40px; color: var(--ink-85); white-space: nowrap; background: linear-gradient(90deg, var(--screen-plate), color-mix(in srgb, var(--screen-plate) 12%, transparent)); clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%); }
+.screen-hd .t::before { content: ""; width: 9px; height: 11px; flex: none; margin-right: 9px; background: var(--screen-accent); clip-path: polygon(0 0, 100% 50%, 0 100%, 0 62%, 60% 50%, 0 38%); }
+.screen-hd::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 40%; background: repeating-linear-gradient(112deg, var(--screen-edge) 0 1px, transparent 1px 9px); -webkit-mask-image: linear-gradient(90deg, transparent, #000 92%); mask-image: linear-gradient(90deg, transparent, #000 92%); }
+.screen-bd { flex: 1; min-height: 0; padding: 10px 14px 14px; display: flex; flex-direction: column; }
+.screen-bd > svg { width: 100%; height: 100%; min-height: 0; flex: 1; }
+/* 大屏里的图表系列色：主系列＝--screen-series-1（经 --primary），宏输出的第二系列（opacity .45）换成实测次色 */
+.screen [fill="var(--primary)"][opacity=".45"] { fill: var(--screen-series-2); opacity: 1; }
+.screen [stroke="var(--primary)"][opacity=".45"] { stroke: var(--screen-series-2); opacity: 1; }
+/* 饼图六色：宏按行序出片，这里按序换成实测的六档灰蓝（切片在 <g> 里，图例色块同序） */
+.screen .screen-bd svg > g > circle:nth-of-type(1) { stroke: var(--screen-pie-1); }
+.screen .screen-bd svg > g > circle:nth-of-type(2) { stroke: var(--screen-pie-2); }
+.screen .screen-bd svg > g > circle:nth-of-type(3) { stroke: var(--screen-pie-3); }
+.screen .screen-bd svg > g > circle:nth-of-type(4) { stroke: var(--screen-pie-4); }
+.screen .screen-bd svg > g > circle:nth-of-type(5) { stroke: var(--screen-pie-5); }
+.screen .screen-bd svg > g > circle:nth-of-type(6) { stroke: var(--screen-pie-6); }
+.screen .screen-bd svg > g > rect:nth-of-type(1) { fill: var(--screen-pie-1); }
+.screen .screen-bd svg > g > rect:nth-of-type(2) { fill: var(--screen-pie-2); }
+.screen .screen-bd svg > g > rect:nth-of-type(3) { fill: var(--screen-pie-3); }
+.screen .screen-bd svg > g > rect:nth-of-type(4) { fill: var(--screen-pie-4); }
+.screen .screen-bd svg > g > rect:nth-of-type(5) { fill: var(--screen-pie-5); }
+.screen .screen-bd svg > g > rect:nth-of-type(6) { fill: var(--screen-pie-6); }
 
-/* 图表卡：标题条 40 高＋绘图区；标题条三种：tag 斜切标签（深青）、chevron 雁翎居中（黑金）、line 左标题渐变底线（生产车间） */
-.screen-card { position: relative; background: var(--screen-card); display: flex; flex-direction: column; min-height: 0; }
-.screen-hd { height: 40px; flex: none; display: flex; align-items: center; padding: 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-85); position: relative; }
-.screen-hd .acts { margin-left: auto; display: flex; gap: 8px; color: var(--ink-45); }
-.screen-hd .acts .ico { width: 16px; height: 16px; }
-.screen-hd.tag { background: linear-gradient(90deg, color-mix(in srgb, var(--screen-accent) 32%, transparent), transparent 70%); clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%); }
-.screen-hd.tag::before { content: "➤"; font-size: 12px; color: var(--screen-accent); margin-right: 10px; }
-.screen-hd.chevron { justify-content: center; padding: 0 64px; color: color-mix(in srgb, var(--screen-accent) 75%, #fff); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--screen-accent) 18%, transparent), transparent); border-bottom: 1px solid color-mix(in srgb, var(--screen-accent) 45%, transparent); }
-.screen-hd.chevron::before, .screen-hd.chevron::after { content: "‹‹‹‹"; position: absolute; top: 0; font-size: 18px; letter-spacing: -3px; color: var(--screen-accent); opacity: .8; }
-.screen-hd.chevron::before { left: 16px; } .screen-hd.chevron::after { right: 16px; transform: scaleX(-1); }
-.screen-hd.chevron .acts { position: absolute; right: 56px; top: 12px; margin-left: 0; }
-.screen-hd.line::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 1px; background: linear-gradient(90deg, var(--screen-accent), transparent); }
-.screen-hd.line::before { content: ""; width: 4px; height: 16px; background: var(--screen-accent); margin-right: 10px; border-radius: 1px; }
-.screen-bd { flex: 1; min-height: 0; padding: 12px 16px 16px; display: flex; flex-direction: column; }
-.screen-bd > svg { width: 100%; height: 100%; min-height: 160px; }
-.screen-bd .grid { background: transparent; }
-.screen-bd .grid th { background: var(--field-bg); color: var(--ink-65); border-bottom-color: var(--line); }
-.screen-bd .grid td { color: var(--ink-85); border-color: var(--line); }
+/* 中央视觉位：客户的地图/3D 图放 img；没有就用线框地球或网点阵占位，都不画国界 */
+.screen-visual { padding: 0; position: relative; overflow: hidden; }
+.screen-visual > img, .screen-visual > svg { width: 100%; height: 100%; object-fit: contain; }
 
-/* 中央视觉位：放 3D 场景图/地图；没图时留一圈光晕地台 */
-.screen-visual { position: relative; min-height: 220px; display: flex; align-items: center; justify-content: center; padding: 8px; }
-.screen-visual img, .screen-visual > svg { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; }
-.screen-visual:empty::after, .screen-visual.placeholder::after {
-  content: ""; width: 70%; height: 36%; border-radius: 50%;
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--screen-accent) 45%, transparent), transparent 70%);
-  border: 1px solid color-mix(in srgb, var(--screen-accent) 40%, transparent);
-}
-/* 进度条列表（黑金/深青模板里的「进度条」卡：行 40 高，名称 14 白，右端百分比） */
-.screen-bars { display: flex; flex-direction: column; gap: 12px; }
-.screen-bar { font-size: 14px; color: var(--ink-85); }
+/* 进度条列表：条底色蓝／橙／绿／红轮转（实测色序） */
+.screen-bars { display: flex; flex-direction: column; justify-content: center; gap: 14px; flex: 1; padding: 2px 2px 4px; }
+.screen-bar { font-size: 14px; line-height: 20px; color: var(--ink-85); }
 .screen-bar .t { display: flex; justify-content: space-between; margin-bottom: 6px; }
-.screen-bar .r { height: 6px; background: var(--tag-bg); border-radius: 3px; overflow: hidden; }
-.screen-bar .r i { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--screen-accent) 55%, transparent), var(--screen-accent)); }
-/* 滚动播报表（生产车间「实时报工播报」）：表头 32、行 35，斑马底 */
-.screen-ticker tr:nth-child(even) td { background: rgba(255, 255, 255, .03); }
+.screen-bar .t span:last-child { color: var(--ink-45); font-variant-numeric: tabular-nums; }
+.screen-bar .r { height: 8px; background: var(--tag-bg); overflow: hidden; }
+.screen-bar .r i { display: block; height: 100%; background: var(--sb, var(--screen-bar-1)); }
+
+/* 放进大屏的普通组件（表格列表、透视表、统计表）：脱掉白卡与投影，跟着大屏 token 走 */
+.screen .w-card, .screen .chart, .screen .chart_single, .screen .chart_table { background: transparent; box-shadow: none; border: 0; border-radius: 0; }
+.screen .screen-bd > .w-card { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.screen .screen-bd > .w-card > .grid { flex: 1; }
+.screen .grid { background: transparent; }
+.screen .grid th { background: var(--field-bg); color: var(--ink-65); border-bottom-color: var(--line); }
+.screen .grid td { color: var(--ink-85); border-color: var(--line); }
+.screen .grid tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--ink-85) 4%, transparent); }
+.screen .til-foot { border-top: 1px solid var(--line); color: var(--ink-45); }
+.screen .legend { color: var(--ink-65); padding: 0 0 2px; gap: 16px; }
 
 </style>
 </head>
@@ -1610,7 +1676,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 <div class="stage auto" data-kind="workbench"><div class="window theme-band">
   <div class="win-body">
     <div class="shell-side">
-      <div class="side-top"><span class="ws-logo">永</span><span class="ws-name">永铭世纪</span><span class="plus"><svg class="ico"><use href="#i-plus"/></svg></span></div>
+      <div class="side-top"><span class="ws-logo">云</span><span class="ws-name">云图贸易</span><span class="plus"><svg class="ico"><use href="#i-plus"/></svg></span></div>
       <div class="ico-row"><i><svg class="ico"><use href="#i-home"/></svg></i><i class="on"><svg class="ico"><use href="#i-table"/></svg></i><i><svg class="ico"><use href="#i-doc"/></svg></i><i><svg class="ico"><use href="#i-flow"/></svg></i></div>
       <div class="tree"><div class="group">物资台账</div><div class="shell-nav-leaf current"><span class="li"><svg class="ico"><use href="#i-home"/></svg></span>库管工作台</div><div class="shell-nav-leaf"><span class="li"><svg class="ico"><use href="#i-app-s"/></svg></span>物资档案</div><div class="shell-nav-leaf"><span class="li ic-green"><svg class="ico"><use href="#i-grid-s"/></svg></span>库存明细</div><div class="group">出入库</div><div class="shell-nav-leaf"><span class="li ic-orange"><svg class="ico"><use href="#i-check-s"/></svg></span>出库单</div><div class="shell-nav-leaf"><span class="li ic-teal"><svg class="ico"><use href="#i-box-s"/></svg></span>入库单</div></div>
       <div class="bottom"><span><svg class="ico"><use href="#i-settings"/></svg> 管理</span><span><svg class="ico"><use href="#i-users"/></svg> 成员</span><span class="more"><svg class="ico"><use href="#i-more"/></svg></span></div>

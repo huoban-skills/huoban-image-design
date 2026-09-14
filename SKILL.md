@@ -19,7 +19,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 用户说的 | `<hb-page kind>` | 必读页面原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
-| 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；尺寸未实测，交付说明注明 |
+| 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗随视口减 48×60，字段区一到四列等分 |
 | 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组与待办 → 页签 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
@@ -64,7 +64,7 @@ python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘�
 ```
 
 - 组件选取与数量按页面原则文档；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。
-- 图表写 `hb-bar`／`hb-line`／`hb-donut`／`hb-area`／`hb-hbar`，坐标由脚本算；双轴、漏斗、散点、地图未采集，先告知用户。
+- 图表写 `hb-bar`／`hb-line`／`hb-donut`／`hb-area`／`hb-hbar`／`hb-biaxial`／`hb-funnel`／`hb-scatter`／`hb-map`，坐标由脚本算；地图不画国界，用网点阵占位或客户提供的地图图片。
 - 完成标准：每张图一个片段；`python3 scripts/expand.py stage.html` 没有报错、提示都处理过。
 
 ### 3. 拼装

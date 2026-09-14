@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""回归：把 tests/frags/*.frag.html 逐个拼装，与 tests/golden/ 的基线做规范化 DOM 比对。
+"""回归：把 tests/frags/*.frag.html 逐个拼装，与 tests/golden/ 的基线做规范化 DOM 比对；
+末尾再比对 expand.py --doc all 的输出与 references/macros.md 是否一致。
 
 用法：
     python3 scripts/regress.py            # 比对
-    python3 scripts/regress.py --update   # 用当前输出覆盖基线（改了公共资产并确认无误后）
+    python3 scripts/regress.py --update   # 用当前输出覆盖基线、并重生成 macros.md（改了公共资产并确认无误后）
 
 规范化：去掉空白差异、class 记号按字母序；不依赖 Chrome。有 Chrome 时可再手动 export.py --png 目检。
 """
@@ -63,8 +64,30 @@ def main():
             print(f"✗ {name} 与基线不同（{len(d)} 处）")
             for l in d[:6]:
                 print("   ", l[:160])
+    if doc_stale(update):
+        bad += 1
     print("全部一致" if not bad else f"{bad} 个不一致")
     return 1 if bad else 0
+
+
+def doc_stale(update):
+    """references/macros.md 是 expand.py --doc all 的产物，改了宏就得重生成。"""
+    doc = SKILL / "references" / "macros.md"
+    r = subprocess.run([sys.executable, str(SKILL / "scripts" / "expand.py"), "--doc", "all"],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        print(f"✗ expand.py --doc all 报错：{r.stderr.strip()[-300:]}")
+        return True
+    now = r.stdout
+    if doc.exists() and doc.read_text(encoding="utf-8") == now:
+        print("✓ macros.md")
+        return False
+    if update:
+        doc.write_text(now, encoding="utf-8")
+        print("= macros.md 已重生成")
+        return False
+    print("✗ macros.md 过期，重跑 --doc all")
+    return True
 
 
 if __name__ == "__main__":

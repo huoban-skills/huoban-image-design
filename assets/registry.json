@@ -7,7 +7,6 @@
       "detail",
       "workbench",
       "dashboard",
-      "portal",
       "screen",
       "mobile"
     ],
@@ -19,7 +18,6 @@
       "page:detail",
       "page:workbench",
       "page:dashboard",
-      "page:portal",
       "page:screen",
       "page:mobile",
       "row",
@@ -1158,11 +1156,15 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row",
         "float"
       ],
-      "note": "与快捷按钮是否同为 button 的两种版式待实测"
+      "note": "与快捷按钮是否同为 button 的两种版式待实测",
+      "aliases": [
+        "按钮组",
+        "快捷方式",
+        "快捷按钮"
+      ]
     },
     {
       "kind": "component",
@@ -1299,7 +1301,7 @@
       "file": "c3-page-detail.html",
       "name": "图表组件",
       "group": "图表",
-      "macro": "hb-bar/hb-line/hb-donut/hb-area",
+      "macro": "hb-bar/hb-line/hb-donut/hb-area/hb-biaxial/hb-funnel/hb-scatter/hb-map",
       "grid": [
         12,
         8
@@ -1324,7 +1326,19 @@
         "tabs",
         "screen-card"
       ],
-      "note": "通用图表卡（card 样式）；具体图类型由修饰类标注。宏实现柱/折/环/面积，横向条另见「条形图」"
+      "note": "通用图表卡（card 样式）；具体图类型由修饰类标注。宏覆盖柱/折/环/面积/双轴/漏斗/散点/地图，横向条另见「条形图」",
+      "aliases": [
+        "折线图",
+        "柱状图",
+        "饼图",
+        "面积图",
+        "条形图",
+        "环图",
+        "双轴图",
+        "漏斗图",
+        "散点图",
+        "地图"
+      ]
     },
     {
       "kind": "component",
@@ -1353,37 +1367,6 @@
       "note": null
     },
     {
-      "kind": "architecture",
-      "id": "portal",
-      "page_kind": "portal",
-      "cn": "企业门户",
-      "old_class": "portal",
-      "file": "c3-page-detail.html",
-      "name": "企业门户",
-      "macro": "hb-page",
-      "variants": [],
-      "measured": "unverified",
-      "note": null
-    },
-    {
-      "kind": "component",
-      "id": "portal-app",
-      "type_key": null,
-      "cn": "工作区入口",
-      "old_class": "pa",
-      "file": "c3-page-detail.html",
-      "name": "工作区入口",
-      "group": "企业门户",
-      "macro": null,
-      "grid": null,
-      "variants": [],
-      "measured": "unverified",
-      "allowed_in": [
-        "page:portal"
-      ],
-      "note": null
-    },
-    {
       "kind": "component",
       "id": "rich",
       "type_key": "rich",
@@ -1401,7 +1384,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "page:detail",
         "row"
       ],
@@ -1425,7 +1407,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "page:detail",
         "row"
       ],
@@ -1449,7 +1430,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row"
       ],
       "note": null
@@ -1472,7 +1452,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row"
       ],
       "note": null
@@ -1495,7 +1474,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row"
       ],
       "note": "官方八种版式 l1～l8，结构位未收录"
@@ -1590,7 +1568,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row"
       ],
       "note": null
@@ -1615,7 +1592,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row"
       ],
       "note": null
@@ -1638,7 +1614,6 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "page:dashboard",
         "row"
       ],
@@ -1694,7 +1669,6 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
-        "page:portal",
         "row"
       ],
       "note": null
@@ -1720,7 +1694,6 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
-        "page:portal",
         "row"
       ],
       "note": null
@@ -1743,11 +1716,15 @@
       "measured": "unverified",
       "allowed_in": [
         "page:workbench",
-        "page:portal",
         "row",
         "float"
       ],
-      "note": null
+      "note": null,
+      "aliases": [
+        "按钮组",
+        "快捷方式",
+        "快捷按钮"
+      ]
     },
     {
       "kind": "component",
@@ -2046,7 +2023,7 @@
       "file": "c3-page-detail.html",
       "name": "图表组件-无卡片壳",
       "group": "图表",
-      "macro": "hb-bar/hb-line/hb-donut/hb-area/hb-hbar",
+      "macro": "hb-bar/hb-line/hb-donut/hb-area/hb-hbar/hb-biaxial/hb-funnel/hb-scatter/hb-map",
       "grid": [
         12,
         20
@@ -2065,7 +2042,19 @@
         "row",
         "tabs"
       ],
-      "note": "style_type=common：无白底无圆角无阴影，只剩 40 高标题行；宏加 plain 出这一形态"
+      "note": "style_type=common：无白底无圆角无阴影，只剩 40 高标题行；宏加 plain 出这一形态",
+      "aliases": [
+        "折线图",
+        "柱状图",
+        "饼图",
+        "面积图",
+        "条形图",
+        "环图",
+        "双轴图",
+        "漏斗图",
+        "散点图",
+        "地图"
+      ]
     },
     {
       "kind": "component",
@@ -2148,6 +2137,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2166,6 +2156,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2184,6 +2175,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2202,6 +2194,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2220,6 +2213,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2238,6 +2232,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2256,6 +2251,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2274,6 +2270,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "m-rec"
       ],
       "note": null
@@ -2292,6 +2289,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "m-rec"
       ],
       "note": null
@@ -2312,6 +2310,7 @@
       ],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2330,6 +2329,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2348,6 +2348,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2366,6 +2367,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2384,6 +2386,7 @@
       "variants": [],
       "measured": "measured",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": null
@@ -2402,6 +2405,7 @@
       "variants": [],
       "measured": "imitated",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": "不是伙伴云界面，按微信端样式仿写"
@@ -2422,6 +2426,7 @@
       ],
       "measured": "imitated",
       "allowed_in": [
+        "page:mobile",
         "phone"
       ],
       "note": "不是伙伴云界面，按微信端样式仿写"
@@ -2679,99 +2684,6 @@
     },
     {
       "kind": "component",
-      "id": "status_bar",
-      "type_key": "status_bar",
-      "cn": "状态条",
-      "old_class": null,
-      "file": null,
-      "name": null,
-      "group": null,
-      "macro": null,
-      "grid": [
-        8,
-        3
-      ],
-      "variants": [],
-      "measured": "unverified",
-      "allowed_in": [
-        "page:detail"
-      ],
-      "note": "官方有、skill 未采集；不画"
-    },
-    {
-      "kind": "component",
-      "id": "procedure_task",
-      "type_key": "procedure_task",
-      "cn": "我处理的",
-      "old_class": null,
-      "file": null,
-      "name": null,
-      "group": null,
-      "macro": null,
-      "grid": [
-        24,
-        12
-      ],
-      "variants": [],
-      "measured": "unverified",
-      "allowed_in": [
-        "page:workbench",
-        "page:dashboard",
-        "page:detail",
-        "row"
-      ],
-      "note": "官方有、skill 未采集；不画"
-    },
-    {
-      "kind": "component",
-      "id": "chart_area",
-      "type_key": "chart_area",
-      "cn": "面积图",
-      "old_class": null,
-      "file": null,
-      "name": null,
-      "group": null,
-      "macro": null,
-      "grid": [
-        12,
-        8
-      ],
-      "variants": [],
-      "measured": "unverified",
-      "allowed_in": [
-        "page:workbench",
-        "page:dashboard",
-        "page:detail",
-        "row"
-      ],
-      "note": "官方有、skill 未采集；不画"
-    },
-    {
-      "kind": "component",
-      "id": "chart_bar_y",
-      "type_key": "chart_bar_y",
-      "cn": "条形图",
-      "old_class": null,
-      "file": null,
-      "name": null,
-      "group": null,
-      "macro": null,
-      "grid": [
-        12,
-        8
-      ],
-      "variants": [],
-      "measured": "unverified",
-      "allowed_in": [
-        "page:workbench",
-        "page:dashboard",
-        "page:detail",
-        "row"
-      ],
-      "note": "官方有、skill 未采集；不画"
-    },
-    {
-      "kind": "component",
       "id": "chart_biaxial",
       "type_key": "chart_biaxial",
       "cn": "双轴图",
@@ -2779,20 +2691,20 @@
       "file": null,
       "name": null,
       "group": null,
-      "macro": null,
+      "macro": "hb-biaxial",
       "grid": [
         12,
         8
       ],
       "variants": [],
-      "measured": "unverified",
+      "measured": "measured",
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
         "page:detail",
         "row"
       ],
-      "note": "官方有、skill 未采集；不画"
+      "note": "2026-09-14 实测：柱次色＋线主色，左轴对柱、右轴对线；宏 hb-biaxial"
     },
     {
       "kind": "component",
@@ -2803,20 +2715,20 @@
       "file": null,
       "name": null,
       "group": null,
-      "macro": null,
+      "macro": "hb-funnel",
       "grid": [
         12,
         8
       ],
       "variants": [],
-      "measured": "unverified",
+      "measured": "measured",
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
         "page:detail",
         "row"
       ],
-      "note": "官方有、skill 未采集；不画"
+      "note": "2026-09-14 实测（项目管理 v2.0「Chart」页）：卡片壳，单色系由深到浅；宏 hb-funnel"
     },
     {
       "kind": "component",
@@ -2827,20 +2739,20 @@
       "file": null,
       "name": null,
       "group": null,
-      "macro": null,
+      "macro": "hb-scatter",
       "grid": [
         12,
         8
       ],
       "variants": [],
-      "measured": "unverified",
+      "measured": "measured",
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
         "page:detail",
         "row"
       ],
-      "note": "官方有、skill 未采集；不画"
+      "note": "2026-09-14 实测（项目管理 v2.0「Chart」页）：卡片壳，两个数值轴、点单色；宏 hb-scatter"
     },
     {
       "kind": "component",
@@ -2851,20 +2763,20 @@
       "file": null,
       "name": null,
       "group": null,
-      "macro": null,
+      "macro": "hb-map",
       "grid": [
         12,
         8
       ],
       "variants": [],
-      "measured": "unverified",
+      "measured": "measured",
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
         "page:detail",
         "row"
       ],
-      "note": "官方有、skill 未采集；不画"
+      "note": "2026-09-14 实测：官方是 ECharts 内置中国地图；本 skill 不画国界，用网点阵标记点或客户提供的地图图片；宏 hb-map"
     },
     {
       "kind": "atom",

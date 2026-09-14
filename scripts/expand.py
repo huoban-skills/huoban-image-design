@@ -680,6 +680,179 @@ def m_area(a, body):
     return chart_card(a, inner, legend_html(series), "hb-area")
 
 
+def m_biaxial(a, body):
+    """双轴图（chart_biaxial）：柱走左轴、折线走右轴，两轴刻度各自算。
+
+    2026-09-14 实测：柱＝次色（宏里的第二系列，大屏换 --screen-series-2），折线＝主色；
+    外壳与标题行同其他图表卡。
+    """
+    labels = cells(a.get("labels", ""))
+    if not a.get("labels"):
+        raise ExpandError("<hb-biaxial> 缺 labels（横轴标签，| 分隔）")
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 3:
+            raise ExpandError(f"<hb-biaxial> 每行「系列名 | 数值,数值,… | bar 或 line」：{ln}")
+        role = c[2].strip().lower()
+        if role not in ("bar", "line"):
+            raise ExpandError(f"<hb-biaxial> 第三列只能是 bar（柱，左轴）或 line（折线，右轴），写了「{c[2]}」")
+        rows.append({"name": c[0], "vals": nums_of(c[1]), "role": role,
+                     "color": c[3].strip() if len(c) > 3 and c[3].strip() else None})
+    bars = [r for r in rows if r["role"] == "bar"]
+    lns = [r for r in rows if r["role"] == "line"]
+    if len(bars) != 1 or len(lns) != 1:
+        raise ExpandError(f"<hb-biaxial> 要正好两行：一行 bar、一行 line（现在 {len(bars)} 行柱、{len(lns)} 行线）")
+    bar, line = bars[0], lns[0]
+    for r in rows:
+        if len(r["vals"]) != len(labels):
+            raise ExpandError(f"<hb-biaxial> 系列「{r['name']}」有 {len(r['vals'])} 个值，labels 有 {len(labels)} 个")
+    W, H = int(a.get("w", 560)), int(a.get("h", 240))
+    L, T, B, R = 44, 16, 34, 44
+    ticks = int(a.get("ticks", 4))
+    vmax_l = float(a["max"]) if "max" in a else nice_max(max(bar["vals"]))
+    vmax_r = float(a["max2"]) if "max2" in a else nice_max(max(line["vals"]))
+    inner, pw, ph, gw = axes(labels, vmax_l, ticks, W, H, L, T, B, R)
+    for i in range(ticks + 1):
+        y = T + ph * (1 - i / ticks)
+        inner.append(f'<text x="{W - R + 8}" y="{y + 4:.1f}" font-size="11" fill="var(--ink-45)">{fmt_num(vmax_r * i / ticks)}</text>')
+    bfill = f'fill="var(--c-{bar["color"]})"' if bar["color"] else 'fill="var(--primary)"'
+    bop = "" if bar["color"] else ' opacity=".45"'
+    lstroke = f'stroke="var(--c-{line["color"]})"' if line["color"] else 'stroke="var(--primary)"'
+    lfill = f'fill="var(--c-{line["color"]})"' if line["color"] else 'fill="var(--primary)"'
+    bw = min(26, gw * 0.5)
+    for j, v in enumerate(bar["vals"]):
+        h = ph * v / vmax_l
+        inner.append(f'<rect x="{L + gw * (j + 0.5) - bw / 2:.1f}" y="{T + ph - h:.1f}" width="{bw:.1f}" height="{h:.1f}" {bfill}{bop}/>')
+    pts = [(L + gw * (j + 0.5), T + ph * (1 - v / vmax_r)) for j, v in enumerate(line["vals"])]
+    inner.append(f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" {lstroke} stroke-width="2"/>')
+    for x, y in pts:
+        inner.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" {lfill}/>')
+    legend = ('<div class="legend">'
+              f'<span><svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10" rx="2" {bfill}{bop}/></svg> {esc(bar["name"])}</span>'
+              f'<span><svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10" rx="2" {lfill}/></svg> {esc(line["name"])}</span>'
+              "</div>")
+    return chart_card(a, inner, legend, "hb-biaxial")
+
+
+def m_funnel(a, body):
+    """漏斗图（chart_funnel）：自上而下逐级收窄的梯形，右侧标转化率；单色系由深到浅（2026-09-14 实测）。"""
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-funnel> 每行「阶段名 | 值」：{ln}")
+        rows.append({"name": c[0], "raw": c[1], "val": num_of(c[1])})
+    if len(rows) < 2:
+        raise ExpandError("<hb-funnel> 至少两段：漏斗讲的是一级级掉下来的转化")
+    top = rows[0]["val"] or 1
+    W, H = int(a.get("w", 560)), int(a.get("h", 240))
+    L, T, B, R = 16, 14, 14, 150
+    pw, ph = W - L - R, H - T - B
+    seg = ph / len(rows)
+    inner = []
+    for i, r in enumerate(rows):
+        w0 = pw * max(r["val"] / top, 0.12)
+        nxt = rows[i + 1]["val"] if i + 1 < len(rows) else r["val"]
+        w1 = pw * max(nxt / top, 0.12) if i + 1 < len(rows) else w0
+        cx = L + pw / 2
+        y0, y1 = T + seg * i, T + seg * (i + 1) - 4
+        op = max(0.3, 1 - i * 0.18)
+        inner.append(f'<polygon points="{cx - w0 / 2:.1f},{y0:.1f} {cx + w0 / 2:.1f},{y0:.1f} '
+                     f'{cx + w1 / 2:.1f},{y1:.1f} {cx - w1 / 2:.1f},{y1:.1f}" fill="var(--primary)" opacity="{op:.2f}"/>')
+        inner.append(f'<text x="{cx:.1f}" y="{(y0 + y1) / 2 + 4:.1f}" font-size="12" fill="#fff" text-anchor="middle">{esc(r["name"])}</text>')
+        rate = f"　{100 * r['val'] / top:.0f}%" if i else ""
+        inner.append(f'<text x="{W - R + 12}" y="{(y0 + y1) / 2 + 4:.1f}" font-size="12" fill="var(--ink-65)">{esc(r["raw"])}{rate}</text>')
+    return chart_card(a, inner, "", "hb-funnel", par="xMidYMid meet")
+
+
+def m_scatter(a, body):
+    """散点图（chart_scatter）：两个数值轴，点按第三列定大小（2026-09-14 实测：点单色、轴与文字深灰）。"""
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 3:
+            raise ExpandError(f"<hb-scatter> 每行「名称 | x 值 | y 值 | 大小(可省)」：{ln}")
+        rows.append({"name": c[0], "x": num_of(c[1]), "y": num_of(c[2]),
+                     "size": num_of(c[3]) if len(c) > 3 and c[3].strip() else None})
+    if not rows:
+        raise ExpandError("<hb-scatter> 没有数据行")
+    W, H = int(a.get("w", 560)), int(a.get("h", 240))
+    L, T, B, R = 48, 28, 36, 16
+    pw, ph = W - L - R, H - T - B
+    xmax = float(a["xmax"]) if "xmax" in a else nice_max(max(r["x"] for r in rows))
+    ymax = float(a["ymax"]) if "ymax" in a else nice_max(max(r["y"] for r in rows))
+    ticks = int(a.get("ticks", 4))
+    inner = []
+    for i in range(ticks + 1):
+        y = T + ph * (1 - i / ticks)
+        inner.append(f'<line x1="{L}" y1="{y:.1f}" x2="{W - R}" y2="{y:.1f}" stroke="var(--line)" stroke-width="1"/>')
+        inner.append(f'<text x="{L - 8}" y="{y + 4:.1f}" font-size="11" fill="var(--ink-45)" text-anchor="end">{fmt_num(ymax * i / ticks)}</text>')
+        x = L + pw * i / ticks
+        inner.append(f'<text x="{x:.1f}" y="{H - B + 20}" font-size="11" fill="var(--ink-45)" text-anchor="middle">{fmt_num(xmax * i / ticks)}</text>')
+    smax = max((r["size"] or 0) for r in rows) or 1
+    for r in rows:
+        x = L + pw * r["x"] / xmax
+        y = T + ph * (1 - r["y"] / ymax)
+        rr = 4 + 8 * (r["size"] / smax) if r["size"] else 5
+        inner.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{rr:.1f}" fill="var(--primary)" opacity=".55"><title>{esc(r["name"])}</title></circle>')
+    if a.get("y") and isinstance(a["y"], str):
+        inner.append(f'<text x="4" y="12" font-size="11" fill="var(--ink-45)">{esc(a["y"])}</text>')
+    if a.get("x") and isinstance(a["x"], str):
+        inner.append(f'<text x="{L + pw / 2:.0f}" y="{H - 2}" font-size="11" fill="var(--ink-45)" text-anchor="middle">{esc(a["x"])}</text>')
+    return chart_card(a, inner, "", "hb-scatter", par="xMidYMid meet")
+
+
+def m_map(a, body):
+    """地图（chart_map）：网点阵底＋发光标记点，标记点大小按值；右侧列地点小表。
+
+    不画任何国家或省份轮廓；要真实地图时用 img 放客户提供的地图图片。
+    """
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-map> 每行「地点 | 值」：{ln}")
+        rows.append({"name": c[0], "raw": c[1], "val": num_of(c[1])})
+    if a.get("img") and isinstance(a["img"], str):
+        body_html = f'<div class="wc-bd"><img src="{a["img"]}" alt="" style="width:100%;display:block"></div>'
+        if "bare" in a:
+            return body_html
+        return chart_shell(a, "hb-map", body_html)
+    if not rows:
+        raise ExpandError("<hb-map> 没有数据行（每行「地点 | 值」），或用 img 放客户提供的地图图片")
+    W, H = int(a.get("w", 560)), int(a.get("h", 240))
+    MW = W - 170
+    vmax = max(r["val"] for r in rows) or 1
+    inner = []
+    cx, cy = MW / 2, H / 2
+    for y in range(14, H - 8, 12):
+        for x in range(14, int(MW) - 8, 12):
+            d = ((x - cx) / (MW / 2)) ** 2 + ((y - cy) / (H / 2)) ** 2
+            if d > 1.02:
+                continue
+            inner.append(f'<circle cx="{x}" cy="{y}" r="1.4" fill="var(--primary)" opacity="{max(0.1, 0.34 - 0.2 * d):.2f}"/>')
+    spots = [(0.34, 0.62), (0.56, 0.34), (0.70, 0.66), (0.24, 0.34), (0.48, 0.80), (0.78, 0.30),
+             (0.62, 0.52), (0.36, 0.22)]
+    for i, r in enumerate(rows[:len(spots)]):
+        fx, fy = spots[i]
+        x, y = MW * fx, H * fy
+        rr = 4 + 9 * (r["val"] / vmax)
+        inner.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rr * 2.4:.1f}" fill="var(--primary)" opacity=".12"/>')
+        inner.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rr:.1f}" fill="var(--primary)" opacity=".85"/>')
+    lx = MW + 24
+    n = len(rows)
+    step = min(26, (H - 24) / max(n, 1))
+    y0 = H / 2 - (n - 1) * step / 2
+    inner.append('<g font-size="12" fill="var(--ink-65)">')
+    for i, r in enumerate(rows):
+        y = y0 + i * step
+        inner.append(f'<circle cx="{lx + 5:.0f}" cy="{y - 4:.0f}" r="4" fill="var(--primary)" opacity=".85"/>'
+                     f'<text x="{lx + 18:.0f}" y="{y:.0f}">{esc(r["name"])}　{esc(r["raw"])}</text>')
+    inner.append("</g>")
+    return chart_card(a, inner, "", "hb-map", par="xMidYMid meet")
+
+
 def m_hbar(a, body):
     """条形图（chart_bar_y）：横向条，名称在左、数值在右（2026-09-14 实测）。"""
     rows = []
@@ -1471,7 +1644,7 @@ def m_ptasks(a, body):
         dd = '<span class="dd">▾</span>' if btn == "办理" else ""
         cards.append(f'<div class="pcard"><div class="ph"><span class="av">{esc(c[0][:1])}</span><span class="who">{esc(c[0])}</span><span class="when">{esc(c[1])}</span>'
                      f'<span class="src">{ico("grid-s")}</span></div><div class="pt">{esc(c[2])}</div><div class="pn">任务：{esc(c[3])}</div>'
-                     f'<div class="portal-app"><span class="b line">{esc(btn)}{dd}</span></div></div>')
+                     f'<div class="pact"><span class="b line">{esc(btn)}{dd}</span></div></div>')
     app = m_mtool({"mode": "app"}, "") if "app" in a else ""
     return (f'<div class="m-ptasks">{tabs}</div><div class="pfilter"><span class="cnt">{cnt}</span><span class="sp"></span>'
             f'<span class="b text">批量</span><span class="vic on">{ico("filter")}</span></div><div class="m-cards">{"".join(cards)}</div>{app}')
@@ -1567,7 +1740,7 @@ PAGE_SLOTS = {
         order=["hb-nav", "hb-views", "hb-tools", "视图", "hb-float"],
         need_view=True,
         doc="产品壳 → 视图页签 → 视图区白卡（工具栏 → 视图 → 合计/分页）。视图三选一：hb-grid / hb-kanban / hb-cards；甘特、日历、任务、透视用 extract_templates.py 提模板手写在同一位置。",
-        example="""<hb-page kind="list" ws="永铭世纪" page="物资档案" me="周">
+        example="""<hb-page kind="list" ws="云图贸易" page="物资档案" me="周">
 <hb-nav>
 # 物资台账
 * 物资档案 | app-s
@@ -1588,13 +1761,16 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         cn="工作台",
         allowed={"hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-tabcard",
                  "hb-pivot", "hb-filters", "hb-float", "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar",
+                 "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map",
                  "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal"},
         required=["hb-nav", "hb-banner", "hb-shortcuts"],
         order=["hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-row", "hb-tasks", "hb-multistats",
-               "hb-procs", "hb-progress", "hb-subtotal", "hb-tabcard", "hb-list", "hb-pivot", "hb-float"],
-        first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-filters"},
-        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 快捷方式（必）与待办（hb-row 并排）→ 页签容器/我的数据。趋势与对比图表、筛选不放首屏（顶层出现会提示），要放收进 hb-tabcard 或页面末尾。",
-        example="""<hb-page kind="workbench" ws="永铭世纪" page="库管工作台" me="周">
+               "hb-procs", "hb-progress", "hb-subtotal", "hb-list", "hb-pivot", "hb-tabcard", "hb-float"],
+        order_free={"hb-tabcard"},
+        first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel",
+                          "hb-scatter", "hb-map", "hb-filters"},
+        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 快捷方式（必）与待办（hb-row 并排）→ 我的数据 → 页签容器。趋势与对比图表、筛选不放首屏（顶层出现会提示），要收进 hb-tabcard 或放页面末尾；hb-tabcard 位置自由，放在 hb-list、hb-pivot 之后把图表收进末位页签也可以。",
+        example="""<hb-page kind="workbench" ws="云图贸易" page="库管工作台" me="周">
 <hb-nav>
 # 物资台账
 * 库管工作台 | home
@@ -1625,12 +1801,14 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
     "dashboard": dict(
         cn="数据看板",
         allowed={"hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
-                 "hb-area", "hb-hbar", "hb-pivot", "hb-tabcard", "hb-float", "hb-multistats", "hb-list", "hb-progress", "hb-subtotal"},
+                 "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map", "hb-pivot", "hb-tabcard",
+                 "hb-float", "hb-multistats", "hb-list", "hb-progress", "hb-subtotal"},
         required=["hb-nav", "hb-banner"],
         order=["hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
-               "hb-area", "hb-hbar", "hb-multistats", "hb-progress", "hb-subtotal", "hb-pivot", "hb-list", "hb-float"],
+               "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map", "hb-multistats",
+               "hb-progress", "hb-subtotal", "hb-pivot", "hb-list", "hb-float"],
         doc="产品壳 → 横幅（必，一行高）→ 筛选（可选）→ 单指标一行（看板必有）→ 图表行（hb-row 16+8 或 12+12）→ 透视表/明细（底部，≤2 张）。",
-        example="""<hb-page kind="dashboard" ws="永铭世纪" page="库存分析" me="周">
+        example="""<hb-page kind="dashboard" ws="云图贸易" page="库存分析" me="周">
 <hb-nav>
 * 库存分析 | chart-s
 </hb-nav>
@@ -1668,10 +1846,12 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         allowed={"hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-tabcard", "hb-flow",
                  "hb-stats", "hb-pivot", "hb-grid", "hb-float", "hb-multistats", "hb-list", "hb-progress",
                  "hb-subtotal", "hb-stream", "hb-comment"},
-        required=["hb-itembar", "hb-tabcard"],
+        required=["hb-itembar", "hb-hcard", "hb-fields", "hb-tabcard"],
         order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-list", "hb-tabcard",
                "hb-flow", "hb-stream", "hb-comment", "hb-float"],
-        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（可选）→ 状态条（可选）→ 字段组/双栏（hb-row spans=13|11）→ 页签容器（必）→ 流程执行记录、动态、评论。不套产品壳；浮层只能右探出。",
+        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必，单栏或 hb-row spans=13|11 双栏）→ 页签容器（必）→ 流程执行记录、动态、评论。"
+            "页头卡片、字段组必有：一条记录先说清是哪条、有哪些字段，页签内的字段组也算。图表宏只能放在 hb-row 或 hb-tabcard 体内，不在顶层。"
+            "不套产品壳；浮层只能右探出（side=\"left\" 会报错）。",
         example="""<hb-page kind="detail">
 <hb-itembar title="CK-20260824-0037 领用出库">
 打印出库单:solid | 撤销:line | 复制:line:dis
@@ -1681,6 +1861,12 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 领用人 | 周敏 | user
 </hb-hcard>
 <hb-steps>已提交 | *库管审批 | 财务复核 | 完成</hb-steps>
+<hb-fields title="出库信息" cols="2">
+出库单号 | CK-20260824-0037
+出库类型 | 领用出库
+存放点 | 城建大厦酒窖
+用途 | 客户接待
+</hb-fields>
 <hb-tabcard span="24" tabs="*出库明细|审批记录">
 <hb-grid bare>…</hb-grid>
 </hb-tabcard>
@@ -1694,7 +1880,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
              "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：进度条 → 对比图），底部两张 hb-scard 各 12 栏。"
              "标题行与分隔条由 hb-screen 产出。大屏不缩放：24 栅格、行高 20h−20、间距 20 与其他页面一致。"),
         example="""<hb-page kind="screen">
-<hb-screen title="物资运营数据大屏" logo="永铭世纪" date="2026年09月14日" week="星期一" time="09:41:20" theme="cyan">
+<hb-screen title="物资运营数据大屏" logo="云图贸易" date="2026年09月14日" week="星期一" time="09:41:20" theme="cyan">
 <hb-scol span="6" rs="38">
 <hb-skpi rs="6">
 在库总量 | 4,386 | 件
@@ -1846,9 +2032,9 @@ def m_screens(a, body):
 m_duo = m_screens  # 旧名，保留给已有片段
 
 
-def _check_slots(kind, spec, names, deep):
+def _check_slots(kind, spec, names, deep, first_screen=None):
     allowed = spec["allowed"]
-    for n in deep:
+    for n in (first_screen if first_screen is not None else deep):
         if n in spec.get("first_screen_ban", set()):
             warn(f"<hb-page kind=\"{kind}\"> 顶层放了 <{n}>：{spec['cn']}首屏不放图表与筛选，要放收进 <hb-tabcard> 或页面末尾")
     for n in names:
@@ -1860,10 +2046,13 @@ def _check_slots(kind, spec, names, deep):
             raise ExpandError(f"<hb-page kind=\"{kind}\"> 缺 <{r}>：{spec['cn']}必有。顺序：{' → '.join(spec['order'])}")
     if spec.get("need_view") and not (set(names) & VIEW_MACROS):
         warn("列表页顶层没有视图宏（hb-grid/hb-kanban/hb-cards）：用模板手写的甘特/日历/任务/透视视图请放在 hb-tools 之后")
-    # 顺序：按 order 表的位次应单调不减（视图宏都算"视图"位）
+    # 顺序：按 order 表的位次应单调不减（视图宏都算"视图"位）；order_free 的宏位置自由，不参与比对
     rank = {n: i for i, n in enumerate(spec["order"])}
+    free = spec.get("order_free", set())
     last = -1
     for n in names:
+        if n in free:
+            continue
         r = rank.get(n if n not in VIEW_MACROS else "视图", rank.get(n, -1))
         if r == -1:
             continue
@@ -1878,8 +2067,6 @@ def _check_slots(kind, spec, names, deep):
         warn("横幅出现了两次：只有看板中段可以再放一个做段落标题")
     if c.get("hb-pivot", 0) > 2:
         warn(f"透视表 {c['hb-pivot']} 张：默认 ≤2 张，多了先并成一张多维透视")
-    if kind == "detail" and any(n == "hb-float" for n in names):
-        pass
 
 
 def m_page(a, body):
@@ -1892,11 +2079,18 @@ def m_page(a, body):
         raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
     parts = _top_level(a.get("_raw", body))
     names = [n for n, _ in parts if n]
-    deep = list(names)
+    deep = list(names)          # 「必有」用：容器体内的宏也算出现过
+    first_screen = list(names)   # 首屏禁令用：并排行仍在首屏，页签容器里的不算
     for n, raw in parts:
-        if n == "hb-row":
-            deep += [m.group(1) for m in TAG_RE.finditer(TAG_RE.match(raw).group(3) or "")]
-    _check_slots(kind, spec, names, deep)
+        if n in ("hb-row", "hb-tabcard"):
+            inner = TAG_RE.match(raw).group(3) or ""
+            for m in TAG_RE.finditer(inner):
+                deep.append(m.group(1))
+                if n == "hb-row":
+                    first_screen.append(m.group(1))
+                if m.group(1) in ("hb-row", "hb-tabcard"):
+                    deep += [x.group(1) for x in TAG_RE.finditer(TAG_RE.match(m.group(0)).group(3) or "")]
+    _check_slots(kind, spec, names, deep, first_screen)
     floats, main_parts, nav_html = [], [], ""
     for name, raw in parts:
         if name == "hb-nav":
@@ -1907,6 +2101,8 @@ def m_page(a, body):
         if name == "hb-float":
             if canvas == "product":
                 raise ExpandError("产品设计类画布不放浮层：去掉 <hb-float>，或改 canvas=\"marketing\"")
+            if kind == "detail" and 'data-side="left"' in html_:
+                raise ExpandError("自定义详情页的浮层只能右探出：把 <hb-float> 的 side 改成 right（详情页左边是字段与正文，左探会盖住记录本身）")
             floats.append(html_)
         else:
             main_parts.append((name, html_))
@@ -1995,6 +2191,10 @@ MACROS = {
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
     "hb-area": (m_area, "面积图卡：同 hb-line 语法，折线下 20% 透明填充"),
     "hb-hbar": (m_hbar, "条形图卡（横向条）：每行「名称 | 值 | 颜色」，标签在左、数值在右"),
+    "hb-biaxial": (m_biaxial, "双轴图卡：labels=横轴|…；两行「系列名 | 值,值,… | bar」柱走左轴、「… | line」折线走右轴"),
+    "hb-funnel": (m_funnel, "漏斗图卡：每行「阶段名 | 值」，自上而下逐级收窄，右侧标转化率"),
+    "hb-scatter": (m_scatter, "散点图卡：属性 x、y 轴名；每行「名称 | x 值 | y 值 | 大小(可省)」"),
+    "hb-map": (m_map, "地图卡：每行「地点 | 值」，网点阵＋标记点（不画轮廓）；属性 img 放客户提供的地图图片"),
     "hb-fields": (m_fields, "字段组：# 开分组；每行「字段名 | 值 | 类型」；属性 title、cols（默认 2）、span"),
     "hb-multistats": (m_multistats, "多项统计：每行「名称 | 数值 | 颜色」，右侧彩色胶囊；属性 title、span"),
     "hb-procs": (m_procs, "我发起的：每行「流程名 | 单据 | 当前节点 | 状态:颜色 | 时间」；属性 title、span"),
@@ -2005,10 +2205,10 @@ MACROS = {
     "hb-stream": (m_stream, "动态：每行「人名 | 时间 | 内容」，人名写 sys:名 出系统动态；属性 span"),
     "hb-comment": (m_comment, "评论：每行「人名 | 时间 | 内容」，无行出空态；属性 title、span"),
     "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
-    "hb-hcard": (m_hcard, "详情页标题卡片：属性 title、sub；体内关键字段行同 hb-info"),
+    "hb-hcard": (m_hcard, "详情页页头卡片：属性 title、sub；体内关键字段行同 hb-info"),
     "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
-    "hb-info": (m_info, "详情页标题卡片信息区：字段名 | 值 | 类型"),
+    "hb-info": (m_info, "详情页页头卡片信息区：字段名 | 值 | 类型"),
     "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
@@ -2039,7 +2239,7 @@ COMMON = """通用写法
 - 值前缀 ~ 做成次要灰字（空值、备注）；值前缀 = 表示后面是写好的 HTML 原样放入；含 < 的值也按 HTML 原样放。
 - 宏可嵌套，内层先展开。列数不对、图标名不存在、工具名没图标都会报错并指出行，改完重跑。
 - 宏只消灭机械重复，不替你做设计决策：用哪种视图、放不放浮层、字段怎么排、数据编成什么样，仍按 SKILL.md 和设计原则定。
-- 没有对应宏的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件、手机端视图切换抽屉与卡片视图大卡等）按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
+- 没有对应宏的组件：`python3 scripts/registry.py --list 页面类型` 里「宏」一列是 — 的那些，按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
 
 GROUPS = [
     ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-screens"]),
@@ -2047,7 +2247,8 @@ GROUPS = [
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
     ("自定义页面组件（工作台 / 数据看板）", ["hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks",
                                             "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal",
-                                            "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-pivot"]),
+                                            "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial",
+                                            "hb-funnel", "hb-scatter", "hb-map", "hb-pivot"]),
     ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
     ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
@@ -2074,7 +2275,7 @@ DOCS = {
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
 例：
 <div class="stage">
-<hb-shell ws="永铭世纪" page="物资档案" nav="table" me="周">
+<hb-shell ws="云图贸易" page="物资档案" nav="table" me="周">
 <hb-nav>…</hb-nav>
 …页面内容…
 </hb-shell>
@@ -2166,6 +2367,41 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 <hb-area title="近 6 个月库存水位" labels="3 月|4 月|5 月|6 月|7 月|8 月">
 在库总量 | 3820,4010,3960,4180,4290,4386 | teal
 </hb-area>""",
+"hb-biaxial": """双轴图（官方 chart_biaxial）。属性 title、labels（横轴，| 分）、span、max（左轴上限，柱）、max2（右轴上限，线）、ticks（默认 4）、plain、bare、w、h。
+体内正好两行：第一行「系列名 | 值,值,… | bar」画柱走左轴，第二行「系列名 | 值,值,… | line」画折线走右轴；两轴刻度各自算，图例两项。
+颜色按实测走：柱次色、线主色（大屏里自动换成大屏系列色），第四列可显式给状态色。量纲不同的两组数（金额与数量、件数与达成率）才用双轴，同量纲就用 hb-bar 多系列。
+例：
+<hb-biaxial title="近 6 个月出库量与周转天数" labels="3 月|4 月|5 月|6 月|7 月|8 月">
+出库量 | 135,165,115,185,212,217 | bar
+周转天数 | 48,45,51,43,40,42 | line
+</hb-biaxial>""",
+"hb-funnel": """漏斗图（官方 chart_funnel）。属性 title、span、plain、bare、w、h。每行「阶段名 | 值」，至少两段，自上而下逐级收窄；右侧标原值与对首段的转化率，颜色是主色由深到浅。
+讲一条链路一级级掉下来的量才用它（线索→商机→报价→签约）；并列的几类量用 hb-bar 或 hb-hbar。
+例：
+<hb-funnel title="销售漏斗">
+线索 | 1,240
+商机 | 486
+报价 | 214
+签约 | 96
+</hb-funnel>""",
+"hb-scatter": """散点图（官方 chart_scatter）。属性 title、x（横轴名）、y（纵轴名）、xmax、ymax、ticks（默认 4）、span、plain、bare、w、h。
+每行「名称 | x 值 | y 值 | 大小(可省)」：给了第四列就按它定点的大小（气泡图），点用主色半透明。
+看两个指标之间有没有关系才用它（客单价与复购率、库龄与周转），只有一个维度时用柱图。
+例：
+<hb-scatter title="客户库龄与周转" x="平均库龄（天）" y="周转次数">
+城建大厦酒窖 | 42 | 8.6 | 1842
+高新库 | 61 | 5.2 | 1097
+经开区备件库 | 28 | 11.4 | 764
+</hb-scatter>""",
+"hb-map": """地图（官方 chart_map）。属性 title、span、plain、bare、w、h、img（客户提供的地图图片路径，给了就直接放图）。
+每行「地点 | 值」：网点阵底上按值定标记点大小，右侧列成地点小表。**不画任何国家或省份轮廓**（审图号与边界准确性），要真实地图就让客户给图走 img。
+例：
+<hb-map title="各仓库在库分布">
+城建大厦酒窖 | 1,842
+高新库 | 1,097
+经开区备件库 | 764
+临时周转库 | 310
+</hb-map>""",
 "hb-hbar": """条形图（官方 chart_bar_y，横向条）。每行 名称 | 值 | 颜色（颜色缺省按 red/blue/purple/teal/green/orange 轮转）；属性 title、span、max（不给按最大值取整）、plain。
 标签在左、条在中、数值在右；条长按 值/max 算。
 例：
@@ -2268,7 +2504,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 体内快捷按钮用 | 分开：名:solid（主色实底）、名:line（线框）、再接 :dis 置灰或 :green/:orange/:teal 实底色。
 例：
 <hb-itembar title="出库单 CK-20260824-0037">确认出库:solid | 驳回修改:line | 打印出库单:line:dis</hb-itembar>""",
-"hb-hcard": """标题卡片（信息摘要，不放按钮）。属性 title 主标题（必填）、sub 副标题或编号、span（默认 24）。体内 1～4 行关键字段，格式同 hb-info：字段名 | 值 | 类型。
+"hb-hcard": """页头卡片（信息摘要，不放按钮）。属性 title 主标题（必填）、sub 副标题或编号、span（默认 24）。体内 1～4 行关键字段，格式同 hb-info：字段名 | 值 | 类型。
 例：
 <hb-hcard title="领用出库 · 城建大厦酒窖" sub="CK-20260824-0037 · 共 8 个品种 / 14 瓶">
 出库类型 | 领用出库:orange
@@ -2299,7 +2535,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 仓库主管审批 | 周敏 执行中 | 8月24日 09:40 | 1.4小时 | 催办
 启动事件 | 陈晓东 扫码创建了「CK-20260824-0037 领用出库单」 | 8月24日 09:12
 </hb-flow>""",
-"hb-info": """标题卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .header_card 里、标题区之后。
+"hb-info": """页头卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .header_card 里、标题区之后。
 例：
 出库类型 | 领用出库:orange
 申请人 | 陈晓东 | user

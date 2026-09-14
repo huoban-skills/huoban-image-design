@@ -4,13 +4,14 @@
 用法：
     python3 scripts/registry.py --check            # 三向核对：登记表 ↔ 结构文件 ↔ base.css
     python3 scripts/registry.py --list [页面类型]   # 按页面类型列可用组件（id、官方名、宏）
-    python3 scripts/registry.py --find 关键词       # 按 id / 官方 type / 中文名 / 旧类名查
+    python3 scripts/registry.py --find 关键词       # 按 id / 官方 type / 中文名 / 别名 / 旧类名查
     python3 scripts/registry.py --coverage         # 各页面允许的官方组件是否都在页面原则或组件辞典里提到
 
---check 报三类问题：
+--check 报四类问题：
   1. 结构文件里有 data-component/data-architecture 但登记表没有
   2. 登记表 id（首记号）在 base.css 里没有对应样式（原子类与页面级 id 除外）
   3. 登记表登记的 file+name 在结构文件里找不到
+  4. 同一 type_key 在同一页面类型下既有 measured 条目、又有未采集的 unverified 占位条目
 退出码：有问题返回 1。
 """
 import argparse
@@ -62,6 +63,22 @@ def check():
             root = e["id"].split()[0]
             if root not in known and root not in ("tfoot",):
                 problems.append(f"无样式：{e['id']}（{e['file']} 「{e['name']}」）")
+    # 同一 type_key 不得同时存在 measured 与 unverified 两条：
+    # 实测条目已经能画，未采集占位（file 为空）就是陈旧重复，按页面类型有交集才算撞车
+    by_key = {}
+    for e in entries:
+        if e.get("kind") == "component" and e.get("type_key"):
+            by_key.setdefault(e["type_key"], []).append(e)
+    for tk, group in by_key.items():
+        done = [e for e in group if e.get("measured") == "measured"]
+        stale = [e for e in group if e.get("measured") == "unverified" and not e.get("file")]
+        for s in stale:
+            pages = set(s.get("allowed_in") or [])
+            for d in done:
+                if pages & set(d.get("allowed_in") or []):
+                    problems.append(f"同一 type_key 既实测又未采集：{tk}「{s['cn']}」是未采集占位，"
+                                    f"已有实测条目 {d['id']}「{d['cn']}」，删掉占位那条")
+                    break
     try:
         import expand
         known = set(expand.MACROS)
@@ -80,8 +97,11 @@ def check():
 def list_(page):
     reg = load()
     alias = {"列表页": "list", "详情页": "detail", "工作台": "workbench", "看板": "dashboard", "数据看板": "dashboard",
-             "大屏": "screen", "数据大屏": "screen", "手机端": "mobile", "手机": "mobile"}
+             "大屏": "screen", "数据大屏": "screen", "手机端": "mobile", "手机": "mobile", "表单编辑页": "form"}
     page = alias.get(page, page)
+    if page == "form":
+        print("表单编辑页不走登记表，按 assets/c2-table-form.html 的模板手写")
+        return
     kinds = {"list": "page:list", "detail": "page:detail", "workbench": "page:workbench", "dashboard": "page:dashboard",
              "screen": "page:screen", "mobile": "page:mobile"}
     if page and page not in kinds:
@@ -98,11 +118,16 @@ def list_(page):
 
 def find(kw):
     reg = load()
+    hit = 0
     for e in reg["entries"]:
         hay = " ".join(str(e.get(k) or "") for k in ("id", "type_key", "cn", "old_class", "name"))
+        hay += " " + " ".join(e.get("aliases") or [])
         if kw.lower() in hay.lower():
-            print(json.dumps({k: e.get(k) for k in ("id", "type_key", "cn", "old_class", "file", "name", "macro", "grid", "measured", "note")},
+            hit += 1
+            print(json.dumps({k: e.get(k) for k in ("id", "type_key", "cn", "aliases", "old_class", "file", "name", "macro", "grid", "measured", "note")},
                              ensure_ascii=False))
+    if not hit:
+        print(f"没有匹配 {kw} 的条目")
 
 
 def coverage():
@@ -120,7 +145,8 @@ def coverage():
             if f"page:{kind}" not in (e.get("allowed_in") or []):
                 continue
             cn = re.sub(r"（.*?）", "", e["cn"]).strip()
-            if cn not in text and cn not in guide:
+            names = [cn] + (e.get("aliases") or [])
+            if not any(n in text or n in guide for n in names):
                 print(f"{doc} 与组件辞典都没提到：{cn}（{e['type_key']}）"); bad += 1
     print("✓ 各页面允许的组件都有出处" if not bad else f"{bad} 处未覆盖")
     return 1 if bad else 0

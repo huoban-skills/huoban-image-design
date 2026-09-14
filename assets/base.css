@@ -953,19 +953,6 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .calendar.agenda .calendar-grid .days { grid-auto-rows: 44px; }
 .agenda-list { border-top: 1px solid var(--line); min-height: 96px; }
 
-/* 企业门户（全屏渐变底＋居中 logo 与企业名＋底部工作区入口） */
-.portal { height: 100%; background: var(--banner-bg); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 28px; }
-.portal-top { align-self: flex-start; display: flex; align-items: center; gap: 8px; opacity: .9; }
-.portal-logo { width: 128px; height: 128px; border-radius: 50%; background: #fff; margin-top: 48px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
-.portal-name { font-size: 34px; font-weight: 600; margin-top: 26px; }
-.portal-sub { font-size: 15px; opacity: .85; margin-top: 12px; }
-.portal-apps { display: flex; gap: 72px; margin-top: 96px; }
-.portal .portal-app { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.portal .pa-ic { width: 64px; height: 64px; border-radius: 16px; background: rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; }
-.portal .pa-ic .ico { width: 30px; height: 30px; }
-.portal .pa-nm { font-size: 14px; }
-.portal-foot { margin-top: auto; align-self: flex-start; opacity: .9; }
-
 /* ══ 十四 骨架层组件（2026-09-14 实测：ERP 演示 v7.1 / 项目管理 v2.0 / 进销存 v6.0 三个工作区的真实 DOM）══
    通用外壳：卡片形态＝白底、圆角 9、阴影 rgba(0,0,0,.08) 0 20px 40px 0；标题行 40 高，标题 16/500，左边距 16。
    common 形态（图表、日历、进度条、嵌入）＝没有白底那层，只剩标题行和内容区。 */
@@ -1303,7 +1290,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .pcard .src .ico { width: 18px; height: 18px; }
 .phone .pcard .pt { margin-top: 11px; font-size: 15px; color: var(--ink-85); line-height: 24px; }
 .phone .pcard .pn { margin-top: 3px; font-size: 13px; color: var(--ink-65); line-height: 20px; }
-.phone .pcard .portal-app { display: flex; justify-content: flex-end; margin-top: 14px; }
+.phone .pcard .pact { display: flex; justify-content: flex-end; margin-top: 14px; }
 .phone .pcard .b.line { height: 40px; padding: 0 11px; border-radius: 6px; border: 1px solid var(--primary); color: var(--primary); font-size: 15px; background: transparent; }
 .phone .pcard .b .dd { font-size: 10px; margin-left: 6px; }
 
