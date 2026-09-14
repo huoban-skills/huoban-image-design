@@ -11,7 +11,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 页面类型路由（唯一真相源）
 
-先判页面类型，再按这一行取骨架 kind 和必读原则。所有图都读通用三篇：visual-four-principles、visual-components、visual-color；多张营销配图另读 anti-sameness。
+先判页面类型，再按这一行取骨架 kind 和必读原则。所有图都读通用两篇：visual-four-principles、visual-color；多张营销配图另读 anti-sameness。
 
 | 用户说的 | `<hb-page kind>` | 必读原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
