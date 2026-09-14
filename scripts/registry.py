@@ -61,6 +61,15 @@ def check():
             root = e["id"].split()[0]
             if root not in known and root not in ("tfoot",):
                 problems.append(f"无样式：{e['id']}（{e['file']} 「{e['name']}」）")
+    try:
+        import expand
+        known = set(expand.MACROS)
+        for e in entries:
+            for m in re.split(r"[/,\s]+", e.get("macro") or ""):
+                if m and m not in known:
+                    problems.append(f"宏不存在：{e['id']} 写了 {m}（expand.py --list 里没有）")
+    except ImportError:
+        pass
     for p in problems:
         print(p)
     print(f"{'✓ 登记表与结构、样式一致' if not problems else f'{len(problems)} 处不一致'}")
@@ -69,8 +78,14 @@ def check():
 
 def list_(page):
     reg = load()
-    key = {"list": "page:list", "detail": "page:detail", "workbench": "page:workbench", "dashboard": "page:dashboard",
-           "screen": "page:screen", "mobile": "page:mobile"}.get(page, page)
+    alias = {"列表页": "list", "详情页": "detail", "工作台": "workbench", "看板": "dashboard", "数据看板": "dashboard",
+             "大屏": "screen", "数据大屏": "screen", "手机端": "mobile", "手机": "mobile"}
+    page = alias.get(page, page)
+    kinds = {"list": "page:list", "detail": "page:detail", "workbench": "page:workbench", "dashboard": "page:dashboard",
+             "screen": "page:screen", "mobile": "page:mobile"}
+    if page and page not in kinds:
+        print(f"没有页面类型 {page}。可用：{'/'.join(kinds)}（或中文：{'/'.join(alias)}）"); return
+    key = kinds.get(page, page)
     rows = [e for e in reg["entries"] if e["kind"] == "component" and (not page or key in e.get("allowed_in", []))]
     for e in rows:
         tk = e.get("type_key") or "—"

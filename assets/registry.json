@@ -1063,7 +1063,7 @@
    "file": "c3-page-detail.html",
    "name": "横幅组件",
    "group": "工作台",
-   "macro": "hb-cover",
+   "macro": "hb-banner",
    "grid": null,
    "variants": [
     "title"
@@ -1084,7 +1084,7 @@
    "file": "c3-page-detail.html",
    "name": "横幅-背景图卡片",
    "group": "工作台",
-   "macro": "hb-cover",
+   "macro": "hb-banner",
    "grid": null,
    "variants": [
     "title",
@@ -1993,8 +1993,8 @@
    "cn": "手机流程壳（2～3 屏）",
    "old_class": "stage",
    "file": "c4-mobile.html",
-   "name": "手机双屏对照",
-   "macro": "hb-flow",
+   "name": "手机流程壳",
+   "macro": "hb-screens",
    "variants": [],
    "measured": "measured",
    "note": null

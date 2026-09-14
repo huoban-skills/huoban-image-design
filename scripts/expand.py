@@ -1358,12 +1358,12 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "mobile": dict(
         cn="手机端",
-        allowed={"hb-phone", "hb-flow", "hb-duo"},
+        allowed={"hb-phone", "hb-screens", "hb-duo"},
         required=[],
-        order=["hb-phone", "hb-flow", "hb-duo"],
-        doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-flow，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。",
+        order=["hb-phone", "hb-screens"],
+        doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。",
         example="""<hb-page kind="mobile">
-<hb-flow>
+<hb-screens>
 <hb-phone title="待办">
 <hb-ptasks tabs="*待办|已办" count="3">
 周敏 | 10:24 | 出库审批 · CK-0037 | 库管审批 | 办理
@@ -1379,7 +1379,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-rec>
 <hb-taskbar who="周敏" sub="库管审批">通过 | 驳回</hb-taskbar>
 </hb-phone>
-</hb-flow>
+</hb-screens>
 </hb-page>"""),
 }
 PAGE_SLOTS["analysis"] = PAGE_SLOTS["dashboard"]
@@ -1434,18 +1434,18 @@ def m_row(a, body):
     return '<div class="w-row">' + "".join(items) + "</div>"
 
 
-def m_flow(a, body):
+def m_screens(a, body):
     html = body.strip()
     phones = html.count('<div class="phone')
     conns = html.count('<div class="conn">')
     if phones < 2 or phones > 3:
-        raise ExpandError(f"<hb-flow> 体内有 {phones} 个 hb-phone：流程壳放 2～3 屏（一步一屏）；超过 3 步拆成两张图")
+        raise ExpandError(f"<hb-screens> 体内有 {phones} 个 hb-phone：流程壳放 2～3 屏（一步一屏）；超过 3 步拆成两张图")
     if conns != phones - 1:
-        raise ExpandError(f"<hb-flow> 有 {phones} 屏但 {conns} 条 hb-conn：每两屏之间放一条中缝说明（hb-phone、hb-conn 交替）")
+        raise ExpandError(f"<hb-screens> 有 {phones} 屏但 {conns} 条 hb-conn：每两屏之间放一条中缝说明（hb-phone、hb-conn 交替）")
     return f'<div class="duo" data-screens="{phones}">{html}</div>'
 
 
-m_duo = m_flow  # 旧名，保留给已有片段
+m_duo = m_screens  # 旧名，保留给已有片段
 
 
 def _check_slots(kind, spec, names, deep):
@@ -1579,8 +1579,8 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的组件（bare 模式）"),
-    "hb-flow": (m_flow, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
-    "hb-duo": (m_duo, "hb-flow 的旧名"),
+    "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
+    "hb-duo": (m_duo, "hb-screens 的旧名"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
     "hb-views": (m_views, "视图页签行：名称 | 图标，* 前缀＝当前视图"),
@@ -1632,7 +1632,7 @@ COMMON = """通用写法
 - 没有对应宏的组件（浮层内容、标题卡片标题区、流程页签、门户内容组件、手机端视图切换抽屉与卡片视图大卡等）按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
 
 GROUPS = [
-    ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-flow"]),
+    ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-screens"]),
     ("产品壳（PC）", ["hb-shell", "hb-nav"]),
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
     ("自定义页面组件（工作台 / 数据看板）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
@@ -1655,8 +1655,8 @@ DOCS = {
 <hb-float top="120" w="404" title="扫码开单">
 <hb-ocards bare>…</hb-ocards>
 </hb-float>""",
-"hb-flow": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微会话那一屏用 hb-chat 写在第一个 hb-phone 里。""",
-"hb-duo": """hb-flow 的旧名，语法相同。""",
+"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微会话那一屏用 hb-chat 写在第一个 hb-phone 里。""",
+"hb-duo": """hb-screens 的旧名，语法相同。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
@@ -1844,7 +1844,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 例：
 <hb-svisual rs="2"/>
 <hb-svisual rs="2" img="素材/厂区3D.png"/>""",
-"hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-flow 里必加）、nobar。体内按页面形态放手机端其他宏。
+"hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-screens 里必加）、nobar。体内按页面形态放手机端其他宏。
 .stage 宽度由 hb-page 按屏数给（单屏 520、两屏 1100、三屏 1640）。
 例：
 <div class="stage">

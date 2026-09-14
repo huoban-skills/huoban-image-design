@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="hb-skill" content="huoban-image-design 2.0">
+<meta name="hb-skill" content="huoban-image-design 2.1">
 <title>fig5-库存报表与盘点</title>
 <style>
 /* 皮肤：藏蓝金。沉稳商务、纸感（navy #24466B / gold #A67C3D）。
@@ -128,6 +128,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .window { position: relative; height: auto; }
 .stage.auto .window.cut { overflow: hidden; }            /* cut=px 时窗口截到指定高度 */
 .stage.auto .win-body { height: auto; align-items: stretch; }
+.stage.auto .shell-side { height: auto; align-self: stretch; }
+.stage.auto .shell-side .tree { flex: 1 0 auto; }
 .stage.auto .main { overflow: visible; }
 .stage.auto .window.cut .main { overflow: hidden; }
 .stage.auto .item-page { height: auto; }
@@ -198,7 +200,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .shell-top-bar .right { margin-left: auto; display: flex; align-items: center; gap: 18px; }
 .me {
   width: 28px; height: 28px; border-radius: 50%; flex: none;
-  background: #4CAF7D; color: #fff; font-size: 12px;
+  background: var(--c-green); color: #fff; font-size: 12px;
   display: inline-flex; align-items: center; justify-content: center;
 }
 
@@ -602,7 +604,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* ── 十 自定义页面组件 ── */
 .page { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; background: var(--page-bg); }
 .page > * { flex: none; } /* 组件按内容高度排布，不被压缩重叠 */
-/* 页面标题区：工作台/看板/数据分析页顶部的「页面名称＋一句话介绍」。
+/* 页面标题区：工作台/数据看板顶部的「页面名称＋一句话介绍」。
    左对齐；默认无背景，标题直接坐在页底上。要背景就加 bg-solid 铺一块干净纯色，
    几何纹理装饰（网格/环纹/斜纹/点阵/光晕）已废弃，别再加回来 */
 .rich.title { padding: 4px 4px 0; }
@@ -729,7 +731,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .chart_table th { height: 34px; font-weight: 400; color: var(--ink-65); border: 1px solid rgba(0,0,0,.08); padding: 0 12px; text-align: left; }
 .chart_table td { height: 33px; border: 1px solid rgba(0,0,0,.08); padding: 0 12px; }
 .chart_table .dim { background: var(--tag-bg); }
-.databar { display: inline-block; background: rgba(228,115,115,.7); padding: 1px 4px; border-radius: 2px; }
+.databar { display: inline-block; background: color-mix(in srgb, var(--c-red) 70%, transparent); padding: 1px 4px; border-radius: 2px; }
 
 /* 内容组件通用壳与快捷表单（c3 内容组件） */
 .content-widget { overflow: hidden; }
@@ -1126,7 +1128,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .fv .ph { color: var(--ink-25); }
 .phone .fv .dd { margin-left: auto; color: var(--ink-45); font-size: 10px; }
 .phone .fv .unit { margin-left: auto; color: var(--ink-45); }
-.phone .m-field.hl { background: var(--field-hl, #A5F2E5); border-radius: 6px; padding: 6px 1px 1px; margin-top: 13px; }
+.phone .m-field.hl { background: var(--field-hl, var(--tint-teal)); border-radius: 6px; padding: 6px 1px 1px; margin-top: 13px; }
 .phone .m-field.hl .fv { background: rgba(255,255,255,.65); }
 .phone .m-field.hl .fv.edit { background: rgba(255,255,255,.65); border: 0; }
 .phone .fv.opts { padding: 8px 10px; gap: 8px; }
@@ -1205,7 +1207,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .phone .wtabs span { display: inline-flex; align-items: center; font-size: 16px; color: var(--ink-65); position: relative; }
 .phone .wtabs .on { color: var(--ink-85); font-weight: 500; }
 .phone .wtabs .on::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--primary); }
-.phone .wsub { margin: 20px; background: #F7F7F7; border-radius: 9px; min-height: 300px; }
+.phone .wsub { margin: 20px; background: var(--page-bg); border-radius: 9px; min-height: 300px; }
 .phone .wsh { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-85); box-shadow: 0 0 0 1px rgba(0,0,0,.04); border-radius: 9px 9px 0 0; }
 .phone .wsh .chips { margin-left: auto; display: inline-flex; gap: 4px; }
 .phone .chip { height: 24px; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 400; color: var(--ink-85); line-height: 16px; }

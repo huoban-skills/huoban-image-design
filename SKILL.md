@@ -19,9 +19,9 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 表单弹窗 / 编辑态 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗与编辑态尺寸未实测，交付说明注明 |
 | 详情页 / 详情界面 | detail | item-detail、component-guide | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench、component-guide | 横幅 → 单指标 → 快捷方式与待办 → 页签 |
-| 数据看板 | dashboard | dashboard、component-guide | 横幅 → 筛选 → 单指标 → 图表行 → 透视表 |
+| 数据看板 | dashboard | dashboard、component-guide | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | dashboard（大屏一节）、component-guide | 体内只放 hb-screen；不套壳、无浮层 |
-| 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-flow 多屏流程（2～3 屏）；不套 .window |
+| 手机端 | mobile | 对应页面篇＋c4 注释 | hb-phone 单屏或 hb-screens 多屏流程（2～3 屏）；不套 .window |
 
 新造或调整皮肤时另读 visual-color 与 skin/custom-skin。
 
@@ -99,7 +99,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 | 约束 | 内容 |
 | --- | --- |
-| 不自造组件 | 只画登记表（assets/registry.json）里有的组件；`registry.py --list 页面类型` 看该页可用组件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
+| 不自造组件 | 只画登记表（assets/registry.json）里有的组件；`registry.py --list workbench`（kind 值或中文页面类型）看该页可用组件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
 | 尺寸是实测的 | 顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24 来自真实产品，改了就不像 |
 | 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画 |
