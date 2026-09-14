@@ -14,25 +14,38 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 依赖关系
 
-| 依赖 | 用途 | 何时用 |
+资产（build.py 自动拼入，模型不整读）：
+
+| 资产 | 用途 |
+| --- | --- |
+| assets/registry.json | 官方组件 type、中文名、类名、宏、采集状态的唯一名录 |
+| assets/c1～c5 | 实测架构，模板带官方 `data-type`；没有宏的组件按名提模板 |
+| assets/base.css、assets/skins/ | 骨架样式与 9 套皮肤 |
+
+脚本：
+
+| 脚本 | 用途 | 步骤 |
 | --- | --- | --- |
-| assets/registry.json | 官方组件 type、中文名、类名、宏、采集状态的唯一名录 | 查组件是否存在、哪些页面可用 |
-| assets/c1～c5 | 实测架构，模板带官方 `data-type` | 没有宏的组件按名提模板 |
-| assets/base.css、assets/skins/ | 骨架样式（尺寸布局）与 9 套皮肤（纯色彩 token） | build.py 自动拼入 |
-| scripts/expand.py | 50 余个组件宏与页面骨架；`--page` 看槽位表，`--doc` 取宏语法 | 步骤 2 |
-| scripts/extract_templates.py | 按名提取结构文件里的模板 | 步骤 2，没有宏的组件 |
-| scripts/build.py | 拼装单文件 HTML | 步骤 3 |
-| scripts/check.py | 静态检查、渲染检查、起草验收表 | 步骤 5 |
-| scripts/export.py | 导出 PNG／SVG | 步骤 6 |
-| scripts/registry.py | `--list <kind>` 列该页可用组件与采集状态 | 步骤 2 |
-| [references/intake.md](references/intake.md) | 追问维度、问法格式、需求单模板 | 步骤 1 |
-| [references/skin/routing.md](references/skin/routing.md) | 皮肤选择；新造或调整皮肤再读 [references/skin/custom-skin.md](references/skin/custom-skin.md) 与 visual-color | 步骤 1 配色 |
-| [references/canvas/marketing.md](references/canvas/marketing.md)、[references/canvas/product-design.md](references/canvas/product-design.md) | 营销类／产品设计类画布规则 | 步骤 2 开头，按需求单的画布类型二选一 |
-| references/principles/visual-four-principles.md、visual-color.md | 所有图必读的通用原则 | 步骤 2 |
-| references/principles/anti-sameness.md | 数据毛边与同批图错开 | 步骤 2，多张营销配图 |
-| references/principles/component-guide.md | 组件辞典 | 选图表类型或拿不准该用哪个组件时 |
-| [references/canvas/verify-export.md](references/canvas/verify-export.md) | 人工验收十条表 | 步骤 5 |
-| [references/canvas/export.md](references/canvas/export.md) | 导出细节与沙箱降级 | 步骤 6 |
+| scripts/expand.py | `--page` 看槽位表，`--doc` 取宏语法 | 2 |
+| scripts/registry.py | `--list <kind>` 列该页可用组件与采集状态 | 2 |
+| scripts/extract_templates.py | 按名提取模板 | 2 |
+| scripts/build.py | 拼装单文件 HTML | 3 |
+| scripts/check.py | 静态检查、渲染检查、起草验收表 | 5 |
+| scripts/export.py | 导出 PNG／SVG | 6 |
+
+文档（按步骤读）：
+
+| 文档 | 步骤 |
+| --- | --- |
+| [references/intake.md](references/intake.md)：追问维度、问法格式、需求单模板 | 1 |
+| [references/skin/routing.md](references/skin/routing.md)：皮肤选择；新造或调整皮肤再读 [references/skin/custom-skin.md](references/skin/custom-skin.md) 与 visual-color | 1 |
+| [references/canvas/marketing.md](references/canvas/marketing.md) 或 [references/canvas/product-design.md](references/canvas/product-design.md)：按需求单的画布类型二选一 | 2 |
+| references/principles/visual-four-principles.md、visual-color.md：所有图必读 | 2 |
+| references/principles/anti-sameness.md：多张营销配图读 | 2 |
+| references/principles/component-guide.md：选图表类型或拿不准该用哪个组件时读 | 2 |
+| 页面原则一篇：按下表路由 | 2、4 |
+| [references/canvas/verify-export.md](references/canvas/verify-export.md)：人工验收十条表 | 5 |
+| [references/canvas/export.md](references/canvas/export.md)：导出细节与沙箱降级 | 6 |
 
 页面类型路由（唯一真相源）：先判页面类型，再按这一行取骨架 kind 和必读页面原则。
 
