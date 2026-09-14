@@ -7,7 +7,13 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 产出"长得像伙伴云产品"的界面示意图：用骨架宏拼装真实产品实测组件，不自由发挥。输入是出图需求或 huoban-solution-report 的图需求单；**交付物是单文件 HTML**（`源文件/图名.html`，离线可开、自适应），PNG／SVG 只在用户或报告明确要时用 export.py 另出。只画伙伴云产品界面，海报/流程图/ER 图/网站不在本 skill。
 
-核心资产：**登记表**（assets/registry.json，官方组件 type ↔ 类名 ↔ 宏，唯一名录）＋**结构**（assets/c1～c5 实测架构，模板带官方 `data-type`）＋**骨架样式**（base.css）＋**皮肤**（assets/skins/ 纯色彩 token，9 套）＋**宏**（scripts/expand.py，模型只填内容）。
+核心资产五层：
+
+- 登记表 assets/registry.json：官方组件 type、中文名、类名、宏、采集状态的唯一名录。
+- 结构 assets/c1～c5：实测架构，模板带官方 `data-type`。
+- 骨架样式 base.css：尺寸与布局，不含颜色。
+- 皮肤 assets/skins/：纯色彩 token，9 套。
+- 宏 scripts/expand.py：50 余个组件宏与页面骨架，模型只填内容。
 
 ## 页面类型路由（唯一真相源）
 
@@ -29,11 +35,11 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ### 1. 追问并确认需求单（闸门）
 
-按 [references/intake.md](references/intake.md) 走：第 1 轮问清出图需求（画布类型、这套图要讲清哪几件事和主角、配色），这三项是用户的决定，材料再详细也要问；答完由本 skill 按场景定每张图的页面类型和端，拟需求单初稿（每张图一句话：某角色在这个界面上能干什么），连同第 2 轮逐图细节问题一起发出；答完更新需求单让用户确认。每轮用选择题格式发出后**结束本轮回复，等用户答完再继续**；不跳过追问直接给需求单。**没拿到用户确认，不进入步骤 2。**
+按 [references/intake.md](references/intake.md) 走。第 1 轮问出图需求：画布类型、这套图要讲清哪几件事和主角、配色；这三项是用户的决定，材料再详细也要问。答完由本 skill 按场景定每张图的页面类型和端，拟需求单初稿（每张图一句话：某角色在这个界面上能干什么），连同第 2 轮逐图细节问题一起发出；答完更新需求单让用户确认。每轮用选择题格式发出后**结束本轮回复，等用户答完再继续**，不跳过追问直接给需求单。**没拿到用户确认，不进入步骤 2。**
 
 ### 2. 写骨架片段
 
-先看槽位表，再只取要用的宏的语法：
+先按需求单的画布类型读 [references/canvas/marketing.md](references/canvas/marketing.md) 或 [references/canvas/product-design.md](references/canvas/product-design.md)。然后看槽位表，只取要用的宏的语法：
 
 ```bash
 python3 scripts/expand.py --page workbench            # 该页面类型的槽位表、可用宏、最小示例
@@ -42,14 +48,16 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 
 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏；并排用 `<hb-row spans="16|8">`；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 
-宏没覆盖的组件（甘特/日历/任务/透视视图、表单编辑页、流程页签细节）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
+没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图、表单编辑页）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
 ```bash
 python3 scripts/extract_templates.py assets/c2-table-form.html --list
 python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘特视图"
 ```
 
-写内容时按页面原则文档定选取与数量；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。图表柱/折/环写 `hb-bar`/`hb-line`/`hb-donut` 由脚本算坐标；其余图表类型未采集，先告知用户。
+写内容时按页面原则文档定选取与数量；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。图表写 `hb-bar`／`hb-line`／`hb-donut`／`hb-area`／`hb-hbar` 由脚本算坐标；双轴、漏斗、散点、地图未采集，先告知用户。
+
+完成标准：每张图一个片段；写完先跑一次 `python3 scripts/expand.py stage.html`，没有报错、提示都处理过，再进步骤 3。
 
 ### 3. 拼装
 
@@ -75,7 +83,7 @@ python3 scripts/check.py "源文件/图名.html" --acceptance # 起草十条人�
 
 ### 6. 交付
 
-默认交付 `源文件/图名.html`。用户或报告明确要 PNG／SVG 时：
+默认交付 `源文件/图名.html`，交付时回复正文里附一段交付说明：每张图一句话讲什么、用了什么皮肤、哪些是仿写或未实测的组件。用户或报告明确要 PNG／SVG 时：
 
 ```bash
 python3 scripts/export.py "源文件/图名.html" --png     # 2x PNG；找不到 Chrome 会给手动命令，不下载
@@ -95,13 +103,13 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 ## 硬约束
 
-页面级规则（横幅写角色不写人、页头卡片不放按钮、浮层只放底层没有的内容、标注气泡只在用户要求时加、自定义页面层次二选一）写在各页面原则和 canvas/marketing.md 里，这里只列跨页面的：
+页面级规则（横幅写角色不写人、页头卡片不放按钮、浮层只放底层没有的内容、标注气泡只在用户要求时加、自定义页面底色二选一）写在各页面原则和 canvas/marketing.md 里，这里只列跨页面的：
 
 | 约束 | 内容 |
 | --- | --- |
-| 不自造组件 | 只画登记表（assets/registry.json）里有的组件；`registry.py --list workbench`（kind 值或中文页面类型）看该页可用组件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
+| 不自造组件 | 只画登记表（assets/registry.json）里有的组件；`registry.py --list workbench`（kind 值或中文页面类型；表单编辑页不走登记表，按 c2 模板）看该页可用组件与采集状态。登记表标"未核"或"未采集"的形态先告知用户，确认后按注释就近仿写；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
-| 原子尺寸是实测的，组件宽高不是 | 顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24 这类组件内部尺寸来自真实产品，改了就不像；组件占几栏、多高按布局和画面自适应，实测记录里的 w×h 只是样板的一次配置，不硬套 |
+| 哪些尺寸照实测 | 组件内部尺寸（顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24）照真实产品，改了就不像；组件占几栏、多高按布局和画面自适应，实测记录里的 w×h 只是样板的一次配置 |
 | 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画 |
 | 组件底色优先级 | 纯白 ＞ 很浅的背景色 ＞ 深色块；深色只留给一级顶栏、状态标签 |
 | 只写业务结论 | 示意图内容不留设计过程的痕迹 |

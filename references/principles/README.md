@@ -16,7 +16,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [component-guide.md](component-guide.md) | 组件辞典：官方组件的适用与举例；不管放哪放几个 | 选图表类型或拿不准用哪个组件时读 |
+| [component-guide.md](component-guide.md) | 组件辞典：官方组件的适用与举例；选图表类型或拿不准用哪个组件时读 |
 
 ## 通用原则（所有图都读）
 
@@ -24,6 +24,6 @@
 |---|---|
 | [visual-four-principles.md](visual-four-principles.md) | 对齐、亲密性、对比、重复；自定义页面通用布局（横幅、页签、层次、等高、留白） |
 | [visual-color.md](visual-color.md) | 三色原则、状态色红绿灯、纯色优先、品牌植入 |
-| [assets/layout-gallery.html](../../assets/layout-gallery.html) | 各页面版式的线框示意（看板 5、工作台 3、详情页 3），改版式表时同步改 |
 | [anti-sameness.md](anti-sameness.md) | 防千篇一律：数据毛边、非理想态、版式错开（多张营销配图必读） |
 
+各页面版式的线框示意在 [assets/layout-gallery.html](../../assets/layout-gallery.html)（浏览器打开，改版式表时同步改），不是原则文档，出图时不读。

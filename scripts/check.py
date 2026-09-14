@@ -39,7 +39,7 @@ PERSON_PATTERNS = [re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)")
 PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报", "周会", "周期", "周边", "周转", "金额", "马上", "于今")
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
-SCALE = {"grid_rows": (6, 14), "stats_per_row": (3, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
+SCALE = {"grid_rows": (8, 14), "stats_per_row": (3, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
 
 
 def load_known_classes():
