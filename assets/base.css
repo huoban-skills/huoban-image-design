@@ -1032,6 +1032,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .table_item_list > .grid { border-top: 1px solid var(--line); }
 .table_item_list > .grid td:last-child { border-right: 0; }
 .til-foot { height: 40px; display: flex; align-items: center; padding: 0 20px; border-top: 1px solid var(--line); color: var(--ink-45); font-size: 12px; }
+.til-count { color: var(--ink-45); }
 .til-pager { margin-left: auto; display: flex; align-items: center; gap: 1px; }
 .til-pager .pg { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 12px; line-height: 24px; color: var(--ink-85); }
 .til-pager .pg.on { background: var(--primary-08); color: var(--primary); font-weight: 500; }

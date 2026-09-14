@@ -1,0 +1,62 @@
+<hb-page kind="workbench" ws="永铭世纪" page="库管工作台" me="周">
+<hb-nav>
+# 物资台账
+* 库管工作台 | home
+物资档案 | app-s
+库存明细 | grid-s | green
+# 出入库
+出库单 | check-s | orange
+入库单 | box-s | teal
+</hb-nav>
+<hb-banner>
+库管工作台
+集中处理出入库审批、库存预警与盘点任务
+</hb-banner>
+<hb-shortcuts title="快捷方式">
+扫码出入库 | f-barcode
+发起盘点 | chart-s
+新建入库单 | box-s
+库存看板 | pie-s
+</hb-shortcuts>
+<hb-row spans="8|8|8">
+<hb-multistats title="待办">
+待我审批的出库单 | 3
+待确认的入库单 | 7
+超期未盘点品种 | 2
+本月退库申请 | 1
+</hb-multistats>
+<hb-procs title="我发起的">
+出库审批 | CK-20260824-0037 领用出库 | 仓库主管审批 | 审批中:orange | 1.4 小时前
+采购申请 | CG-20260820-0012 年度补货 | 财务复核 | 已完成:green | 8月20日
+盘点计划 | PD-20260818-0003 季度盘点 | 库管确认 | 已驳回:red | 8月18日
+</hb-procs>
+<hb-progress title="9 月计划完成进度" style="bar">
+出库计划 | 8200 | 10000 | purple
+入库计划 | 6400 | 10000
+盘点计划 | 2700 | 3000 | green
+</hb-progress>
+</hb-row>
+<hb-row spans="6|18">
+<hb-subtotal title="分品类库存金额">
+共计 | 5,076.8 k
+酒品 | 2,841.2 k
+茶叶 | 1,320.4 k
+礼盒 | 915.2 k
+</hb-subtotal>
+<hb-list title="出库记录" tools="搜索|新建|导出" count="1,217">
+出库单号 | 物资 | 品类:tag | 数量 | 领用人:user | 状态:tag
+CK-20260824-0037 | 茅台飞天 53° 500ml | 酒品:red | 12 | 周敏 | 待审批:orange
+CK-20260823-0036 | 武夷山大红袍 | 茶叶:green | 6 | 陈晓东 | 已出库:green
+CK-20260822-0035 | 中秋礼盒 A 款 | 礼盒:purple | 40 | 李文彬 | 已出库:green
+CK-20260821-0034 | 五粮液 52° 500ml | 酒品:red | 8 | 周敏 | 已驳回:red
+</hb-list>
+</hb-row>
+<hb-tabcard pill tabs="*存放点在库量|近 6 个月出入库">
+<hb-hbar title="各存放点在库量" plain>
+城建大厦酒窖 | 1,842 | blue
+北京办公室 | 1,097 | teal
+珍藏品库 | 764 | green
+澳洲总部代管 | 683 | purple
+</hb-hbar>
+</hb-tabcard>
+</hb-page>
