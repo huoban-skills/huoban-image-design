@@ -10,7 +10,8 @@
 | [form.md](form.md) | 表单编辑页：字段类型与展示形态、列数与分组、必填与校验 |
 | [item-detail.md](item-detail.md) | 自定义详情页：记录功能区、页头卡片、步骤条、字段组双栏、页签容器 |
 | [workbench.md](workbench.md) | 工作台：版式、位置与栅格、按角色问题选组件 |
-| [dashboard.md](dashboard.md) | 数据看板／大屏：版式、位置与栅格、指标到组件、大屏 |
+| [dashboard.md](dashboard.md) | 数据看板：版式、位置与栅格、指标到组件 |
+| [screen.md](screen.md) | 数据大屏：官方样板骨架的版式表、五主题与视觉表、检查清单 |
 
 ## 组件选取（画工作台、看板、详情页时读）
 

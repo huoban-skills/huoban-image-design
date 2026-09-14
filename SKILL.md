@@ -23,7 +23,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组与待办 → 页签 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
-| 数据大屏 | screen | dashboard（大屏一节） | 体内只放 hb-screen；不套壳、无浮层 |
+| 数据大屏 | screen | screen | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端（上面任一页面的手机版） | mobile | 对应页面篇＋c4 注释 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
 
 要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 visual-color 与 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
