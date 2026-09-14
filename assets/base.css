@@ -636,6 +636,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .page-tabs-body { min-height: 0; }
 /* 页签内直接放字段时，沿用快捷表单实测的字段容器规则（左右 16、行间 12、首行留顶）。
    缺这条时字段会贴着卡片边缘且行行相连，一排灰色值框糊成一片，看不出「白卡片＋灰值框」的层次。 */
+/* 页签内容区实测 padding 20：直接放整张组件卡时按这条留边，放 bare 表格时贴边由内容自己管 */
+.page-tabs-body > .w-card, .page-tabs-body > .w-row { margin: 20px; }
 .page-tabs-body > .field { padding: 0 16px 12px; }
 .page-tabs-body > .field:first-child { padding-top: 12px; }
 .procedure_task { border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; min-height: 220px; }
@@ -1053,6 +1055,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .pg-text .pg-track i { position: relative; display: block; width: var(--pct, 0%); height: 4px; border-radius: 10px; background: var(--pg, var(--primary)); }
 
 /* 条形图 chart_bar_y：横向条，名称在左、数值在右；行 32、条区 8 高圆角 10 */
+.chart_bar_y { min-width: 0; }
 .hbar-list { padding: 8px 16px 12px; }
 .hbar-row { display: flex; align-items: center; gap: 12px; height: 32px; font-size: 13px; color: var(--ink-65); }
 .hbar-name { width: 112px; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

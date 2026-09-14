@@ -1,3026 +1,3160 @@
 {
- "version": "2.0",
- "about": "组件登记表：伙伴云界面示意图 skill 的唯一名录。id＝根类名（有官方 widget type 的直接用官方 key）；old_class＝1.x 的旧根类，仅迁移用；measured：measured＝带实测注释，imitated＝仿写，unverified＝无实测注释或官方有而未采集。",
- "containers": {
-  "page": [
-   "list",
-   "detail",
-   "workbench",
-   "dashboard",
-   "portal",
-   "screen",
-   "mobile"
+  "version": "2.0",
+  "about": "组件登记表：伙伴云界面示意图 skill 的唯一名录。id＝根类名（有官方 widget type 的直接用官方 key）；old_class＝1.x 的旧根类，仅迁移用；measured：measured＝带实测注释，imitated＝仿写，unverified＝无实测注释或官方有而未采集。",
+  "containers": {
+    "page": [
+      "list",
+      "detail",
+      "workbench",
+      "dashboard",
+      "portal",
+      "screen",
+      "mobile"
+    ],
+    "ids": [
+      "stage",
+      "shell",
+      "nav",
+      "page:list",
+      "page:detail",
+      "page:workbench",
+      "page:dashboard",
+      "page:portal",
+      "page:screen",
+      "page:mobile",
+      "row",
+      "float",
+      "tabs",
+      "modal",
+      "view-grid",
+      "screen-card",
+      "phone",
+      "m-rec",
+      "field_group"
+    ],
+    "no_nesting": [
+      "tabs",
+      "row",
+      "float"
+    ]
+  },
+  "utility_prefixes": [
+    "ic-",
+    "tone-",
+    "c-",
+    "bg-",
+    "i-",
+    "span-",
+    "sp-",
+    "rs-"
   ],
-  "ids": [
-   "stage",
-   "shell",
-   "nav",
-   "page:list",
-   "page:detail",
-   "page:workbench",
-   "page:dashboard",
-   "page:portal",
-   "page:screen",
-   "page:mobile",
-   "row",
-   "float",
-   "tabs",
-   "modal",
-   "view-grid",
-   "screen-card",
-   "phone",
-   "m-rec",
-   "field_group"
-  ],
-  "no_nesting": [
-   "tabs",
-   "row",
-   "float"
+  "entries": [
+    {
+      "kind": "architecture",
+      "id": "shell",
+      "page_kind": null,
+      "cn": "产品壳（左侧导航＋一级顶栏）",
+      "old_class": "stage",
+      "file": "c1-shell.html",
+      "name": "产品界面壳层",
+      "macro": "hb-page",
+      "variants": [],
+      "measured": "measured",
+      "note": "不属页面模型；PC 页面的外框"
+    },
+    {
+      "kind": "component",
+      "id": "shell-top-bar",
+      "type_key": null,
+      "cn": "一级顶栏",
+      "old_class": "top-bar",
+      "file": "c1-shell.html",
+      "name": "一级顶栏",
+      "group": "产品壳层",
+      "macro": "hb-shell",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "shell"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "shell-side",
+      "type_key": null,
+      "cn": "左侧导航",
+      "old_class": "side",
+      "file": "c1-shell.html",
+      "name": "左侧导航",
+      "group": "产品壳层",
+      "macro": "hb-shell",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "shell"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "ico-row",
+      "type_key": null,
+      "cn": "导航图标入口",
+      "old_class": "i",
+      "file": "c1-shell.html",
+      "name": "导航图标入口",
+      "group": "左侧导航",
+      "macro": "hb-nav",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "nav"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "group",
+      "type_key": null,
+      "cn": "导航分组",
+      "old_class": "group",
+      "file": "c1-shell.html",
+      "name": "导航分组标题",
+      "group": "左侧导航",
+      "macro": "hb-nav",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "nav"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "shell-nav-leaf",
+      "type_key": null,
+      "cn": "导航页面项",
+      "old_class": "leaf",
+      "file": "c1-shell.html",
+      "name": "导航页面项",
+      "group": "左侧导航",
+      "macro": "hb-nav",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "nav"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "shell-nav-folder",
+      "type_key": null,
+      "cn": "导航文件夹",
+      "old_class": "folder",
+      "file": "c1-shell.html",
+      "name": "导航文件夹",
+      "group": "左侧导航",
+      "macro": "hb-nav",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "nav"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "sub",
+      "type_key": null,
+      "cn": "导航子项",
+      "old_class": "sub",
+      "file": "c1-shell.html",
+      "name": "导航子项容器",
+      "group": "左侧导航",
+      "macro": "hb-nav",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "nav"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "mk-float",
+      "type_key": null,
+      "cn": "营销浮层",
+      "old_class": "float",
+      "file": "c1-shell.html",
+      "name": "营销浮层",
+      "group": "画布",
+      "macro": "hb-float",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "stage"
+      ],
+      "note": "非产品件，营销类画布专用"
+    },
+    {
+      "kind": "component",
+      "id": "mk-callout",
+      "type_key": null,
+      "cn": "营销标注",
+      "old_class": "callout",
+      "file": "c1-shell.html",
+      "name": "营销标注",
+      "group": "画布",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "stage"
+      ],
+      "note": "非产品件，仅用户明确要求业务价值标注时用"
+    },
+    {
+      "kind": "architecture",
+      "id": "view-box",
+      "page_kind": "list",
+      "cn": "列表页视图区",
+      "old_class": "view-box",
+      "file": "c2-table-form.html",
+      "name": "列表页主内容",
+      "macro": "hb-page",
+      "variants": [],
+      "measured": "measured",
+      "note": "白卡浮灰底，实测强特征"
+    },
+    {
+      "kind": "component",
+      "id": "view-tabs",
+      "type_key": null,
+      "cn": "视图页签",
+      "old_class": "views",
+      "file": "c2-table-form.html",
+      "name": "视图页签",
+      "group": "列表页",
+      "macro": "hb-views",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-tools",
+      "type_key": null,
+      "cn": "工具栏",
+      "old_class": "tools",
+      "file": "c2-table-form.html",
+      "name": "工具栏",
+      "group": "列表页",
+      "macro": "hb-tools",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-grid",
+      "type_key": null,
+      "cn": "网格视图",
+      "old_class": "table-view grid-view",
+      "file": "c2-table-form.html",
+      "name": "网格视图",
+      "group": "业务视图",
+      "macro": "hb-grid",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "float",
+        "tabs",
+        "screen-card"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "group",
+      "type_key": null,
+      "cn": "分组行",
+      "old_class": "group",
+      "file": "c2-table-form.html",
+      "name": "分组行",
+      "group": "业务视图",
+      "macro": "hb-grid",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "view-grid"
+      ],
+      "note": "tr.group，与导航分组 div.group 同名不同标签"
+    },
+    {
+      "kind": "component",
+      "id": "view-pager",
+      "type_key": null,
+      "cn": "分页器",
+      "old_class": "pager",
+      "file": "c2-table-form.html",
+      "name": "分页器",
+      "group": "列表页",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "tfoot",
+      "type_key": null,
+      "cn": "合计行",
+      "old_class": "table",
+      "file": "c2-table-form.html",
+      "name": "底部合计行",
+      "group": "列表页",
+      "macro": "hb-grid",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "view-grid"
+      ],
+      "note": "根是 tfoot 语义标签，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "tag",
+      "type_key": null,
+      "cn": "标签",
+      "old_class": "tag",
+      "file": "c2-table-form.html",
+      "name": "灰底标签",
+      "group": "单元格",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "*"
+      ],
+      "note": null
+    },
+    {
+      "kind": "atom",
+      "id": "tag",
+      "type_key": null,
+      "cn": "选项标签",
+      "old_class": "tag",
+      "file": "c2-table-form.html",
+      "name": "彩色选项标签",
+      "group": "单元格",
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "c-red",
+        "c-blue",
+        "c-green",
+        "c-orange",
+        "c-teal",
+        "c-purple",
+        "c-yellow"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "*"
+      ],
+      "note": null
+    },
+    {
+      "kind": "atom",
+      "id": "tags",
+      "type_key": null,
+      "cn": "多值标签",
+      "old_class": "tags",
+      "file": "c2-table-form.html",
+      "name": "多值标签",
+      "group": "单元格",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "*"
+      ],
+      "note": null
+    },
+    {
+      "kind": "atom",
+      "id": "user",
+      "type_key": null,
+      "cn": "人员",
+      "old_class": "user",
+      "file": "c2-table-form.html",
+      "name": "人员",
+      "group": "单元格",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "*"
+      ],
+      "note": null
+    },
+    {
+      "kind": "atom",
+      "id": "op-btn",
+      "type_key": null,
+      "cn": "行内快捷按钮",
+      "old_class": "op-btn",
+      "file": "c2-table-form.html",
+      "name": "行内快捷按钮",
+      "group": "单元格",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "*"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field",
+      "type_key": null,
+      "cn": "字段",
+      "old_class": "field",
+      "file": "c2-table-form.html",
+      "name": "基础字段",
+      "group": "字段",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field_group",
+      "type_key": "field_group",
+      "cn": "字段组",
+      "old_class": "field-group",
+      "file": "c2-table-form.html",
+      "name": "字段分组",
+      "group": "字段",
+      "macro": null,
+      "grid": [
+        24,
+        10
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "page:detail",
+        "row"
+      ],
+      "note": "c2 里是表单里的折叠分组标题；页面组件 field_group 见 c3「字段组组件」，两者不是一回事"
+    },
+    {
+      "kind": "component",
+      "id": "field",
+      "type_key": null,
+      "cn": "关联字段展开态",
+      "old_class": "field rel-open",
+      "file": "c2-table-form.html",
+      "name": "关联字段展开态",
+      "group": "字段",
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "rel-open"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field",
+      "type_key": null,
+      "cn": "单行文本",
+      "old_class": "field editing",
+      "file": "c2-table-form.html",
+      "name": "单行输入字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "editing"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-textarea",
+      "type_key": null,
+      "cn": "多行文本",
+      "old_class": "field editing textarea-field",
+      "file": "c2-table-form.html",
+      "name": "多行文本字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-category",
+      "type_key": null,
+      "cn": "选项",
+      "old_class": "field editing category-field",
+      "file": "c2-table-form.html",
+      "name": "选项字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-rich",
+      "type_key": null,
+      "cn": "富文本字段",
+      "old_class": "field rich-field",
+      "file": "c2-table-form.html",
+      "name": "富文本字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field",
+      "type_key": null,
+      "cn": "带后缀输入",
+      "old_class": "field editing",
+      "file": "c2-table-form.html",
+      "name": "带后缀输入字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "editing",
+        "suffix"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": "旧根与单行输入字段相同，改名后靠 suffix 修饰类区分"
+    },
+    {
+      "kind": "component",
+      "id": "field-barcode",
+      "type_key": null,
+      "cn": "条码",
+      "old_class": "field barcode-field editing",
+      "file": "c2-table-form.html",
+      "name": "条码字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-date",
+      "type_key": null,
+      "cn": "日期和时间",
+      "old_class": "field date-field editing",
+      "file": "c2-table-form.html",
+      "name": "日期和时间字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-numeric",
+      "type_key": null,
+      "cn": "数值",
+      "old_class": "field numeric-field editing",
+      "file": "c2-table-form.html",
+      "name": "数值字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-money",
+      "type_key": null,
+      "cn": "金额",
+      "old_class": "field money-field editing",
+      "file": "c2-table-form.html",
+      "name": "金额字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-user",
+      "type_key": null,
+      "cn": "成员",
+      "old_class": "field user-field",
+      "file": "c2-table-form.html",
+      "name": "成员字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-location",
+      "type_key": null,
+      "cn": "位置",
+      "old_class": "field location-field",
+      "file": "c2-table-form.html",
+      "name": "位置字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-file",
+      "type_key": null,
+      "cn": "附件",
+      "old_class": "field file-field",
+      "file": "c2-table-form.html",
+      "name": "附件字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-signature",
+      "type_key": null,
+      "cn": "手写签名",
+      "old_class": "field signature-field",
+      "file": "c2-table-form.html",
+      "name": "手写签名字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "field-image",
+      "type_key": null,
+      "cn": "图片字段",
+      "old_class": "field image-field",
+      "file": "c2-table-form.html",
+      "name": "图片字段",
+      "group": "字段类型",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal",
+        "field_group"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "modal-mask",
+      "page_kind": "detail",
+      "cn": "标准表单编辑态",
+      "old_class": "modal-mask",
+      "file": "c2-table-form.html",
+      "name": "标准表单编辑态",
+      "macro": null,
+      "variants": [
+        "sf"
+      ],
+      "measured": "unverified",
+      "note": "overlay，仅明确要求时"
+    },
+    {
+      "kind": "architecture",
+      "id": "modal-mask",
+      "page_kind": "detail",
+      "cn": "创建或编辑表单",
+      "old_class": "modal-mask",
+      "file": "c2-table-form.html",
+      "name": "创建或编辑表单",
+      "macro": null,
+      "variants": [
+        "fm"
+      ],
+      "measured": "unverified",
+      "note": "overlay，仅明确要求时"
+    },
+    {
+      "kind": "component",
+      "id": "row",
+      "type_key": null,
+      "cn": "表单字段行",
+      "old_class": "row",
+      "file": "c2-table-form.html",
+      "name": "表单字段行",
+      "group": "表单",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-cards",
+      "type_key": null,
+      "cn": "卡片视图",
+      "old_class": "table-view record-card-grid-view",
+      "file": "c2-table-form.html",
+      "name": "卡片视图",
+      "group": "业务视图",
+      "macro": "hb-cards",
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:list",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-cards",
+      "type_key": null,
+      "cn": "卡片视图（快捷操作型）",
+      "old_class": "card-list",
+      "file": "c2-table-form.html",
+      "name": "卡片视图-快捷操作型",
+      "group": "业务视图",
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "ops"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:list",
+        "float"
+      ],
+      "note": "旧根 card-list 与卡片视图不同套，是否同一产品视图待实测"
+    },
+    {
+      "kind": "component",
+      "id": "view-pivot",
+      "type_key": null,
+      "cn": "透视表视图",
+      "old_class": "table-view pivot-view",
+      "file": "c2-table-form.html",
+      "name": "透视表视图",
+      "group": "业务视图",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-gantt",
+      "type_key": null,
+      "cn": "甘特视图",
+      "old_class": "table-view gantt-view",
+      "file": "c2-table-form.html",
+      "name": "甘特视图",
+      "group": "业务视图",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-task",
+      "type_key": null,
+      "cn": "任务视图",
+      "old_class": "table-view task-view",
+      "file": "c2-table-form.html",
+      "name": "任务视图",
+      "group": "业务视图",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-calendar",
+      "type_key": null,
+      "cn": "日历视图",
+      "old_class": "table-view calendar-view",
+      "file": "c2-table-form.html",
+      "name": "日历视图",
+      "group": "业务视图",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "view-kanban",
+      "type_key": null,
+      "cn": "看板视图",
+      "old_class": "table-view kanban-view",
+      "file": "c2-table-form.html",
+      "name": "看板视图",
+      "group": "业务视图",
+      "macro": "hb-kanban",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "modal-mask",
+      "page_kind": "detail",
+      "cn": "记录详情弹窗",
+      "old_class": "modal-mask",
+      "file": "c3-page-detail.html",
+      "name": "记录详情弹窗",
+      "macro": null,
+      "variants": [
+        "item"
+      ],
+      "measured": "measured",
+      "note": "仅明确要求弹窗详情时"
+    },
+    {
+      "kind": "component",
+      "id": "modal-card",
+      "type_key": null,
+      "cn": "弹窗内容卡片",
+      "old_class": "widget-card",
+      "file": "c3-page-detail.html",
+      "name": "内容卡片",
+      "group": "记录详情",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "modal"
+      ],
+      "note": "是否等于官方 card 容器待实测"
+    },
+    {
+      "kind": "component",
+      "id": "w-stream",
+      "type_key": "stream",
+      "cn": "动态",
+      "old_class": "fi",
+      "file": "c3-page-detail.html",
+      "name": "动态条目",
+      "group": "记录详情",
+      "macro": "hb-stream",
+      "grid": [
+        24,
+        12
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "modal",
+        "page:detail",
+        "row",
+        "tabs"
+      ],
+      "note": "页面组件 stream；无标题行，列表壳与评论共用。类名 fi 是记录详情弹窗右栏那套，另留"
+    },
+    {
+      "kind": "component",
+      "id": "w-comment",
+      "type_key": "comment",
+      "cn": "评论",
+      "old_class": "comment-box",
+      "file": "c3-page-detail.html",
+      "name": "评论框",
+      "group": "记录详情",
+      "macro": "hb-comment",
+      "grid": [
+        8,
+        19
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "modal",
+        "page:detail",
+        "row",
+        "tabs"
+      ],
+      "note": "有标题行＋底部 68 高发布条；与动态共用列表壳"
+    },
+    {
+      "kind": "architecture",
+      "id": "page",
+      "page_kind": "workbench",
+      "cn": "自定义页面（工作台／数据看板）",
+      "old_class": "page flat",
+      "file": "c3-page-detail.html",
+      "name": "工作台或数据看板",
+      "macro": "hb-page",
+      "variants": [
+        "flat"
+      ],
+      "measured": "unverified",
+      "note": "kind=workbench 或 dashboard；flat 层次开关"
+    },
+    {
+      "kind": "component",
+      "id": "rich",
+      "type_key": "rich",
+      "cn": "富文本（大标题预设，横幅）",
+      "old_class": "w-banner",
+      "file": "c3-page-detail.html",
+      "name": "横幅组件",
+      "group": "工作台",
+      "macro": "hb-banner",
+      "grid": null,
+      "variants": [
+        "title"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard"
+      ],
+      "note": "官方 ERP 样板实测：工作台/看板/大屏横幅＝rich 大标题预设，24×5，card 样式渐变背景浅色字；不是 cover element（各页 has_cover 均 false）"
+    },
+    {
+      "kind": "component",
+      "id": "rich",
+      "type_key": "rich",
+      "cn": "富文本（大标题预设，背景图卡片式）",
+      "old_class": "w-banner card",
+      "file": "c3-page-detail.html",
+      "name": "横幅-背景图卡片",
+      "group": "工作台",
+      "macro": "hb-banner",
+      "grid": null,
+      "variants": [
+        "title",
+        "card"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "w-row",
+      "page_kind": "workbench",
+      "cn": "大标题 16 栏＋按钮组 8 栏同行",
+      "old_class": "w-row",
+      "file": "c3-page-detail.html",
+      "name": "横幅带操作按钮",
+      "macro": null,
+      "variants": [
+        "actions"
+      ],
+      "measured": "unverified",
+      "note": "已降级为布局配方（官方样板计划工作台：rich 16×7 ＋ button 8×7），不再是架构"
+    },
+    {
+      "kind": "component",
+      "id": "filter",
+      "type_key": "filter",
+      "cn": "筛选组件",
+      "old_class": "w-filters",
+      "file": "c3-page-detail.html",
+      "name": "筛选组件",
+      "group": "页面组件",
+      "macro": "hb-filters",
+      "grid": [
+        4,
+        5
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row"
+      ],
+      "note": "官方两变体：筛选卡片 4×5／筛选输入框 4×3，只收了一个"
+    },
+    {
+      "kind": "component",
+      "id": "button",
+      "type_key": "button",
+      "cn": "按钮（快捷方式版式）",
+      "old_class": "w-card w-shortcut",
+      "file": "c3-page-detail.html",
+      "name": "快捷方式",
+      "group": "工作台",
+      "macro": "hb-shortcuts",
+      "grid": [
+        4,
+        3
+      ],
+      "variants": [
+        "shortcuts"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row",
+        "float"
+      ],
+      "note": "与快捷按钮是否同为 button 的两种版式待实测"
+    },
+    {
+      "kind": "component",
+      "id": "chart_single",
+      "type_key": "chart_single",
+      "cn": "单指标",
+      "old_class": "w-card w-stat center",
+      "file": "c3-page-detail.html",
+      "name": "单指标-居中大数",
+      "group": "统计",
+      "macro": "hb-stats",
+      "grid": [
+        6,
+        6
+      ],
+      "variants": [
+        "center"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "chart_single",
+      "type_key": "chart_single",
+      "cn": "单指标",
+      "old_class": "w-card w-stat strip",
+      "file": "c3-page-detail.html",
+      "name": "单指标-左文右图",
+      "group": "统计",
+      "macro": "hb-stats",
+      "grid": [
+        6,
+        6
+      ],
+      "variants": [
+        "strip"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "tabs",
+      "type_key": "tabs",
+      "cn": "标签页",
+      "old_class": "w-card page-tabs-card",
+      "file": "c3-page-detail.html",
+      "name": "页签容器",
+      "group": "容器",
+      "macro": "hb-tabcard",
+      "grid": [
+        24,
+        6
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方 tabs 与 card 容器同尺寸，归属待实测"
+    },
+    {
+      "kind": "component",
+      "id": "tabs",
+      "type_key": "tabs",
+      "cn": "标签页（胶囊式）",
+      "old_class": "w-card w-tabs",
+      "file": "c3-page-detail.html",
+      "name": "页签容器-胶囊式",
+      "group": "容器",
+      "macro": "hb-tabcard",
+      "grid": [
+        24,
+        6
+      ],
+      "variants": [
+        "pill"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "procedure_task",
+      "type_key": "procedure_task",
+      "cn": "我处理的（流程待办列表）",
+      "old_class": "w-sub",
+      "file": "c3-page-detail.html",
+      "name": "待办或流程任务子区",
+      "group": "流程",
+      "macro": "hb-tasks",
+      "grid": [
+        8,
+        16
+      ],
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "page:workbench",
+        "tabs",
+        "row",
+        "float"
+      ],
+      "note": "官方 ERP 样板：待办行＝multi_stats「待办」8 ＋ procedure_task 8 ＋ procedure_process 8；本 skill 的待办子区对应 procedure_task 列表形态，结构未按产品实测采集"
+    },
+    {
+      "kind": "component",
+      "id": "chart",
+      "type_key": "chart_*",
+      "cn": "图表",
+      "old_class": "w-card w-chart",
+      "file": "c3-page-detail.html",
+      "name": "图表组件",
+      "group": "图表",
+      "macro": "hb-bar/hb-line/hb-donut/hb-area",
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [
+        "chart_bar",
+        "chart_line",
+        "chart_pie",
+        "chart_area",
+        "chart_bar_y",
+        "chart_biaxial",
+        "chart_funnel",
+        "chart_scatter",
+        "chart_map"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row",
+        "float",
+        "tabs",
+        "screen-card"
+      ],
+      "note": "通用图表卡（card 样式）；具体图类型由修饰类标注。宏实现柱/折/环/面积，横向条另见「条形图」"
+    },
+    {
+      "kind": "component",
+      "id": "chart_table",
+      "type_key": "chart_table",
+      "cn": "透视表",
+      "old_class": "w-card w-pivot",
+      "file": "c3-page-detail.html",
+      "name": "统计表",
+      "group": "表格",
+      "macro": "hb-pivot",
+      "grid": [
+        24,
+        21
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row",
+        "float",
+        "tabs",
+        "screen-card"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "portal",
+      "page_kind": "portal",
+      "cn": "企业门户",
+      "old_class": "portal",
+      "file": "c3-page-detail.html",
+      "name": "企业门户",
+      "macro": "hb-page",
+      "variants": [],
+      "measured": "unverified",
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "portal-app",
+      "type_key": null,
+      "cn": "工作区入口",
+      "old_class": "pa",
+      "file": "c3-page-detail.html",
+      "name": "工作区入口",
+      "group": "企业门户",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:portal"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "rich",
+      "type_key": "rich",
+      "cn": "富文本",
+      "old_class": "w-card content-widget rich-widget",
+      "file": "c3-page-detail.html",
+      "name": "富文本",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        24,
+        18
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "page:detail",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "image",
+      "type_key": "image",
+      "cn": "单图",
+      "old_class": "w-card content-widget image-widget",
+      "file": "c3-page-detail.html",
+      "name": "图片",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        12,
+        12
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "page:detail",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "carousel",
+      "type_key": "carousel",
+      "cn": "轮播",
+      "old_class": "w-card content-widget carousel-widget",
+      "file": "c3-page-detail.html",
+      "name": "轮播图",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        12,
+        12
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "image_list",
+      "type_key": "image_list",
+      "cn": "组图",
+      "old_class": "w-card content-widget image-list-widget",
+      "file": "c3-page-detail.html",
+      "name": "组图",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        24,
+        12
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "image_text_list",
+      "type_key": "image_text_list",
+      "cn": "图文列表",
+      "old_class": "w-card content-widget graphic-list-widget",
+      "file": "c3-page-detail.html",
+      "name": "图文列表",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        12,
+        16
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row"
+      ],
+      "note": "官方八种版式 l1～l8，结构位未收录"
+    },
+    {
+      "kind": "component",
+      "id": "table_item_list",
+      "type_key": "table_item_list",
+      "cn": "表格列表",
+      "old_class": "w-card content-widget table-item-list-widget",
+      "file": "c3-page-detail.html",
+      "name": "表格列表",
+      "group": "内容",
+      "macro": "hb-list",
+      "grid": [
+        24,
+        16
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row",
+        "tabs"
+      ],
+      "note": "全工作区 64 个，最常用组件；外壳 40＋表体＋40 分页条"
+    },
+    {
+      "kind": "component",
+      "id": "fast_form",
+      "type_key": "fast_form",
+      "cn": "快捷表单",
+      "old_class": "w-card content-widget fast-form-widget",
+      "file": "c3-page-detail.html",
+      "name": "快捷表单",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        6,
+        6
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "row",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "rich",
+      "type_key": "rich",
+      "cn": "富文本（任务清单预设）",
+      "old_class": "w-card content-widget rich-widget rich-checklist",
+      "file": "c3-page-detail.html",
+      "name": "任务清单",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        24,
+        18
+      ],
+      "variants": [
+        "checklist"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "row"
+      ],
+      "note": "产品是否有独立任务清单组件待实测；官方说文档/便签/任务清单/大标题都是 rich 预设"
+    },
+    {
+      "kind": "component",
+      "id": "embed",
+      "type_key": "embed",
+      "cn": "嵌入",
+      "old_class": "w-card content-widget embed-widget",
+      "file": "c3-page-detail.html",
+      "name": "嵌入",
+      "group": "内容",
+      "macro": null,
+      "grid": [
+        12,
+        12
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "rich",
+      "type_key": "rich",
+      "cn": "富文本（大标题预设）",
+      "old_class": "rich-hero",
+      "file": "c3-page-detail.html",
+      "name": "大幅富文本",
+      "group": "原生组件",
+      "macro": null,
+      "grid": [
+        24,
+        18
+      ],
+      "variants": [
+        "hero"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "decoration",
+      "type_key": "decoration",
+      "cn": "装饰",
+      "old_class": "decoration",
+      "file": "c3-page-detail.html",
+      "name": "装饰",
+      "group": "原生组件",
+      "macro": null,
+      "grid": [
+        24,
+        2
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "page:dashboard",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "progress_bar",
+      "type_key": "progress_bar",
+      "cn": "进度条",
+      "old_class": "w-card multi-progress-card",
+      "file": "c3-page-detail.html",
+      "name": "多进度条",
+      "group": "统计",
+      "macro": "hb-progress",
+      "grid": [
+        8,
+        5
+      ],
+      "variants": [
+        "newStyle",
+        "normal"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row",
+        "float",
+        "tabs"
+      ],
+      "note": "一个组件可多条，每条 40；两种形态由 extra_config.style.bar_type 定"
+    },
+    {
+      "kind": "component",
+      "id": "timer",
+      "type_key": "timer",
+      "cn": "时间组件",
+      "old_class": "datetime-hero",
+      "file": "c3-page-detail.html",
+      "name": "日期时间-背景型",
+      "group": "日期",
+      "macro": null,
+      "grid": [
+        6,
+        8
+      ],
+      "variants": [
+        "hero"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:portal",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "timer",
+      "type_key": "timer",
+      "cn": "时间组件",
+      "old_class": "w-card datetime-time-date",
+      "file": "c3-page-detail.html",
+      "name": "日期时间-上下型",
+      "group": "日期",
+      "macro": null,
+      "grid": [
+        6,
+        8
+      ],
+      "variants": [
+        "stack"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:portal",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "button",
+      "type_key": "button",
+      "cn": "按钮",
+      "old_class": "w-card shortcut-widget",
+      "file": "c3-page-detail.html",
+      "name": "快捷按钮",
+      "group": "按钮",
+      "macro": null,
+      "grid": [
+        4,
+        3
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:portal",
+        "row",
+        "float"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "procedure_process",
+      "type_key": "procedure_process",
+      "cn": "我发起的",
+      "old_class": "w-card procedure-process-widget",
+      "file": "c3-page-detail.html",
+      "name": "我发起的流程",
+      "group": "流程",
+      "macro": "hb-procs",
+      "grid": [
+        8,
+        16
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "row",
+        "tabs"
+      ],
+      "note": "标题行右侧只有漏斗，没有分段切换；那是「我处理的」才有"
+    },
+    {
+      "kind": "component",
+      "id": "multi_stats",
+      "type_key": "multi_stats",
+      "cn": "多项统计",
+      "old_class": "w-card multi-stats-widget",
+      "file": "c3-page-detail.html",
+      "name": "多项汇总",
+      "group": "统计",
+      "macro": "hb-multistats",
+      "grid": [
+        8,
+        16
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row",
+        "float",
+        "tabs"
+      ],
+      "note": "右侧彩色胶囊是它与分类汇总最直观的差别"
+    },
+    {
+      "kind": "component",
+      "id": "subtotal",
+      "type_key": "subtotal",
+      "cn": "分类汇总",
+      "old_class": "w-card subtotal-widget",
+      "file": "c3-page-detail.html",
+      "name": "分类小计",
+      "group": "统计",
+      "macro": "hb-subtotal",
+      "grid": [
+        4,
+        18
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row",
+        "float",
+        "tabs"
+      ],
+      "note": "顶部合计行＋纯文本数值，无胶囊无分隔线"
+    },
+    {
+      "kind": "component",
+      "id": "calendar",
+      "type_key": "calendar",
+      "cn": "日历",
+      "old_class": "w-card calendar-agenda-widget",
+      "file": "c3-page-detail.html",
+      "name": "日历-带日程",
+      "group": "日历",
+      "macro": null,
+      "grid": [
+        24,
+        16
+      ],
+      "variants": [
+        "agenda"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "row",
+        "tabs"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "calendar",
+      "type_key": "calendar",
+      "cn": "日历（小日历）",
+      "old_class": "calendar-month-view",
+      "file": "c3-page-detail.html",
+      "name": "日历-单月视图",
+      "group": "日历",
+      "macro": null,
+      "grid": [
+        8,
+        16
+      ],
+      "variants": [
+        "month"
+      ],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "row"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "item-page",
+      "page_kind": "detail",
+      "cn": "独立自定义详情页",
+      "old_class": "custom-detail-page",
+      "file": "c3-page-detail.html",
+      "name": "独立自定义详情页",
+      "macro": "hb-page",
+      "variants": [],
+      "measured": "unverified",
+      "note": "官方 item_detail 页；默认不套壳不套弹窗"
+    },
+    {
+      "kind": "component",
+      "id": "item-toolbar",
+      "type_key": null,
+      "cn": "记录功能区",
+      "old_class": "item-page-toolbar",
+      "file": "c3-page-detail.html",
+      "name": "记录功能区",
+      "group": "自定义详情页",
+      "macro": "hb-itembar",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail",
+        "modal"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "header_card",
+      "type_key": "header_card",
+      "cn": "页头卡片",
+      "old_class": "w-card page-header-card span-24",
+      "file": "c3-page-detail.html",
+      "name": "标题卡片",
+      "group": "自定义详情页",
+      "macro": "hb-hcard",
+      "grid": [
+        24,
+        12
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "item-tiles",
+      "type_key": "category",
+      "cn": "选项字段平铺",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "选项字段-平铺样式",
+      "group": "自定义详情页",
+      "macro": "hb-steps",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail"
+      ],
+      "note": "字段的展示样式（is_tile=1），不是 status_bar 组件；用 <hb-steps pill>"
+    },
+    {
+      "kind": "component",
+      "id": "item-steps",
+      "type_key": "status_bar",
+      "cn": "状态条",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "状态条",
+      "group": "自定义详情页",
+      "macro": "hb-steps",
+      "grid": [
+        24,
+        3
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail"
+      ],
+      "note": "箭头式分段步骤条，通栏 24×3；段色取自绑定选项字段自身的颜色"
+    },
+    {
+      "kind": "component",
+      "id": "w-field-group",
+      "type_key": "field_group",
+      "cn": "字段组",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "字段组组件",
+      "group": "自定义详情页",
+      "macro": "hb-fields",
+      "grid": [
+        13,
+        29
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail",
+        "row",
+        "tabs",
+        "modal"
+      ],
+      "note": "详情页第一主力组件；与 c2 的「字段分组」（表单里的折叠分组）不是一回事"
+    },
+    {
+      "kind": "component",
+      "id": "page-cover",
+      "type_key": "cover",
+      "cn": "页面封面",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "页面封面",
+      "group": "自定义详情页",
+      "macro": "hb-cover",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "page:screen",
+        "page:mobile"
+      ],
+      "note": "element_map 里的 cover 元素，不是组件；不占栅格，放页面最前"
+    },
+    {
+      "kind": "component",
+      "id": "chart_bar_y",
+      "type_key": "chart_bar_y",
+      "cn": "条形图",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "条形图",
+      "group": "图表",
+      "macro": "hb-hbar",
+      "grid": [
+        12,
+        18
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row",
+        "float",
+        "tabs",
+        "screen-card"
+      ],
+      "note": "横向条；纵向柱图的官方 type 是 chart_bar，不存在 chart_bar_x"
+    },
+    {
+      "kind": "component",
+      "id": "chart plain",
+      "type_key": "chart_*",
+      "cn": "图表（common 样式）",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "图表组件-无卡片壳",
+      "group": "图表",
+      "macro": "hb-bar/hb-line/hb-donut/hb-area/hb-hbar",
+      "grid": [
+        12,
+        20
+      ],
+      "variants": [
+        "chart_area",
+        "chart_line",
+        "chart_pie",
+        "chart_biaxial",
+        "chart_table"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "row",
+        "tabs"
+      ],
+      "note": "style_type=common：无白底无圆角无阴影，只剩 40 高标题行；宏加 plain 出这一形态"
+    },
+    {
+      "kind": "component",
+      "id": "item-grid",
+      "type_key": null,
+      "cn": "详情页栅格画布",
+      "old_class": "item-page-grid",
+      "file": "c3-page-detail.html",
+      "name": "详情页24栅格",
+      "group": "自定义详情页",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "process",
+      "type_key": "process",
+      "cn": "流程执行记录",
+      "old_class": "flow-msg",
+      "file": "c3-page-detail.html",
+      "name": "流程页签",
+      "group": "记录详情",
+      "macro": "hb-flow",
+      "grid": [
+        8,
+        12
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail",
+        "tabs",
+        "modal"
+      ],
+      "note": "归 process 还是 procedure_* 待实测"
+    },
+    {
+      "kind": "architecture",
+      "id": "phone",
+      "page_kind": "mobile",
+      "cn": "手机单屏",
+      "old_class": "stage",
+      "file": "c4-mobile.html",
+      "name": "手机单屏",
+      "macro": "hb-phone",
+      "variants": [],
+      "measured": "measured",
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "duo",
+      "page_kind": "mobile",
+      "cn": "手机流程壳（2～3 屏）",
+      "old_class": "stage",
+      "file": "c4-mobile.html",
+      "name": "手机流程壳",
+      "macro": "hb-screens",
+      "variants": [],
+      "measured": "measured",
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-topbar",
+      "type_key": null,
+      "cn": "手机顶栏",
+      "old_class": "wxbar",
+      "file": "c4-mobile.html",
+      "name": "手机顶栏",
+      "group": "手机端",
+      "macro": "hb-phone",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-home",
+      "type_key": null,
+      "cn": "工作区首页",
+      "old_class": "stabs",
+      "file": "c4-mobile.html",
+      "name": "手机工作区首页",
+      "group": "手机端",
+      "macro": "hb-mhome",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-viewbar",
+      "type_key": null,
+      "cn": "列表视图条",
+      "old_class": "vbar",
+      "file": "c4-mobile.html",
+      "name": "手机视图条",
+      "group": "手机端",
+      "macro": "hb-vbar",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-cards",
+      "type_key": null,
+      "cn": "三槽卡片列表",
+      "old_class": "plist",
+      "file": "c4-mobile.html",
+      "name": "手机卡片列表",
+      "group": "手机端",
+      "macro": "hb-ocards",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-fab",
+      "type_key": null,
+      "cn": "悬浮新建与分页",
+      "old_class": "fab",
+      "file": "c4-mobile.html",
+      "name": "手机悬浮新建与分页",
+      "group": "手机端",
+      "macro": "hb-ocards",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-tool",
+      "type_key": null,
+      "cn": "底部工具栏",
+      "old_class": "mtool",
+      "file": "c4-mobile.html",
+      "name": "手机底部工具栏",
+      "group": "手机端",
+      "macro": "hb-mtool",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-rec",
+      "type_key": null,
+      "cn": "记录页",
+      "old_class": "rec",
+      "file": "c4-mobile.html",
+      "name": "手机记录页",
+      "group": "手机端",
+      "macro": "hb-rec",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-field",
+      "type_key": null,
+      "cn": "字段值",
+      "old_class": "fld",
+      "file": "c4-mobile.html",
+      "name": "手机字段值变体",
+      "group": "手机端",
+      "macro": "hb-rec",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "m-rec"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-subtabs",
+      "type_key": null,
+      "cn": "子表页签",
+      "old_class": "stab",
+      "file": "c4-mobile.html",
+      "name": "手机子表页签容器",
+      "group": "手机端",
+      "macro": "hb-rec",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "m-rec"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-tool",
+      "type_key": null,
+      "cn": "记录操作条",
+      "old_class": "mtool obar",
+      "file": "c4-mobile.html",
+      "name": "手机记录操作条",
+      "group": "手机端",
+      "macro": "hb-mtool",
+      "grid": null,
+      "variants": [
+        "obar"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-savebar",
+      "type_key": null,
+      "cn": "表单保存条",
+      "old_class": "fbar",
+      "file": "c4-mobile.html",
+      "name": "手机表单保存条",
+      "group": "手机端",
+      "macro": "hb-fbar",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-taskbar",
+      "type_key": null,
+      "cn": "任务办理区",
+      "old_class": "taskbar",
+      "file": "c4-mobile.html",
+      "name": "手机任务办理区",
+      "group": "手机端",
+      "macro": "hb-taskbar",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-ptasks",
+      "type_key": null,
+      "cn": "流程任务列表",
+      "old_class": "ptabs",
+      "file": "c4-mobile.html",
+      "name": "手机流程任务列表",
+      "group": "手机端",
+      "macro": "hb-ptasks",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-workbench",
+      "type_key": null,
+      "cn": "手机工作台",
+      "old_class": "wpage",
+      "file": "c4-mobile.html",
+      "name": "手机工作台",
+      "group": "手机端",
+      "macro": "hb-wpage",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-chat",
+      "type_key": null,
+      "cn": "企业微信会话",
+      "old_class": "chat",
+      "file": "c4-mobile.html",
+      "name": "企业微信待办会话",
+      "group": "手机端",
+      "macro": "hb-chat",
+      "grid": null,
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": "不是伙伴云界面，按微信端样式仿写"
+    },
+    {
+      "kind": "component",
+      "id": "m-chat",
+      "type_key": null,
+      "cn": "公众号会话",
+      "old_class": "chat",
+      "file": "c4-mobile.html",
+      "name": "公众号图文会话＋底部菜单",
+      "group": "手机端",
+      "macro": "hb-chat",
+      "grid": null,
+      "variants": [
+        "mp"
+      ],
+      "measured": "imitated",
+      "allowed_in": [
+        "phone"
+      ],
+      "note": "不是伙伴云界面，按微信端样式仿写"
+    },
+    {
+      "kind": "architecture",
+      "id": "screen",
+      "page_kind": "screen",
+      "cn": "数据大屏",
+      "old_class": "stage",
+      "file": "c5-screen.html",
+      "name": "数据大屏",
+      "macro": "hb-screen",
+      "variants": [],
+      "measured": "measured",
+      "note": "官方 page_width=ultra"
+    },
+    {
+      "kind": "component",
+      "id": "screen-head",
+      "type_key": null,
+      "cn": "大屏标题条",
+      "old_class": "sc-head",
+      "file": "c5-screen.html",
+      "name": "大屏标题条",
+      "group": "大屏",
+      "macro": "hb-screen",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "screen-kpi",
+      "type_key": "chart_single",
+      "cn": "大屏指标框",
+      "old_class": "sc-kpi frame-bracket sp-4",
+      "file": "c5-screen.html",
+      "name": "指标框",
+      "group": "大屏",
+      "macro": "hb-skpi",
+      "grid": [
+        6,
+        6
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": "内容仍是单指标，装饰框为大屏专有"
+    },
+    {
+      "kind": "component",
+      "id": "screen-card",
+      "type_key": "chart_*",
+      "cn": "大屏图表卡",
+      "old_class": "sc-card frame-bracket sp-8",
+      "file": "c5-screen.html",
+      "name": "大屏图表卡",
+      "group": "大屏",
+      "macro": "hb-scard",
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "screen-visual",
+      "type_key": null,
+      "cn": "大屏中央视觉位",
+      "old_class": "sc-visual sp-8 rs-2",
+      "file": "c5-screen.html",
+      "name": "中央视觉位",
+      "group": "大屏",
+      "macro": "hb-svisual",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": "是否 image 组件待实测（产品里是搭建者上传图片）"
+    },
+    {
+      "kind": "component",
+      "id": "screen-bars",
+      "type_key": "progress_bar",
+      "cn": "大屏进度条",
+      "old_class": "sc-bars",
+      "file": "c5-screen.html",
+      "name": "进度条列表",
+      "group": "大屏",
+      "macro": "hb-sbars",
+      "grid": [
+        12,
+        6
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "screen-card",
+        "page:screen"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "screen-card",
+      "type_key": null,
+      "cn": "大屏播报表",
+      "old_class": "sc-card frame-bracket sp-16",
+      "file": "c5-screen.html",
+      "name": "播报表",
+      "group": "大屏",
+      "macro": "hb-scard",
+      "grid": null,
+      "variants": [
+        "ticker"
+      ],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": "chart_table 还是 table_item_list 待实测"
+    },
+    {
+      "kind": "component",
+      "id": "card",
+      "type_key": "card",
+      "cn": "卡片容器",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        24,
+        6
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "table_relation_schema",
+      "type_key": "table_relation_schema",
+      "cn": "表格关系图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        24,
+        12
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "custom",
+      "type_key": "custom",
+      "cn": "自定义组件",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        21
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "status_bar",
+      "type_key": "status_bar",
+      "cn": "状态条",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        8,
+        3
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "procedure_task",
+      "type_key": "procedure_task",
+      "cn": "我处理的",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        24,
+        12
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "chart_area",
+      "type_key": "chart_area",
+      "cn": "面积图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "chart_bar_y",
+      "type_key": "chart_bar_y",
+      "cn": "条形图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "chart_biaxial",
+      "type_key": "chart_biaxial",
+      "cn": "双轴图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "chart_funnel",
+      "type_key": "chart_funnel",
+      "cn": "漏斗图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "chart_scatter",
+      "type_key": "chart_scatter",
+      "cn": "散点图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "component",
+      "id": "chart_map",
+      "type_key": "chart_map",
+      "cn": "地图",
+      "old_class": null,
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": [
+        12,
+        8
+      ],
+      "variants": [],
+      "measured": "unverified",
+      "allowed_in": [
+        "page:workbench",
+        "page:dashboard",
+        "page:detail",
+        "row"
+      ],
+      "note": "官方有、skill 未采集；不画"
+    },
+    {
+      "kind": "atom",
+      "id": "b",
+      "type_key": null,
+      "cn": "按钮原子",
+      "old_class": "b",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "line",
+        "solid",
+        "dis",
+        "cancel",
+        "save",
+        "text"
+      ],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "pill",
+      "type_key": null,
+      "cn": "小胶囊",
+      "old_class": "pill",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "ico",
+      "type_key": null,
+      "cn": "图标",
+      "old_class": "ico",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "av",
+      "type_key": null,
+      "cn": "头像",
+      "old_class": "av",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "stage",
+      "type_key": null,
+      "cn": "画布",
+      "old_class": "stage",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [
+        "has-float",
+        "float-left"
+      ],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "w-card",
+      "type_key": null,
+      "cn": "组件白卡外壳",
+      "old_class": "w-card",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "wc-hd",
+      "type_key": null,
+      "cn": "卡片标题区",
+      "old_class": "wc-hd",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "wc-bd",
+      "type_key": null,
+      "cn": "卡片内容区",
+      "old_class": "wc-bd",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "table-view",
+      "type_key": null,
+      "cn": "视图引擎外层",
+      "old_class": "table-view",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "span-N",
+      "type_key": null,
+      "cn": "详情页栅格跨度",
+      "old_class": "span-N",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "sp-N",
+      "type_key": null,
+      "cn": "大屏栅格跨度",
+      "old_class": "sp-N",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "rs-N",
+      "type_key": null,
+      "cn": "大屏行跨度",
+      "old_class": "rs-N",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "muted",
+      "type_key": null,
+      "cn": "次要灰字",
+      "old_class": "muted",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "ic-*",
+      "type_key": null,
+      "cn": "图标着色",
+      "old_class": "ic-*",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "tone-*",
+      "type_key": null,
+      "cn": "色调工具类",
+      "old_class": "tone-*",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "c-*",
+      "type_key": null,
+      "cn": "标签色",
+      "old_class": "c-*",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "bg-*",
+      "type_key": null,
+      "cn": "大屏背景",
+      "old_class": "bg-*",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "atom",
+      "id": "i-*",
+      "type_key": null,
+      "cn": "图标 symbol id",
+      "old_class": "i-*",
+      "file": null,
+      "name": null,
+      "group": null,
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": null,
+      "allowed_in": [
+        "*"
+      ],
+      "note": "原子/工具类，不改名"
+    }
   ]
- },
- "utility_prefixes": [
-  "ic-",
-  "tone-",
-  "c-",
-  "bg-",
-  "i-",
-  "span-",
-  "sp-",
-  "rs-"
- ],
- "entries": [
-  {
-   "kind": "architecture",
-   "id": "shell",
-   "page_kind": null,
-   "cn": "产品壳（左侧导航＋一级顶栏）",
-   "old_class": "stage",
-   "file": "c1-shell.html",
-   "name": "产品界面壳层",
-   "macro": "hb-page",
-   "variants": [],
-   "measured": "measured",
-   "note": "不属页面模型；PC 页面的外框"
-  },
-  {
-   "kind": "component",
-   "id": "shell-top-bar",
-   "type_key": null,
-   "cn": "一级顶栏",
-   "old_class": "top-bar",
-   "file": "c1-shell.html",
-   "name": "一级顶栏",
-   "group": "产品壳层",
-   "macro": "hb-shell",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "shell"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "shell-side",
-   "type_key": null,
-   "cn": "左侧导航",
-   "old_class": "side",
-   "file": "c1-shell.html",
-   "name": "左侧导航",
-   "group": "产品壳层",
-   "macro": "hb-shell",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "shell"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "ico-row",
-   "type_key": null,
-   "cn": "导航图标入口",
-   "old_class": "i",
-   "file": "c1-shell.html",
-   "name": "导航图标入口",
-   "group": "左侧导航",
-   "macro": "hb-nav",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "nav"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "group",
-   "type_key": null,
-   "cn": "导航分组",
-   "old_class": "group",
-   "file": "c1-shell.html",
-   "name": "导航分组标题",
-   "group": "左侧导航",
-   "macro": "hb-nav",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "nav"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "shell-nav-leaf",
-   "type_key": null,
-   "cn": "导航页面项",
-   "old_class": "leaf",
-   "file": "c1-shell.html",
-   "name": "导航页面项",
-   "group": "左侧导航",
-   "macro": "hb-nav",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "nav"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "shell-nav-folder",
-   "type_key": null,
-   "cn": "导航文件夹",
-   "old_class": "folder",
-   "file": "c1-shell.html",
-   "name": "导航文件夹",
-   "group": "左侧导航",
-   "macro": "hb-nav",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "nav"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "sub",
-   "type_key": null,
-   "cn": "导航子项",
-   "old_class": "sub",
-   "file": "c1-shell.html",
-   "name": "导航子项容器",
-   "group": "左侧导航",
-   "macro": "hb-nav",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "nav"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "mk-float",
-   "type_key": null,
-   "cn": "营销浮层",
-   "old_class": "float",
-   "file": "c1-shell.html",
-   "name": "营销浮层",
-   "group": "画布",
-   "macro": "hb-float",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "stage"
-   ],
-   "note": "非产品件，营销类画布专用"
-  },
-  {
-   "kind": "component",
-   "id": "mk-callout",
-   "type_key": null,
-   "cn": "营销标注",
-   "old_class": "callout",
-   "file": "c1-shell.html",
-   "name": "营销标注",
-   "group": "画布",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "stage"
-   ],
-   "note": "非产品件，仅用户明确要求业务价值标注时用"
-  },
-  {
-   "kind": "architecture",
-   "id": "view-box",
-   "page_kind": "list",
-   "cn": "列表页视图区",
-   "old_class": "view-box",
-   "file": "c2-table-form.html",
-   "name": "列表页主内容",
-   "macro": "hb-page",
-   "variants": [],
-   "measured": "measured",
-   "note": "白卡浮灰底，实测强特征"
-  },
-  {
-   "kind": "component",
-   "id": "view-tabs",
-   "type_key": null,
-   "cn": "视图页签",
-   "old_class": "views",
-   "file": "c2-table-form.html",
-   "name": "视图页签",
-   "group": "列表页",
-   "macro": "hb-views",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-tools",
-   "type_key": null,
-   "cn": "工具栏",
-   "old_class": "tools",
-   "file": "c2-table-form.html",
-   "name": "工具栏",
-   "group": "列表页",
-   "macro": "hb-tools",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-grid",
-   "type_key": null,
-   "cn": "网格视图",
-   "old_class": "table-view grid-view",
-   "file": "c2-table-form.html",
-   "name": "网格视图",
-   "group": "业务视图",
-   "macro": "hb-grid",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:list",
-    "float",
-    "tabs",
-    "screen-card"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "group",
-   "type_key": null,
-   "cn": "分组行",
-   "old_class": "group",
-   "file": "c2-table-form.html",
-   "name": "分组行",
-   "group": "业务视图",
-   "macro": "hb-grid",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "view-grid"
-   ],
-   "note": "tr.group，与导航分组 div.group 同名不同标签"
-  },
-  {
-   "kind": "component",
-   "id": "view-pager",
-   "type_key": null,
-   "cn": "分页器",
-   "old_class": "pager",
-   "file": "c2-table-form.html",
-   "name": "分页器",
-   "group": "列表页",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "tfoot",
-   "type_key": null,
-   "cn": "合计行",
-   "old_class": "table",
-   "file": "c2-table-form.html",
-   "name": "底部合计行",
-   "group": "列表页",
-   "macro": "hb-grid",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "view-grid"
-   ],
-   "note": "根是 tfoot 语义标签，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "tag",
-   "type_key": null,
-   "cn": "标签",
-   "old_class": "tag",
-   "file": "c2-table-form.html",
-   "name": "灰底标签",
-   "group": "单元格",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "*"
-   ],
-   "note": null
-  },
-  {
-   "kind": "atom",
-   "id": "tag",
-   "type_key": null,
-   "cn": "选项标签",
-   "old_class": "tag",
-   "file": "c2-table-form.html",
-   "name": "彩色选项标签",
-   "group": "单元格",
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "c-red",
-    "c-blue",
-    "c-green",
-    "c-orange",
-    "c-teal",
-    "c-purple",
-    "c-yellow"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "*"
-   ],
-   "note": null
-  },
-  {
-   "kind": "atom",
-   "id": "tags",
-   "type_key": null,
-   "cn": "多值标签",
-   "old_class": "tags",
-   "file": "c2-table-form.html",
-   "name": "多值标签",
-   "group": "单元格",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "*"
-   ],
-   "note": null
-  },
-  {
-   "kind": "atom",
-   "id": "user",
-   "type_key": null,
-   "cn": "人员",
-   "old_class": "user",
-   "file": "c2-table-form.html",
-   "name": "人员",
-   "group": "单元格",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "*"
-   ],
-   "note": null
-  },
-  {
-   "kind": "atom",
-   "id": "op-btn",
-   "type_key": null,
-   "cn": "行内快捷按钮",
-   "old_class": "op-btn",
-   "file": "c2-table-form.html",
-   "name": "行内快捷按钮",
-   "group": "单元格",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "*"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field",
-   "type_key": null,
-   "cn": "字段",
-   "old_class": "field",
-   "file": "c2-table-form.html",
-   "name": "基础字段",
-   "group": "字段",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field_group",
-   "type_key": "field_group",
-   "cn": "字段组",
-   "old_class": "field-group",
-   "file": "c2-table-form.html",
-   "name": "字段分组",
-   "group": "字段",
-   "macro": null,
-   "grid": [
-    24,
-    10
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "page:detail",
-    "row"
-   ],
-   "note": "c2 里是表单折叠分组；与官方页面组件 field_group 是否同物待实测"
-  },
-  {
-   "kind": "component",
-   "id": "field",
-   "type_key": null,
-   "cn": "关联字段展开态",
-   "old_class": "field rel-open",
-   "file": "c2-table-form.html",
-   "name": "关联字段展开态",
-   "group": "字段",
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "rel-open"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field",
-   "type_key": null,
-   "cn": "单行文本",
-   "old_class": "field editing",
-   "file": "c2-table-form.html",
-   "name": "单行输入字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "editing"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-textarea",
-   "type_key": null,
-   "cn": "多行文本",
-   "old_class": "field editing textarea-field",
-   "file": "c2-table-form.html",
-   "name": "多行文本字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-category",
-   "type_key": null,
-   "cn": "选项",
-   "old_class": "field editing category-field",
-   "file": "c2-table-form.html",
-   "name": "选项字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-rich",
-   "type_key": null,
-   "cn": "富文本字段",
-   "old_class": "field rich-field",
-   "file": "c2-table-form.html",
-   "name": "富文本字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field",
-   "type_key": null,
-   "cn": "带后缀输入",
-   "old_class": "field editing",
-   "file": "c2-table-form.html",
-   "name": "带后缀输入字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "editing",
-    "suffix"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": "旧根与单行输入字段相同，改名后靠 suffix 修饰类区分"
-  },
-  {
-   "kind": "component",
-   "id": "field-barcode",
-   "type_key": null,
-   "cn": "条码",
-   "old_class": "field barcode-field editing",
-   "file": "c2-table-form.html",
-   "name": "条码字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-date",
-   "type_key": null,
-   "cn": "日期和时间",
-   "old_class": "field date-field editing",
-   "file": "c2-table-form.html",
-   "name": "日期和时间字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-numeric",
-   "type_key": null,
-   "cn": "数值",
-   "old_class": "field numeric-field editing",
-   "file": "c2-table-form.html",
-   "name": "数值字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-money",
-   "type_key": null,
-   "cn": "金额",
-   "old_class": "field money-field editing",
-   "file": "c2-table-form.html",
-   "name": "金额字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-user",
-   "type_key": null,
-   "cn": "成员",
-   "old_class": "field user-field",
-   "file": "c2-table-form.html",
-   "name": "成员字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-location",
-   "type_key": null,
-   "cn": "位置",
-   "old_class": "field location-field",
-   "file": "c2-table-form.html",
-   "name": "位置字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-file",
-   "type_key": null,
-   "cn": "附件",
-   "old_class": "field file-field",
-   "file": "c2-table-form.html",
-   "name": "附件字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-signature",
-   "type_key": null,
-   "cn": "手写签名",
-   "old_class": "field signature-field",
-   "file": "c2-table-form.html",
-   "name": "手写签名字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "field-image",
-   "type_key": null,
-   "cn": "图片字段",
-   "old_class": "field image-field",
-   "file": "c2-table-form.html",
-   "name": "图片字段",
-   "group": "字段类型",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "field_group"
-   ],
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "modal-mask",
-   "page_kind": "detail",
-   "cn": "标准表单编辑态",
-   "old_class": "modal-mask",
-   "file": "c2-table-form.html",
-   "name": "标准表单编辑态",
-   "macro": null,
-   "variants": [
-    "sf"
-   ],
-   "measured": "unverified",
-   "note": "overlay，仅明确要求时"
-  },
-  {
-   "kind": "architecture",
-   "id": "modal-mask",
-   "page_kind": "detail",
-   "cn": "创建或编辑表单",
-   "old_class": "modal-mask",
-   "file": "c2-table-form.html",
-   "name": "创建或编辑表单",
-   "macro": null,
-   "variants": [
-    "fm"
-   ],
-   "measured": "unverified",
-   "note": "overlay，仅明确要求时"
-  },
-  {
-   "kind": "component",
-   "id": "row",
-   "type_key": null,
-   "cn": "表单字段行",
-   "old_class": "row",
-   "file": "c2-table-form.html",
-   "name": "表单字段行",
-   "group": "表单",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-cards",
-   "type_key": null,
-   "cn": "卡片视图",
-   "old_class": "table-view record-card-grid-view",
-   "file": "c2-table-form.html",
-   "name": "卡片视图",
-   "group": "业务视图",
-   "macro": "hb-cards",
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:list",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-cards",
-   "type_key": null,
-   "cn": "卡片视图（快捷操作型）",
-   "old_class": "card-list",
-   "file": "c2-table-form.html",
-   "name": "卡片视图-快捷操作型",
-   "group": "业务视图",
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "ops"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:list",
-    "float"
-   ],
-   "note": "旧根 card-list 与卡片视图不同套，是否同一产品视图待实测"
-  },
-  {
-   "kind": "component",
-   "id": "view-pivot",
-   "type_key": null,
-   "cn": "透视表视图",
-   "old_class": "table-view pivot-view",
-   "file": "c2-table-form.html",
-   "name": "透视表视图",
-   "group": "业务视图",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-gantt",
-   "type_key": null,
-   "cn": "甘特视图",
-   "old_class": "table-view gantt-view",
-   "file": "c2-table-form.html",
-   "name": "甘特视图",
-   "group": "业务视图",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-task",
-   "type_key": null,
-   "cn": "任务视图",
-   "old_class": "table-view task-view",
-   "file": "c2-table-form.html",
-   "name": "任务视图",
-   "group": "业务视图",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-calendar",
-   "type_key": null,
-   "cn": "日历视图",
-   "old_class": "table-view calendar-view",
-   "file": "c2-table-form.html",
-   "name": "日历视图",
-   "group": "业务视图",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:list"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "view-kanban",
-   "type_key": null,
-   "cn": "看板视图",
-   "old_class": "table-view kanban-view",
-   "file": "c2-table-form.html",
-   "name": "看板视图",
-   "group": "业务视图",
-   "macro": "hb-kanban",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:list",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "modal-mask",
-   "page_kind": "detail",
-   "cn": "记录详情弹窗",
-   "old_class": "modal-mask",
-   "file": "c3-page-detail.html",
-   "name": "记录详情弹窗",
-   "macro": null,
-   "variants": [
-    "item"
-   ],
-   "measured": "measured",
-   "note": "仅明确要求弹窗详情时"
-  },
-  {
-   "kind": "component",
-   "id": "modal-card",
-   "type_key": null,
-   "cn": "弹窗内容卡片",
-   "old_class": "widget-card",
-   "file": "c3-page-detail.html",
-   "name": "内容卡片",
-   "group": "记录详情",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal"
-   ],
-   "note": "是否等于官方 card 容器待实测"
-  },
-  {
-   "kind": "component",
-   "id": "fi",
-   "type_key": "stream",
-   "cn": "动态",
-   "old_class": "fi",
-   "file": "c3-page-detail.html",
-   "name": "动态条目",
-   "group": "记录详情",
-   "macro": null,
-   "grid": [
-    8,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "page:detail",
-    "row"
-   ],
-   "note": "动态条目（组件 stream 的一条）；类名保留 fi"
-  },
-  {
-   "kind": "component",
-   "id": "comment",
-   "type_key": "comment",
-   "cn": "评论",
-   "old_class": "comment-box",
-   "file": "c3-page-detail.html",
-   "name": "评论框",
-   "group": "记录详情",
-   "macro": null,
-   "grid": [
-    24,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "modal",
-    "page:detail",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "page",
-   "page_kind": "workbench",
-   "cn": "自定义页面（工作台／数据看板）",
-   "old_class": "page flat",
-   "file": "c3-page-detail.html",
-   "name": "工作台或数据看板",
-   "macro": "hb-page",
-   "variants": [
-    "flat"
-   ],
-   "measured": "unverified",
-   "note": "kind=workbench 或 dashboard；flat 层次开关"
-  },
-  {
-   "kind": "component",
-   "id": "rich",
-   "type_key": "rich",
-   "cn": "富文本（大标题预设，横幅）",
-   "old_class": "w-banner",
-   "file": "c3-page-detail.html",
-   "name": "横幅组件",
-   "group": "工作台",
-   "macro": "hb-banner",
-   "grid": null,
-   "variants": [
-    "title"
-   ],
-   "measured": "measured",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard"
-   ],
-   "note": "官方 ERP 样板实测：工作台/看板/大屏横幅＝rich 大标题预设，24×5，card 样式渐变背景浅色字；不是 cover element（各页 has_cover 均 false）"
-  },
-  {
-   "kind": "component",
-   "id": "rich",
-   "type_key": "rich",
-   "cn": "富文本（大标题预设，背景图卡片式）",
-   "old_class": "w-banner card",
-   "file": "c3-page-detail.html",
-   "name": "横幅-背景图卡片",
-   "group": "工作台",
-   "macro": "hb-banner",
-   "grid": null,
-   "variants": [
-    "title",
-    "card"
-   ],
-   "measured": "measured",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard"
-   ],
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "w-row",
-   "page_kind": "workbench",
-   "cn": "大标题 16 栏＋按钮组 8 栏同行",
-   "old_class": "w-row",
-   "file": "c3-page-detail.html",
-   "name": "横幅带操作按钮",
-   "macro": null,
-   "variants": [
-    "actions"
-   ],
-   "measured": "unverified",
-   "note": "已降级为布局配方（官方样板计划工作台：rich 16×7 ＋ button 8×7），不再是架构"
-  },
-  {
-   "kind": "component",
-   "id": "filter",
-   "type_key": "filter",
-   "cn": "筛选组件",
-   "old_class": "w-filters",
-   "file": "c3-page-detail.html",
-   "name": "筛选组件",
-   "group": "页面组件",
-   "macro": "hb-filters",
-   "grid": [
-    4,
-    5
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row"
-   ],
-   "note": "官方两变体：筛选卡片 4×5／筛选输入框 4×3，只收了一个"
-  },
-  {
-   "kind": "component",
-   "id": "button",
-   "type_key": "button",
-   "cn": "按钮（快捷方式版式）",
-   "old_class": "w-card w-shortcut",
-   "file": "c3-page-detail.html",
-   "name": "快捷方式",
-   "group": "工作台",
-   "macro": "hb-shortcuts",
-   "grid": [
-    4,
-    3
-   ],
-   "variants": [
-    "shortcuts"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row",
-    "float"
-   ],
-   "note": "与快捷按钮是否同为 button 的两种版式待实测"
-  },
-  {
-   "kind": "component",
-   "id": "chart_single",
-   "type_key": "chart_single",
-   "cn": "单指标",
-   "old_class": "w-card w-stat center",
-   "file": "c3-page-detail.html",
-   "name": "单指标-居中大数",
-   "group": "统计",
-   "macro": "hb-stats",
-   "grid": [
-    6,
-    6
-   ],
-   "variants": [
-    "center"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "chart_single",
-   "type_key": "chart_single",
-   "cn": "单指标",
-   "old_class": "w-card w-stat strip",
-   "file": "c3-page-detail.html",
-   "name": "单指标-左文右图",
-   "group": "统计",
-   "macro": "hb-stats",
-   "grid": [
-    6,
-    6
-   ],
-   "variants": [
-    "strip"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "tabs",
-   "type_key": "tabs",
-   "cn": "标签页",
-   "old_class": "w-card page-tabs-card",
-   "file": "c3-page-detail.html",
-   "name": "页签容器",
-   "group": "容器",
-   "macro": "hb-tabcard",
-   "grid": [
-    24,
-    6
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方 tabs 与 card 容器同尺寸，归属待实测"
-  },
-  {
-   "kind": "component",
-   "id": "tabs",
-   "type_key": "tabs",
-   "cn": "标签页（胶囊式）",
-   "old_class": "w-card w-tabs",
-   "file": "c3-page-detail.html",
-   "name": "页签容器-胶囊式",
-   "group": "容器",
-   "macro": "hb-tabcard",
-   "grid": [
-    24,
-    6
-   ],
-   "variants": [
-    "pill"
-   ],
-   "measured": "measured",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "procedure_task",
-   "type_key": "procedure_task",
-   "cn": "我处理的（流程待办列表）",
-   "old_class": "w-sub",
-   "file": "c3-page-detail.html",
-   "name": "待办或流程任务子区",
-   "group": "流程",
-   "macro": "hb-tasks",
-   "grid": [
-    8,
-    16
-   ],
-   "variants": [],
-   "measured": "imitated",
-   "allowed_in": [
-    "page:workbench",
-    "tabs",
-    "row",
-    "float"
-   ],
-   "note": "官方 ERP 样板：待办行＝multi_stats「待办」8 ＋ procedure_task 8 ＋ procedure_process 8；本 skill 的待办子区对应 procedure_task 列表形态，结构未按产品实测采集"
-  },
-  {
-   "kind": "component",
-   "id": "chart",
-   "type_key": "chart_*",
-   "cn": "图表",
-   "old_class": "w-card w-chart",
-   "file": "c3-page-detail.html",
-   "name": "图表组件",
-   "group": "图表",
-   "macro": "hb-bar/hb-line/hb-donut",
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [
-    "chart_bar",
-    "chart_line",
-    "chart_pie",
-    "chart_area",
-    "chart_bar_y",
-    "chart_biaxial",
-    "chart_funnel",
-    "chart_scatter",
-    "chart_map"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float",
-    "tabs",
-    "screen-card"
-   ],
-   "note": "一个通用图表卡，具体图类型由修饰类标注；宏只实现柱/折/环"
-  },
-  {
-   "kind": "component",
-   "id": "chart_table",
-   "type_key": "chart_table",
-   "cn": "透视表",
-   "old_class": "w-card w-pivot",
-   "file": "c3-page-detail.html",
-   "name": "统计表",
-   "group": "表格",
-   "macro": "hb-pivot",
-   "grid": [
-    24,
-    21
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float",
-    "tabs",
-    "screen-card"
-   ],
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "portal",
-   "page_kind": "portal",
-   "cn": "企业门户",
-   "old_class": "portal",
-   "file": "c3-page-detail.html",
-   "name": "企业门户",
-   "macro": "hb-page",
-   "variants": [],
-   "measured": "unverified",
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "portal-app",
-   "type_key": null,
-   "cn": "工作区入口",
-   "old_class": "pa",
-   "file": "c3-page-detail.html",
-   "name": "工作区入口",
-   "group": "企业门户",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:portal"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "rich",
-   "type_key": "rich",
-   "cn": "富文本",
-   "old_class": "w-card content-widget rich-widget",
-   "file": "c3-page-detail.html",
-   "name": "富文本",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    24,
-    18
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "page:detail",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "image",
-   "type_key": "image",
-   "cn": "单图",
-   "old_class": "w-card content-widget image-widget",
-   "file": "c3-page-detail.html",
-   "name": "图片",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    12,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "page:detail",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "carousel",
-   "type_key": "carousel",
-   "cn": "轮播",
-   "old_class": "w-card content-widget carousel-widget",
-   "file": "c3-page-detail.html",
-   "name": "轮播图",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    12,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "image_list",
-   "type_key": "image_list",
-   "cn": "组图",
-   "old_class": "w-card content-widget image-list-widget",
-   "file": "c3-page-detail.html",
-   "name": "组图",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    24,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "image_text_list",
-   "type_key": "image_text_list",
-   "cn": "图文列表",
-   "old_class": "w-card content-widget graphic-list-widget",
-   "file": "c3-page-detail.html",
-   "name": "图文列表",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    12,
-    16
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row"
-   ],
-   "note": "官方八种版式 l1～l8，结构位未收录"
-  },
-  {
-   "kind": "component",
-   "id": "table_item_list",
-   "type_key": "table_item_list",
-   "cn": "表格列表",
-   "old_class": "w-card content-widget table-item-list-widget",
-   "file": "c3-page-detail.html",
-   "name": "表格列表",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    24,
-    10
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row",
-    "tabs"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "fast_form",
-   "type_key": "fast_form",
-   "cn": "快捷表单",
-   "old_class": "w-card content-widget fast-form-widget",
-   "file": "c3-page-detail.html",
-   "name": "快捷表单",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    6,
-    6
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "rich",
-   "type_key": "rich",
-   "cn": "富文本（任务清单预设）",
-   "old_class": "w-card content-widget rich-widget rich-checklist",
-   "file": "c3-page-detail.html",
-   "name": "任务清单",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    24,
-    18
-   ],
-   "variants": [
-    "checklist"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "row"
-   ],
-   "note": "产品是否有独立任务清单组件待实测；官方说文档/便签/任务清单/大标题都是 rich 预设"
-  },
-  {
-   "kind": "component",
-   "id": "embed",
-   "type_key": "embed",
-   "cn": "嵌入",
-   "old_class": "w-card content-widget embed-widget",
-   "file": "c3-page-detail.html",
-   "name": "嵌入",
-   "group": "内容",
-   "macro": null,
-   "grid": [
-    12,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "rich",
-   "type_key": "rich",
-   "cn": "富文本（大标题预设）",
-   "old_class": "rich-hero",
-   "file": "c3-page-detail.html",
-   "name": "大幅富文本",
-   "group": "原生组件",
-   "macro": null,
-   "grid": [
-    24,
-    18
-   ],
-   "variants": [
-    "hero"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "decoration",
-   "type_key": "decoration",
-   "cn": "装饰",
-   "old_class": "decoration",
-   "file": "c3-page-detail.html",
-   "name": "装饰",
-   "group": "原生组件",
-   "macro": null,
-   "grid": [
-    24,
-    2
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "page:dashboard",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "progress_bar",
-   "type_key": "progress_bar",
-   "cn": "进度条",
-   "old_class": "w-card multi-progress-card",
-   "file": "c3-page-detail.html",
-   "name": "多进度条",
-   "group": "统计",
-   "macro": null,
-   "grid": [
-    12,
-    6
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "timer",
-   "type_key": "timer",
-   "cn": "时间组件",
-   "old_class": "datetime-hero",
-   "file": "c3-page-detail.html",
-   "name": "日期时间-背景型",
-   "group": "日期",
-   "macro": null,
-   "grid": [
-    6,
-    8
-   ],
-   "variants": [
-    "hero"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:portal",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "timer",
-   "type_key": "timer",
-   "cn": "时间组件",
-   "old_class": "w-card datetime-time-date",
-   "file": "c3-page-detail.html",
-   "name": "日期时间-上下型",
-   "group": "日期",
-   "macro": null,
-   "grid": [
-    6,
-    8
-   ],
-   "variants": [
-    "stack"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:portal",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "button",
-   "type_key": "button",
-   "cn": "按钮",
-   "old_class": "w-card shortcut-widget",
-   "file": "c3-page-detail.html",
-   "name": "快捷按钮",
-   "group": "按钮",
-   "macro": null,
-   "grid": [
-    4,
-    3
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:portal",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "procedure_process",
-   "type_key": "procedure_process",
-   "cn": "我发起的",
-   "old_class": "w-card procedure-process-widget",
-   "file": "c3-page-detail.html",
-   "name": "我发起的流程",
-   "group": "流程",
-   "macro": null,
-   "grid": [
-    24,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "row",
-    "tabs"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "multi_stats",
-   "type_key": "multi_stats",
-   "cn": "多项统计",
-   "old_class": "w-card multi-stats-widget",
-   "file": "c3-page-detail.html",
-   "name": "多项汇总",
-   "group": "统计",
-   "macro": null,
-   "grid": [
-    12,
-    6
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "subtotal",
-   "type_key": "subtotal",
-   "cn": "分类汇总",
-   "old_class": "w-card subtotal-widget",
-   "file": "c3-page-detail.html",
-   "name": "分类小计",
-   "group": "统计",
-   "macro": null,
-   "grid": [
-    12,
-    6
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "row",
-    "float"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "calendar",
-   "type_key": "calendar",
-   "cn": "日历",
-   "old_class": "w-card calendar-agenda-widget",
-   "file": "c3-page-detail.html",
-   "name": "日历-带日程",
-   "group": "日历",
-   "macro": null,
-   "grid": [
-    24,
-    16
-   ],
-   "variants": [
-    "agenda"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "row",
-    "tabs"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "calendar",
-   "type_key": "calendar",
-   "cn": "日历（小日历）",
-   "old_class": "calendar-month-view",
-   "file": "c3-page-detail.html",
-   "name": "日历-单月视图",
-   "group": "日历",
-   "macro": null,
-   "grid": [
-    8,
-    16
-   ],
-   "variants": [
-    "month"
-   ],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "row"
-   ],
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "item-page",
-   "page_kind": "detail",
-   "cn": "独立自定义详情页",
-   "old_class": "custom-detail-page",
-   "file": "c3-page-detail.html",
-   "name": "独立自定义详情页",
-   "macro": "hb-page",
-   "variants": [],
-   "measured": "unverified",
-   "note": "官方 item_detail 页；默认不套壳不套弹窗"
-  },
-  {
-   "kind": "component",
-   "id": "item-toolbar",
-   "type_key": null,
-   "cn": "记录功能区",
-   "old_class": "item-page-toolbar",
-   "file": "c3-page-detail.html",
-   "name": "记录功能区",
-   "group": "自定义详情页",
-   "macro": "hb-itembar",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:detail",
-    "modal"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "header_card",
-   "type_key": "header_card",
-   "cn": "页头卡片",
-   "old_class": "w-card page-header-card span-24",
-   "file": "c3-page-detail.html",
-   "name": "标题卡片",
-   "group": "自定义详情页",
-   "macro": "hb-hcard",
-   "grid": [
-    24,
-    12
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:detail"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "item-steps",
-   "type_key": null,
-   "cn": "选项字段步骤条",
-   "old_class": "option-steps span-24",
-   "file": "c3-page-detail.html",
-   "name": "选项字段-步骤样式",
-   "group": "自定义详情页",
-   "macro": "hb-steps",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:detail"
-   ],
-   "note": "是否官方 status_bar（8×3）待实测，实测为通栏"
-  },
-  {
-   "kind": "component",
-   "id": "item-grid",
-   "type_key": null,
-   "cn": "详情页栅格画布",
-   "old_class": "item-page-grid",
-   "file": "c3-page-detail.html",
-   "name": "详情页24栅格",
-   "group": "自定义详情页",
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:detail"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "process",
-   "type_key": "process",
-   "cn": "流程执行记录",
-   "old_class": "flow-msg",
-   "file": "c3-page-detail.html",
-   "name": "流程页签",
-   "group": "记录详情",
-   "macro": "hb-flow",
-   "grid": [
-    8,
-    12
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:detail",
-    "tabs",
-    "modal"
-   ],
-   "note": "归 process 还是 procedure_* 待实测"
-  },
-  {
-   "kind": "architecture",
-   "id": "phone",
-   "page_kind": "mobile",
-   "cn": "手机单屏",
-   "old_class": "stage",
-   "file": "c4-mobile.html",
-   "name": "手机单屏",
-   "macro": "hb-phone",
-   "variants": [],
-   "measured": "measured",
-   "note": null
-  },
-  {
-   "kind": "architecture",
-   "id": "duo",
-   "page_kind": "mobile",
-   "cn": "手机流程壳（2～3 屏）",
-   "old_class": "stage",
-   "file": "c4-mobile.html",
-   "name": "手机流程壳",
-   "macro": "hb-screens",
-   "variants": [],
-   "measured": "measured",
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-topbar",
-   "type_key": null,
-   "cn": "手机顶栏",
-   "old_class": "wxbar",
-   "file": "c4-mobile.html",
-   "name": "手机顶栏",
-   "group": "手机端",
-   "macro": "hb-phone",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-home",
-   "type_key": null,
-   "cn": "工作区首页",
-   "old_class": "stabs",
-   "file": "c4-mobile.html",
-   "name": "手机工作区首页",
-   "group": "手机端",
-   "macro": "hb-mhome",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-viewbar",
-   "type_key": null,
-   "cn": "列表视图条",
-   "old_class": "vbar",
-   "file": "c4-mobile.html",
-   "name": "手机视图条",
-   "group": "手机端",
-   "macro": "hb-vbar",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-cards",
-   "type_key": null,
-   "cn": "三槽卡片列表",
-   "old_class": "plist",
-   "file": "c4-mobile.html",
-   "name": "手机卡片列表",
-   "group": "手机端",
-   "macro": "hb-ocards",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-fab",
-   "type_key": null,
-   "cn": "悬浮新建与分页",
-   "old_class": "fab",
-   "file": "c4-mobile.html",
-   "name": "手机悬浮新建与分页",
-   "group": "手机端",
-   "macro": "hb-ocards",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-tool",
-   "type_key": null,
-   "cn": "底部工具栏",
-   "old_class": "mtool",
-   "file": "c4-mobile.html",
-   "name": "手机底部工具栏",
-   "group": "手机端",
-   "macro": "hb-mtool",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-rec",
-   "type_key": null,
-   "cn": "记录页",
-   "old_class": "rec",
-   "file": "c4-mobile.html",
-   "name": "手机记录页",
-   "group": "手机端",
-   "macro": "hb-rec",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-field",
-   "type_key": null,
-   "cn": "字段值",
-   "old_class": "fld",
-   "file": "c4-mobile.html",
-   "name": "手机字段值变体",
-   "group": "手机端",
-   "macro": "hb-rec",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "m-rec"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-subtabs",
-   "type_key": null,
-   "cn": "子表页签",
-   "old_class": "stab",
-   "file": "c4-mobile.html",
-   "name": "手机子表页签容器",
-   "group": "手机端",
-   "macro": "hb-rec",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "m-rec"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-tool",
-   "type_key": null,
-   "cn": "记录操作条",
-   "old_class": "mtool obar",
-   "file": "c4-mobile.html",
-   "name": "手机记录操作条",
-   "group": "手机端",
-   "macro": "hb-mtool",
-   "grid": null,
-   "variants": [
-    "obar"
-   ],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-savebar",
-   "type_key": null,
-   "cn": "表单保存条",
-   "old_class": "fbar",
-   "file": "c4-mobile.html",
-   "name": "手机表单保存条",
-   "group": "手机端",
-   "macro": "hb-fbar",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-taskbar",
-   "type_key": null,
-   "cn": "任务办理区",
-   "old_class": "taskbar",
-   "file": "c4-mobile.html",
-   "name": "手机任务办理区",
-   "group": "手机端",
-   "macro": "hb-taskbar",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-ptasks",
-   "type_key": null,
-   "cn": "流程任务列表",
-   "old_class": "ptabs",
-   "file": "c4-mobile.html",
-   "name": "手机流程任务列表",
-   "group": "手机端",
-   "macro": "hb-ptasks",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-workbench",
-   "type_key": null,
-   "cn": "手机工作台",
-   "old_class": "wpage",
-   "file": "c4-mobile.html",
-   "name": "手机工作台",
-   "group": "手机端",
-   "macro": "hb-wpage",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "m-chat",
-   "type_key": null,
-   "cn": "企业微信会话",
-   "old_class": "chat",
-   "file": "c4-mobile.html",
-   "name": "企业微信待办会话",
-   "group": "手机端",
-   "macro": "hb-chat",
-   "grid": null,
-   "variants": [],
-   "measured": "imitated",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": "不是伙伴云界面，按微信端样式仿写"
-  },
-  {
-   "kind": "component",
-   "id": "m-chat",
-   "type_key": null,
-   "cn": "公众号会话",
-   "old_class": "chat",
-   "file": "c4-mobile.html",
-   "name": "公众号图文会话＋底部菜单",
-   "group": "手机端",
-   "macro": "hb-chat",
-   "grid": null,
-   "variants": [
-    "mp"
-   ],
-   "measured": "imitated",
-   "allowed_in": [
-    "phone"
-   ],
-   "note": "不是伙伴云界面，按微信端样式仿写"
-  },
-  {
-   "kind": "architecture",
-   "id": "screen",
-   "page_kind": "screen",
-   "cn": "数据大屏",
-   "old_class": "stage",
-   "file": "c5-screen.html",
-   "name": "数据大屏",
-   "macro": "hb-screen",
-   "variants": [],
-   "measured": "measured",
-   "note": "官方 page_width=ultra"
-  },
-  {
-   "kind": "component",
-   "id": "screen-head",
-   "type_key": null,
-   "cn": "大屏标题条",
-   "old_class": "sc-head",
-   "file": "c5-screen.html",
-   "name": "大屏标题条",
-   "group": "大屏",
-   "macro": "hb-screen",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:screen"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "screen-kpi",
-   "type_key": "chart_single",
-   "cn": "大屏指标框",
-   "old_class": "sc-kpi frame-bracket sp-4",
-   "file": "c5-screen.html",
-   "name": "指标框",
-   "group": "大屏",
-   "macro": "hb-skpi",
-   "grid": [
-    6,
-    6
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:screen"
-   ],
-   "note": "内容仍是单指标，装饰框为大屏专有"
-  },
-  {
-   "kind": "component",
-   "id": "screen-card",
-   "type_key": "chart_*",
-   "cn": "大屏图表卡",
-   "old_class": "sc-card frame-bracket sp-8",
-   "file": "c5-screen.html",
-   "name": "大屏图表卡",
-   "group": "大屏",
-   "macro": "hb-scard",
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:screen"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "screen-visual",
-   "type_key": null,
-   "cn": "大屏中央视觉位",
-   "old_class": "sc-visual sp-8 rs-2",
-   "file": "c5-screen.html",
-   "name": "中央视觉位",
-   "group": "大屏",
-   "macro": "hb-svisual",
-   "grid": null,
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "page:screen"
-   ],
-   "note": "是否 image 组件待实测（产品里是搭建者上传图片）"
-  },
-  {
-   "kind": "component",
-   "id": "screen-bars",
-   "type_key": "progress_bar",
-   "cn": "大屏进度条",
-   "old_class": "sc-bars",
-   "file": "c5-screen.html",
-   "name": "进度条列表",
-   "group": "大屏",
-   "macro": "hb-sbars",
-   "grid": [
-    12,
-    6
-   ],
-   "variants": [],
-   "measured": "measured",
-   "allowed_in": [
-    "screen-card",
-    "page:screen"
-   ],
-   "note": null
-  },
-  {
-   "kind": "component",
-   "id": "screen-card",
-   "type_key": null,
-   "cn": "大屏播报表",
-   "old_class": "sc-card frame-bracket sp-16",
-   "file": "c5-screen.html",
-   "name": "播报表",
-   "group": "大屏",
-   "macro": "hb-scard",
-   "grid": null,
-   "variants": [
-    "ticker"
-   ],
-   "measured": "measured",
-   "allowed_in": [
-    "page:screen"
-   ],
-   "note": "chart_table 还是 table_item_list 待实测"
-  },
-  {
-   "kind": "component",
-   "id": "card",
-   "type_key": "card",
-   "cn": "卡片容器",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    24,
-    6
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "table_relation_schema",
-   "type_key": "table_relation_schema",
-   "cn": "表格关系图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    24,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "custom",
-   "type_key": "custom",
-   "cn": "自定义组件",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    21
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "status_bar",
-   "type_key": "status_bar",
-   "cn": "状态条",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    8,
-    3
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "procedure_task",
-   "type_key": "procedure_task",
-   "cn": "我处理的",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    24,
-    12
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "chart_area",
-   "type_key": "chart_area",
-   "cn": "面积图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "chart_bar_y",
-   "type_key": "chart_bar_y",
-   "cn": "条形图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "chart_biaxial",
-   "type_key": "chart_biaxial",
-   "cn": "双轴图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "chart_funnel",
-   "type_key": "chart_funnel",
-   "cn": "漏斗图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "chart_scatter",
-   "type_key": "chart_scatter",
-   "cn": "散点图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "component",
-   "id": "chart_map",
-   "type_key": "chart_map",
-   "cn": "地图",
-   "old_class": null,
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": [
-    12,
-    8
-   ],
-   "variants": [],
-   "measured": "unverified",
-   "allowed_in": [
-    "page:workbench",
-    "page:dashboard",
-    "page:detail",
-    "row"
-   ],
-   "note": "官方有、skill 未采集；不画"
-  },
-  {
-   "kind": "atom",
-   "id": "b",
-   "type_key": null,
-   "cn": "按钮原子",
-   "old_class": "b",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "line",
-    "solid",
-    "dis",
-    "cancel",
-    "save",
-    "text"
-   ],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "pill",
-   "type_key": null,
-   "cn": "小胶囊",
-   "old_class": "pill",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "ico",
-   "type_key": null,
-   "cn": "图标",
-   "old_class": "ico",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "av",
-   "type_key": null,
-   "cn": "头像",
-   "old_class": "av",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "stage",
-   "type_key": null,
-   "cn": "画布",
-   "old_class": "stage",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [
-    "has-float",
-    "float-left"
-   ],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "w-card",
-   "type_key": null,
-   "cn": "组件白卡外壳",
-   "old_class": "w-card",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "wc-hd",
-   "type_key": null,
-   "cn": "卡片标题区",
-   "old_class": "wc-hd",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "wc-bd",
-   "type_key": null,
-   "cn": "卡片内容区",
-   "old_class": "wc-bd",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "table-view",
-   "type_key": null,
-   "cn": "视图引擎外层",
-   "old_class": "table-view",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "span-N",
-   "type_key": null,
-   "cn": "详情页栅格跨度",
-   "old_class": "span-N",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "sp-N",
-   "type_key": null,
-   "cn": "大屏栅格跨度",
-   "old_class": "sp-N",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "rs-N",
-   "type_key": null,
-   "cn": "大屏行跨度",
-   "old_class": "rs-N",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "muted",
-   "type_key": null,
-   "cn": "次要灰字",
-   "old_class": "muted",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "ic-*",
-   "type_key": null,
-   "cn": "图标着色",
-   "old_class": "ic-*",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "tone-*",
-   "type_key": null,
-   "cn": "色调工具类",
-   "old_class": "tone-*",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "c-*",
-   "type_key": null,
-   "cn": "标签色",
-   "old_class": "c-*",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "bg-*",
-   "type_key": null,
-   "cn": "大屏背景",
-   "old_class": "bg-*",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  },
-  {
-   "kind": "atom",
-   "id": "i-*",
-   "type_key": null,
-   "cn": "图标 symbol id",
-   "old_class": "i-*",
-   "file": null,
-   "name": null,
-   "group": null,
-   "macro": null,
-   "grid": null,
-   "variants": [],
-   "measured": null,
-   "allowed_in": [
-    "*"
-   ],
-   "note": "原子/工具类，不改名"
-  }
- ]
 }

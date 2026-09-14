@@ -410,11 +410,71 @@
   </div>
 </template>
 
-<template data-component="选项字段-步骤样式" data-cn="选项字段步骤条" data-group="自定义详情页" data-measured="容器高 40 圆角 9；每段箭头形 clip-path（切口 10px、段间叠合 -10px、padding 0 20）；已过段＝主色 25% 底＋ink-45 字，当前段＝主色实底白字，未来段＝白底 ink-65。它是选项字段的展示样式，不是独立阶段组件">
+<template data-component="状态条" data-type="status_bar" data-cn="状态条" data-group="自定义详情页"
+          data-measured="2026-09-14 项目管理 v2.0「项目档案」实测（24×3 → 1488×40）：白卡 r9 有阴影、无标题行，顶上还压一层 rgba(255,255,255,.45) 遮罩；段高 40＝组件全高，段宽按文字自适应并铺满整行（实测 206/210/210/210/210/252/248），padding 0 20，首段左 16、末段右 16，相邻段 x 重叠约 10＝箭头咬合；四态：首段与已过段＝选项色 25% 底＋ink-45 字，当前段＝选项色实底白字 fw500（实测 #36D9A3，取自选项自身颜色而非工作区主题色），未到段＝透明底＋ink-85 字。数据源是表里的一个 category 选项字段，段数＝选项数">
   <div class="item-steps span-24">
     <span class="preceding"><!-- 当前值之前的选项 --></span>
     <span class="current"><!-- 当前选项 --></span>
     <span class="following"><!-- 当前值之后的选项 --></span>
+  </div>
+</template>
+
+<template data-component="选项字段-平铺样式" data-type="category" data-cn="选项字段平铺" data-group="自定义详情页"
+          data-measured="2026-09-14 ERP v7.1 生产工单系统详情页实测：这是字段的展示样式（config.is_tile=1），不是 status_bar 组件。整块字段底 #BFDFFF、圆角 6、高 57（标签行 24＋值行 32）；值行里每个选项 58×20、圆角 100、padding 0 4、14/20；未选中透明底＋ink-65 字，选中用该选项自身颜色填充＋白字（实测「生产中」#FFA526）">
+  <div class="item-tiles span-24">
+    <span class="tile"><!-- 未选中的选项 --></span>
+    <span class="tile on"><!-- 当前值；style="--pg:var(--c-orange)" 指定该选项自身颜色 --></span>
+  </div>
+</template>
+
+<template data-component="字段组组件" data-type="field_group" data-cn="字段组" data-group="自定义详情页"
+          data-measured="2026-09-14 ERP v7.1 / 进销存 v6.0 实测（11 张自定义详情页共 14 个，如 13×29 → 810×560、11×13 → 682×240）：白卡 r9 无边框、阴影 rgba(0,0,0,.08) 0 20 40 0；标题行 40（16/500），底色来自 style.title.background_fill_var，实测三档 cyan-100 #B8EBFF / teal-100 #A2F2E0 / lightblue-100 #BDDCFF；内容区左右各距卡片 20、上 14；单行字段 69＝57＋上下各 6 的单元格内距，标签行 24（padding 4 8，14/16/ink-65），值行 32（底 #F5F6F8、r6、padding 6 8，14/22/ink-85）；每行字段数由 field_layout 定，实测 1～4 个都有（两列时 810 宽卡内单元格 391）；关联字段带附加信息时整块变高（实测 224）">
+  <div class="w-card w-field-group">
+    <div class="wc-hd"><!-- 组件名称；底色用 tint-blue / tint-teal / tint-cyan --></div>
+    <div class="fg-grid fg-c2">
+      <div class="fg-group t0"><!-- 分组名，三种浅色底轮转 t0/t1/t2 --></div>
+      <div class="fg-field">
+        <div class="fg-label"><!-- 字段名 --></div>
+        <div class="fg-value"><!-- 字段值 --></div>
+      </div>
+      <div class="fg-field full"><!-- 多行文本／附件／图片这类不定高字段独占整行 -->
+        <div class="fg-label"></div><div class="fg-value"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template data-component="页面封面" data-type="cover" data-cn="页面封面" data-group="自定义详情页"
+          data-measured="2026-09-14 Project Management「Chart」页实测（has_cover 首次见到启用）：封面 1154×280，紧贴顶栏下方，宽度取内容区全宽、不受 ultra 内边距约束；页面图标 80×80 圆角 8，左对齐到栅格左边，纵向压在封面下沿上（跨过封面底边约 40）；页面标题 40/56/500，宽度等于栅格宽。纵向节奏：顶栏 56 → 封面 280（底 336）→ 标题 416～472 → 栅格起点 524。配置在 element_map 的 cover 元素上，不是组件">
+  <div class="page-cover">
+    <div class="cover-band"><!-- 封面图；没有客户图时走主色渐变 --></div>
+    <div class="cover-head">
+      <span class="cover-icon"><!-- 页面图标 --></span>
+      <div class="cover-title"><!-- 页面标题 --></div>
+      <div class="cover-sub"><!-- 一句话介绍，可选 --></div>
+    </div>
+  </div>
+</template>
+
+<template data-component="条形图" data-type="chart_bar_y" data-cn="条形图" data-group="图表"
+          data-measured="2026-09-14 实测（20 个页面 8 个实例，常见 12×19～22、6×16）：横向条，名称在左、数值在右；外壳与其它图表一致——ERP 那边是 common（无卡片底，只剩 40 高标题行），Project Management 那边是 card（白底 r9 阴影）。产品里由 ECharts 画进单个 canvas，DOM 取不到条的节点尺寸，这里按可读版式仿写">
+  <div class="w-card chart chart_bar_y">
+    <div class="wc-hd"><!-- 组件名称 --></div>
+    <div class="hbar-list">
+      <div class="hbar-row">
+        <span class="hbar-name"><!-- 分类名 --></span>
+        <span class="hbar-track"><i><!-- style="width:62%;--pg:var(--c-blue)" --></i></span>
+        <span class="hbar-val"><!-- 数值 --></span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template data-component="图表组件-无卡片壳" data-type="chart_*" data-cn="图表（common 样式）" data-group="图表"
+          data-measured="2026-09-14 ERP v7.1 实测：style_type=common 的组件（图表、日历、进度条）没有 _cardBackground_ 那一层——无白底、无圆角、无阴影，只剩 40 高标题行（16/25.14/500，右侧两个 32 按钮）＋内容区；内容区高＝组件高 − 40，上 padding 5。同一个图表类型在别的工作区可能配成 card 样式（Project Management 那页就是），按目标工作区取">
+  <div class="chart plain">
+    <div class="wc-hd"><!-- 组件名称 --></div>
+    <div class="wc-bd"><!-- 绘图区 --></div>
   </div>
 </template>
 

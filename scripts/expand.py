@@ -540,11 +540,12 @@ def legend_html(series):
     return '<div class="legend">' + "".join(items) + "</div>"
 
 
-def chart_shell(a, tagname, inner_html):
+def chart_shell(a, tagname, inner_html, extra=""):
     """图表外壳：默认卡片（白底圆角阴影）；plain＝产品的 common 样式，只剩 40 高标题行。"""
     cls = "chart plain" if "plain" in a else "w-card chart"
     span = f' span-{a["span"]}' if "span" in a else ""
-    return f'<div class="{cls}{span}">{card_head(a, tagname)}{inner_html}</div>'
+    ex = f" {extra}" if extra else ""
+    return f'<div class="{cls}{ex}{span}">{card_head(a, tagname)}{inner_html}</div>'
 
 
 def chart_card(a, inner, legend, tagname, par="none"):
@@ -695,7 +696,7 @@ def m_hbar(a, body):
         out.append(f'<div class="hbar-row"><span class="hbar-name">{esc(r["name"])}</span>'
                    f'<span class="hbar-track"><i style="width:{pct:.1f}%;--pg:var(--c-{color})"></i></span>'
                    f'<span class="hbar-val">{esc(r["raw"])}</span></div>')
-    return chart_shell(a, "hb-hbar", f'<div class="hbar-list">{"".join(out)}</div>')
+    return chart_shell(a, "hb-hbar", f'<div class="hbar-list">{"".join(out)}</div>', extra="chart_bar_y")
 
 
 # ── 详情页 ──────────────────────────────────────────────────────────────
