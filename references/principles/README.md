@@ -25,7 +25,7 @@
 | [visual-four-principles.md](visual-four-principles.md) | 对齐、亲密性、对比、重复；24 栅格、三种布局、横向留白 |
 | [visual-color.md](visual-color.md) | 三色原则、状态色红绿灯、纯色优先、品牌植入 |
 | [visual-components.md](visual-components.md) | 按钮分级、页面层级 |
-| [layout-gallery.html](layout-gallery.html) | 各页面版式的线框示意（看板 5、工作台 3、详情页 2），改版式表时同步改 | 迭代版式时对照 |
+| [assets/layout-gallery.html](../../assets/layout-gallery.html) | 各页面版式的线框示意（看板 5、工作台 3、详情页 2），改版式表时同步改 | 迭代版式时对照 |
 | [anti-sameness.md](anti-sameness.md) | 防千篇一律：数据毛边、非理想态、版式错开（多张营销配图必读） |
 
 实测记录在 [../measured/](../measured/)，是页面原则里产品事实的出处。

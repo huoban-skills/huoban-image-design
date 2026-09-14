@@ -34,6 +34,7 @@
         assets/c5-screen.html      数据大屏                     ┘
 骨架样式 assets/base.css            尺寸布局，无颜色
 皮肤    assets/skins/*.css         纯色彩 token，9 套
+版式    assets/layout-gallery.html 各页面版式线框示意（人看，浏览器打开），与页面原则的版式表同步
 宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 40 余个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
