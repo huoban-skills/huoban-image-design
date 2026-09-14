@@ -16,7 +16,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [component-guide.md](component-guide.md) | 组件辞典：38 个官方组件什么时候用、举例；不管放哪放几个 |
+| [component-guide.md](component-guide.md) | 组件辞典：38 个官方组件的适用与举例；不管放哪放几个 |
 
 ## 通用原则（所有图都读）
 
