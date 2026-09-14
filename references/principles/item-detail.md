@@ -23,7 +23,7 @@
 
 不放的组件：横幅（富文本 大标题预设；详情页的标题在记录功能区，不另放横幅）、筛选组件 筛选、趋势与对比图表、按钮组 快捷方式格子（操作在记录功能区）。
 
-组件本身怎么选、边界、举例见 [dashboard-chart-selection.md](dashboard-chart-selection.md)。待核：步骤条是否 状态条、流程页签归 流程执行记录 还是 procedure_*。
+组件本身怎么选、边界、举例见 [component-guide.md](component-guide.md)。待核：步骤条是否 状态条、流程页签归 流程执行记录 还是 procedure_*。
 
 ## 3. 布局原则
 

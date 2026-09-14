@@ -16,7 +16,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [dashboard-chart-selection.md](dashboard-chart-selection.md) | 按分析场景选官方组件：38 个组件的用途、举例、边界 |
+| [component-guide.md](component-guide.md) | 组件辞典：相近组件怎么区分、38 个官方组件的用途、举例、边界；不管放哪放几个 |
 | [dashboard-data-story.md](dashboard-data-story.md) | 看板定位、四问法、指标体系（指标拆不清时读） |
 
 ## 通用原则（所有图都读）
