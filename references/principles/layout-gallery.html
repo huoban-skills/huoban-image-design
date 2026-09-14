@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>版式示意</title>
+<style>
+body{margin:0;padding:28px;font:14px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#222;background:#f4f5f7}
+h1{font-size:20px;margin:0 0 6px}h2{font-size:17px;margin:34px 0 12px;padding-left:10px;border-left:4px solid #2f6fed}
+.wrap{display:flex;flex-wrap:wrap;gap:22px}
+.card{background:#fff;border:1px solid #dde1e7;border-radius:8px;width:440px;padding:14px}
+.card h3{margin:0 0 4px;font-size:15px}.card p{margin:0 0 10px;color:#666;font-size:12px}
+.g{display:grid;grid-template-columns:repeat(24,1fr);gap:4px;align-content:start}
+.b{background:#e9eef8;border:1px solid #9fb4e6;border-radius:3px;font-size:11px;color:#2c4a8f;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;box-sizing:border-box;min-height:18px}
+.b.t{background:#fff3e0;border-color:#e6b070;color:#8a5200}
+.b.k{background:#e6f5ec;border-color:#7fc59a;color:#1c6b3d}
+.b.f{background:#f1f1f1;border-color:#bbb;color:#555}
+.b.x{background:#fdeaea;border-color:#e39a9a;color:#8f2b2b}
+.n{display:grid;grid-template-columns:repeat(24,1fr);gap:4px;align-content:start}
+</style></head><body>
+<h1>页面版式示意（24 栅格，块高按行高比例）</h1>
+<p style="color:#666;margin:0">与 references/principles 各页面篇"布局原则"里的版式表一一对应，改版式表时同步改本文件的 SECTIONS 数据。橙＝横幅／标题，蓝＝指标与图表，绿＝入口与待办，灰＝筛选与说明，红＝明细表。</p>
+<div id="root"></div>
+<script>
+// 块：[span, 文字, 高px, 类]；子网格：{span, rows:[[...]]}
+const H=6; // 每栅格高单位
+const R=(...b)=>b;
+const SECTIONS=[
+{title:"数据看板（4 种）＋大屏（1 种）",items:[
+ {name:"层叠式（默认）",use:"一条主线讲三问：指标 4～6 个、图 2～3 张。最常见，别整批都用它。",rows:[
+  R([24,"横幅 24×5",5,"t"]),R([6,"筛选",3,"f"],[6,"筛选",3,"f"],[6,"筛选",3,"f"],[6,"筛选",3,"f"]),
+  R([6,"单指标",7],[6,"单指标",7],[6,"单指标",7],[6,"单指标",7]),
+  R([16,"主趋势图 16×20",20],[8,"对比图 8×20",20]),R([24,"明细／透视表 24×16",16,"x"])]},
+ {name:"宫格式",use:"几条平行业务线各看各的，没有主次：同权重卡片矩阵。",rows:[
+  R([24,"横幅 24×5",5,"t"]),R([6,"单指标",7],[6,"单指标",7],[6,"单指标",7],[6,"单指标",7]),
+  R([8,"图 8×16",16],[8,"图 8×16",16],[8,"图 8×16",16]),R([12,"图 12×16",16],[12,"图 12×16",16]),R([24,"明细 24×12",12,"x"])]},
+ {name:"左栏导览式",use:"筛选项 4 个以上的分析页：左列竖叠筛选组件和分类汇总，右侧放内容。",rows:[
+  R([24,"横幅 24×5",5,"t"]),
+  R({span:6,rows:[R([24,"筛选 6×3",3,"f"]),R([24,"筛选 6×3",3,"f"]),R([24,"筛选 6×3",3,"f"]),R([24,"分类汇总 6×26",26])]},
+    {span:18,rows:[R([8,"单指标 6×7",7],[8,"单指标 6×7",7],[8,"单指标 6×7",7]),R([12,"图 9×16",16],[12,"图 9×16",16]),R([24,"明细 18×12",12,"x"])]})]},
+ {name:"页签分段式（官方样板）",use:"内容按阶段或业务分 3～5 段，每段各有图和表；页签内自成小看板。",rows:[
+  R([24,"横幅 24×5",5,"t"]),R([6,"单指标",7],[6,"单指标",7],[6,"单指标",7],[6,"单指标",7]),
+  {span:24,tabs:true,rows:[R([6,"筛选",3,"f"],[6,"筛选",3,"f"],[12,"",3,"f"]),R([12,"图 12×16",16],[6,"图",16],[6,"图",16]),R([24,"表 24×12",12,"x"])]}]},
+ {name:"中心视觉式（大屏专用）",use:"Z 型一屏放完：标题行 → 指标行 → 中央大图两侧列 → 底部播报。深色底。",dark:true,rows:[
+  R([3,"装饰",5,"f"],[18,"大标题 18×5",5,"t"],[3,"时间",5,"f"]),
+  R([3,"指标",6],[3,"指标",6],[3,"指标",6],[3,"指标",6],[3,"指标",6],[3,"指标",6],[3,"指标",6],[3,"指标",6]),
+  R({span:6,rows:[R([24,"图表卡 6×18",18])]},[12,"中央视觉位 12×18",18],{span:6,rows:[R([24,"图表卡 6×18",18])]}),
+  R([6,"图 6×12",12],[12,"播报表 12×12",12,"x"],[6,"图 6×12",12])]},
+]},
+{title:"工作台（4 种）",items:[
+ {name:"层叠式（默认，官方样板）",use:"角色动作和待办都多：指标 → 入口 → 待办 → 页签。",rows:[
+  R([24,"横幅 24×5",5,"t"]),R([6,"单指标",7],[6,"单指标",7],[6,"单指标",7],[6,"单指标",7]),
+  R([24,"快捷入口 24×6（3～8 个按钮）",6,"k"]),R([8,"待办 8×16",16,"k"],[8,"我处理的 8×16",16,"k"],[8,"我发起的 8×16",16,"k"]),
+  R([24,"页签容器 24（筛选行 → 表格列表）",18,"x"])]},
+ {name:"主从式",use:"角色以查自己的数据为主，动作少：左 16 内容、右 8 侧栏竖叠入口和待办。",rows:[
+  R([24,"横幅 24×5",5,"t"]),
+  R({span:16,rows:[R([8,"单指标",7],[8,"单指标",7],[8,"单指标",7]),R([24,"我的数据 16×26",26,"x"])]},
+    {span:8,rows:[R([24,"快捷入口 8×10",10,"k"]),R([24,"待办 8×12",12,"k"]),R([24,"日程 8×11",11,"f"])]})]},
+ {name:"入口优先式",use:"角色一进来就要动手，指标不重要：横幅与按钮同行，没有单指标行。",rows:[
+  R([16,"横幅 16×7",7,"t"],[8,"按钮组 8×7",7,"k"]),R([6,"待办 6×16",16,"k"],[9,"我处理的 9×16",16,"k"],[9,"我发起的 9×16",16,"k"]),
+  R([16,"我的数据 16×18",18,"x"],[8,"进度 8×18",18])]},
+ {name:"页签承载式",use:"事项多、按阶段分 3～5 段：入口与待办同行，主体交给页签。",rows:[
+  R([24,"横幅 24×5",5,"t"]),R([6,"待办 6×12",12,"k"],[18,"快捷入口 18×12",12,"k"]),
+  {span:24,tabs:true,rows:[R([6,"筛选",3,"f"],[6,"筛选",3,"f"],[12,"",3,"f"]),R([24,"表格列表 24×16",16,"x"])]}]},
+]},
+{title:"自定义详情页（2 种）",items:[
+ {name:"双栏式：左字段、右分析区",use:"所有详情页：左栏字段组 13，右栏分析区 11 直接竖叠本记录的数据组件（主题多才套页签），页签容器通栏在下。两栏等高，页签左对齐。",rows:[
+  R([24,"记录功能区",4,"t"]),R([24,"页头卡片 24×9（标题＋状态标签＋关键字段）",9,"t"]),R([24,"步骤条 24×2（有则放）",2,"f"]),
+  R([13,"字段组 13×24（每行 1～2 字段）",24],{span:11,rows:[R([24,"分析区 11×16（数值／计算字段的字段组、单指标、进度条、图表，按需求定）",16]),R([24,"快捷表单 11×7（若有）",7,"k"])]}),
+  {span:24,tabs:true,rows:[R([24,"明细表 24×14（其他页签：流程 → 动态）",14,"x"])]}]},
+ {name:"单栏式",use:"没有数据分析和快捷表单：中间一块字段组通栏，底下页签容器放明细、流程、动态。页签左对齐。",rows:[
+  R([24,"记录功能区",4,"t"]),R([24,"页头卡片 24×9（标题＋状态标签＋关键字段）",9,"t"]),R([24,"步骤条 24×2（有则放）",2,"f"]),
+  R([24,"字段组 24×16（内部按分组排）",16]),
+  {span:24,tabs:true,rows:[R([24,"明细表 24×12（其他页签：流程 → 动态）",12,"x"])]}]},
+]}];
+function block(b){
+  if(Array.isArray(b)){const [s,t,h,c]=b;const d=document.createElement('div');d.className='b '+(c||'');d.style.gridColumn='span '+s;d.style.height=(h*H)+'px';d.textContent=t;return d;}
+  const d=document.createElement('div');d.className='n';d.style.gridColumn='span '+b.span;
+  if(b.tabs){const tb=document.createElement('div');tb.className='b f';tb.style.gridColumn='span 24';tb.style.height='20px';tb.textContent='页签 1 ｜ 页签 2 ｜ 页签 3';tb.style.justifyContent='flex-start';tb.style.paddingLeft='10px';d.appendChild(tb);d.style.border='1px dashed #999';d.style.padding='4px';d.style.borderRadius='4px';}
+  b.rows.forEach(r=>r.forEach(x=>d.appendChild(block(x))));return d;}
+const root=document.getElementById('root');
+SECTIONS.forEach(sec=>{const h=document.createElement('h2');h.textContent=sec.title;root.appendChild(h);const w=document.createElement('div');w.className='wrap';root.appendChild(w);
+ sec.items.forEach(it=>{const c=document.createElement('div');c.className='card';if(it.dark){c.style.background='#0f1a2e';c.style.color='#fff';}
+  c.innerHTML=`<h3>${it.name}</h3><p ${it.dark?'style="color:#b9c6e0"':''}>${it.use}</p>`;const g=document.createElement('div');g.className='g';it.rows.forEach(r=>r.forEach?r.forEach(x=>g.appendChild(block(x))):g.appendChild(block(r)));c.appendChild(g);w.appendChild(c);});});
+</script></body></html>
