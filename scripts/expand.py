@@ -540,13 +540,20 @@ def legend_html(series):
     return '<div class="legend">' + "".join(items) + "</div>"
 
 
+def chart_shell(a, tagname, inner_html):
+    """图表外壳：默认卡片（白底圆角阴影）；plain＝产品的 common 样式，只剩 40 高标题行。"""
+    cls = "chart plain" if "plain" in a else "w-card chart"
+    span = f' span-{a["span"]}' if "span" in a else ""
+    return f'<div class="{cls}{span}">{card_head(a, tagname)}{inner_html}</div>'
+
+
 def chart_card(a, inner, legend, tagname, par="none"):
     # par：柱/折线拉伸填满卡片（none）；环图必须等比，否则圆被抻成椭圆
     W, H = int(a.get("w", 560)), int(a.get("h", 240))
     svg = f'<svg viewBox="0 0 {W} {H}" preserveAspectRatio="{par}" xmlns="http://www.w3.org/2000/svg">{"".join(inner)}</svg>'
     if "bare" in a:
         return svg + legend
-    return f'<div class="w-card chart">{card_head(a, tagname)}<div class="wc-bd">{svg}</div>{legend}</div>'
+    return chart_shell(a, tagname, f'<div class="wc-bd">{svg}</div>{legend}')
 
 
 def m_bar(a, body):
@@ -641,6 +648,56 @@ def m_donut(a, body):
     return chart_card(a, inner, "", "hb-donut", par="xMidYMid meet")
 
 
+def m_area(a, body):
+    """面积图：折线 + 线下 20% 透明填充（2026-09-14 实测 chart_area 走线实色、下方渐变面积）。"""
+    labels = cells(a.get("labels", ""))
+    if not a.get("labels"):
+        raise ExpandError("<hb-area> 缺 labels（横轴标签，| 分隔）")
+    series = parse_series(body, "hb-area")
+    for s in series:
+        if len(s["vals"]) != len(labels):
+            raise ExpandError(f"<hb-area> 系列「{s['name']}」有 {len(s['vals'])} 个值，labels 有 {len(labels)} 个")
+    W, H = int(a.get("w", 560)), int(a.get("h", 240))
+    L, T, B, R = 44, 16, 34, 12
+    vmax = float(a["max"]) if "max" in a else nice_max(max(v for s in series for v in s["vals"]))
+    ticks = int(a.get("ticks", 4))
+    inner, pw, ph, gw = axes(labels, vmax, ticks, W, H, L, T, B, R)
+    for i, s in enumerate(series):
+        fill, stroke, op = series_fill(i, s)
+        pts = [(L + gw * (j + 0.5), T + ph * (1 - v / vmax)) for j, v in enumerate(s["vals"])]
+        poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+        base = T + ph
+        area = f"{pts[0][0]:.1f},{base:.1f} {poly} {pts[-1][0]:.1f},{base:.1f}"
+        inner.append(f'<polygon points="{area}" {fill} opacity=".2"/>')
+        inner.append(f'<polyline points="{poly}" fill="none" {stroke} stroke-width="2"{op}/>')
+        for x, y in pts:
+            inner.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" {fill}{op}/>')
+    return chart_card(a, inner, legend_html(series), "hb-area")
+
+
+def m_hbar(a, body):
+    """条形图（chart_bar_y）：横向条，名称在左、数值在右（2026-09-14 实测）。"""
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-hbar> 每行「名称 | 值 | 颜色(可选)」：{ln}")
+        rows.append({"name": c[0], "raw": c[1], "val": num_of(c[1]), "color": c[2].strip() if len(c) > 2 and c[2].strip() else None})
+    if not rows:
+        raise ExpandError("<hb-hbar> 没有数据行")
+    vmax = float(a["max"]) if "max" in a else nice_max(max(r["val"] for r in rows))
+    out = []
+    for i, r in enumerate(rows):
+        color = r["color"] or SERIES_COLORS[i % len(SERIES_COLORS)]
+        if color not in COLORS:
+            raise ExpandError(f"<hb-hbar> 颜色「{color}」不认识，可用：{'、'.join(sorted(COLORS))}")
+        pct = max(0.0, min(100.0, 100 * r["val"] / vmax))
+        out.append(f'<div class="hbar-row"><span class="hbar-name">{esc(r["name"])}</span>'
+                   f'<span class="hbar-track"><i style="width:{pct:.1f}%;--pg:var(--c-{color})"></i></span>'
+                   f'<span class="hbar-val">{esc(r["raw"])}</span></div>')
+    return chart_shell(a, "hb-hbar", f'<div class="hbar-list">{"".join(out)}</div>')
+
+
 # ── 详情页 ──────────────────────────────────────────────────────────────
 def m_info(a, body):
     out = []
@@ -662,12 +719,21 @@ def m_steps(a, body):
     cur = next((i for i, it in enumerate(items) if it.startswith("*")), None)
     if cur is None:
         raise ExpandError("<hb-steps> 要用 * 标出当前步骤")
+    span = a.get("span", "24")
+    if "pill" in a:
+        # 选项字段平铺形态（2026-09-14 实测）：全圆角胶囊 20 高，选中填该选项自身颜色，其余透明底
+        out = []
+        for i, it in enumerate(items):
+            name, color = split_color(it[1:].strip() if it.startswith("*") else it)
+            cls = "tile" + (" on" if i == cur else "")
+            style = f' style="--pg:var(--c-{color})"' if i == cur and color else ""
+            out.append(f'<span class="{cls}"{style}>{esc(name)}</span>')
+        return f'<div class="item-tiles span-{span}">' + "".join(out) + "</div>"
     out = []
     for i, it in enumerate(items):
-        name = it[1:].strip() if it.startswith("*") else it
+        name = split_color(it[1:].strip() if it.startswith("*") else it)[0]
         cls = "preceding" if i < cur else "current" if i == cur else "following"
         out.append(f'<span class="{cls}">{esc(name)}</span>')
-    span = a.get("span", "24")
     return f'<div class="item-steps span-{span}">' + "".join(out) + "</div>"
 
 
@@ -751,6 +817,207 @@ def m_flow(a, body):
                      f'<div class="flowbox-body">{body_}{tm}</div>{links}</div>')
     return (f'<div class="process"><div class="flow-msg-body"><span class="app-ic">{ico("grid-s")}</span><span><b>{esc(name)}</b>{by}</span></div>{cancel}</div>'
             f'<div class="flowbox-timeline">{"".join(boxes)}</div><div class="flow-foot">{esc(a.get("foot", "查看详细记录"))}</div>')
+
+
+# ── 骨架层新增组件（2026-09-14 实测：ERP 演示 / 项目管理 v2.0 / 进销存 v6.0）────────
+def span_wrap(a, html_):
+    return f'<div class="span-{a["span"]}">{html_}</div>' if "span" in a else html_
+
+
+FIELD_TYPES = ("text", "tag", "tags", "user", "multi", "file", "image")
+FULL_ROW_TYPES = ("multi", "file", "image")
+MS_COLORS = ["orange", "green", "red", "yellow", "purple", "blue"]
+PG_COLORS = ["blue", "green", "yellow", "purple", "orange", "teal"]
+LIST_TOOL_ICONS = {"搜索": "search", "新建": "plus", "新增": "plus", "导出": "export", "导入": "import",
+                   "更多": "more", "筛选": "filter", "打印": "print", "分享": "share", "设置": "settings"}
+
+
+def m_fields(a, body):
+    """字段组：# 开分组，其余每行「字段名 | 值 | 类型」。行 69 高＝标签 24 ＋ 值框 32 ＋ 内距。"""
+    cols = int(a.get("cols", 2))
+    if cols not in (1, 2, 3, 4):
+        raise ExpandError("<hb-fields cols> 只能是 1～4（实测每行 1～4 个字段）")
+    out, gi = [], 0
+    for ln in lines(body):
+        if ln.startswith("#"):
+            out.append(f'<div class="fg-group t{gi % 3}">{esc(ln[1:].strip())}</div>')
+            gi += 1
+            continue
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-fields> 每行「字段名 | 值 | 类型(可选)」：{ln}")
+        typ = c[2].strip() if len(c) > 2 and c[2].strip() else "text"
+        if typ not in FIELD_TYPES:
+            raise ExpandError(f"<hb-fields> 字段类型「{typ}」不认识，可用：{'、'.join(FIELD_TYPES)}")
+        full = typ in FULL_ROW_TYPES
+        val = render_val(c[1], "text" if full else typ, "hb-fields")
+        out.append(f'<div class="fg-field{" full" if full else ""}"><div class="fg-label">{esc(c[0])}</div>'
+                   f'<div class="fg-value">{val}</div></div>')
+    if not out:
+        raise ExpandError("<hb-fields> 没有字段行")
+    card = (f'<div class="w-card w-field-group">{card_head(a, "hb-fields")}'
+            f'<div class="fg-grid fg-c{cols}">{"".join(out)}</div></div>')
+    return span_wrap(a, card)
+
+
+def m_multistats(a, body):
+    """多项统计：每行「名称 | 数值 | 颜色」，条 40 高，右侧 20 高圆角 10 胶囊，六色轮转。"""
+    out = []
+    for i, ln in enumerate(lines(body)):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-multistats> 每行「名称 | 数值 | 颜色(可选)」：{ln}")
+        color = c[2].strip() if len(c) > 2 and c[2].strip() else MS_COLORS[i % len(MS_COLORS)]
+        if color not in COLORS:
+            raise ExpandError(f"<hb-multistats> 颜色「{color}」不认识，可用：{'、'.join(sorted(COLORS))}")
+        out.append(f'<div class="multi-stat-row"><span>{esc(c[0])}</span><b class="pill {color}">{esc(c[1])}</b></div>')
+    if not out:
+        raise ExpandError("<hb-multistats> 没有数据行")
+    card = f'<div class="w-card multi_stats">{card_head(a, "hb-multistats")}{"".join(out)}</div>'
+    return span_wrap(a, card)
+
+
+def m_procs(a, body):
+    """我发起的：每行「流程名 | 单据 | 当前节点 | 状态:颜色 | 时间」，行 80 高、三行 14/12/12。"""
+    out = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 3:
+            raise ExpandError(f"<hb-procs> 每行「流程名 | 单据 | 当前节点 | 状态:颜色 | 时间」：{ln}")
+        st = ""
+        if len(c) > 3 and c[3].strip():
+            text, color = split_color(c[3])
+            st = tag(text, color)
+        tm = f'<span class="proc-time">{esc(c[4])}</span>' if len(c) > 4 and c[4].strip() else ""
+        out.append(f'<div class="proc"><div class="proc-t1">{esc(c[0])}{tm}</div>'
+                   f'<div class="proc-t2">{esc(c[1])}</div>'
+                   f'<div class="proc-t3">{esc(c[2])}{st}</div></div>')
+    body_ = "".join(out) if out else '<div class="proc-empty">暂无</div>'
+    card = f'<div class="w-card procedure_process">{card_head(a, "hb-procs")}<div class="proc-list">{body_}</div></div>'
+    return span_wrap(a, card)
+
+
+def m_list(a, body):
+    """表格列表：外壳（标题 40 ＋ 表体 ＋ 分页 40）＋ hb-grid 的表体；体内语法同 hb-grid。"""
+    ga = {"bare": True}
+    for k in ("nock", "noidx", "total"):
+        if k in a:
+            ga[k] = a[k]
+    grid = m_grid(ga, body)
+    tools = []
+    for t in [x.strip() for x in str(a.get("tools", "")).split("|") if x.strip()]:
+        if t not in LIST_TOOL_ICONS:
+            raise ExpandError(f"<hb-list tools> 里的「{t}」没有对应图标，可用：{'、'.join(LIST_TOOL_ICONS)}")
+        tools.append(ico(LIST_TOOL_ICONS[t], tag="<hb-list> "))
+    hd = card_head(a, "hb-list")
+    if tools:
+        acts = f'<span class="acts">{"".join(tools)}</span>'
+        hd = hd.replace("</div>", acts + "</div>", 1) if hd else f'<div class="wc-hd">{acts}</div>'
+    count = f'<span class="til-count">共 {esc(str(a["count"]))} 条</span>' if "count" in a else ""
+    pager = ('<span class="til-pager"><span class="pg">‹</span><span class="pg on">1</span>'
+             '<span class="pg">2</span><span class="pg">3</span><span class="pg">›</span></span>')
+    card = (f'<div class="w-card table_item_list">{hd}{grid}'
+            f'<div class="til-foot">{count}{pager}</div></div>')
+    return span_wrap(a, card)
+
+
+def m_progress(a, body):
+    """进度条：每行「名称 | 完成值 | 目标值 | 颜色」；style=bar（新样式，文字嵌条内）或 text（普通样式）。"""
+    style = a.get("style", "bar")
+    if style not in ("bar", "text"):
+        raise ExpandError('<hb-progress style> 只能是 bar（新样式，32 高条内文字）或 text（普通样式，文字行＋细条）')
+    out = []
+    for i, ln in enumerate(lines(body)):
+        c = cells(ln)
+        if len(c) < 3:
+            raise ExpandError(f"<hb-progress> 每行「名称 | 完成值 | 目标值 | 颜色(可选)」：{ln}")
+        done, target = num_of(c[1]), num_of(c[2])
+        if target <= 0:
+            raise ExpandError(f"<hb-progress> 目标值要大于 0：{ln}")
+        pct = max(0.0, min(100.0, 100 * done / target))
+        color = c[3].strip() if len(c) > 3 and c[3].strip() else PG_COLORS[i % len(PG_COLORS)]
+        if color not in COLORS:
+            raise ExpandError(f"<hb-progress> 颜色「{color}」不认识，可用：{'、'.join(sorted(COLORS))}")
+        st = f'style="--pct:{pct:.1f}%;--pg:var(--c-{color})"'
+        txt = f'<span class="pg-name">{esc(c[0])}</span><span class="pg-num">{pct:.0f}%</span>'
+        if style == "bar":
+            out.append(f'<div class="pg-row pg-bar" {st}><span class="pg-track"></span><span class="pg-fill"></span>'
+                       f'<span class="pg-txt">{txt}</span><span class="pg-txt light">{txt}</span></div>')
+        else:
+            out.append(f'<div class="pg-row pg-text" {st}><span class="pg-txt">{txt}</span>'
+                       f'<span class="pg-track"><i></i></span></div>')
+    if not out:
+        raise ExpandError("<hb-progress> 没有数据行")
+    card = f'<div class="w-card progress_bar">{card_head(a, "hb-progress")}<div class="pg-list">{"".join(out)}</div></div>'
+    return span_wrap(a, card)
+
+
+def m_subtotal(a, body):
+    """分类汇总：首行是合计（加粗），其后每行「名称 | 数值」；条目 40 高，右侧纯文本无胶囊。"""
+    ls = lines(body)
+    if not ls:
+        raise ExpandError("<hb-subtotal> 至少要有一行合计「共计 | 值」")
+    rows = []
+    for i, ln in enumerate(ls):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-subtotal> 每行「名称 | 数值」：{ln}")
+        cls = "subtotal-head" if i == 0 else "subtotal-row"
+        left = f"<strong>{esc(c[0])}</strong><strong>{esc(c[1])}</strong>" if i == 0 else f"<span>{esc(c[0])}</span><span>{esc(c[1])}</span>"
+        rows.append(f'<div class="{cls}">{left}</div>')
+    card = f'<div class="w-card subtotal">{card_head(a, "hb-subtotal")}{"".join(rows)}</div>'
+    return span_wrap(a, card)
+
+
+def m_cover(a, body):
+    """页面封面：封面 280 高取内容区全宽，页面图标 80×80 压在封面下沿，标题 40/56/500。"""
+    title = a.get("title", "")
+    if not title:
+        raise ExpandError("<hb-cover> 缺 title（页面标题）")
+    icon = ico(a.get("icon", "app-s") if isinstance(a.get("icon"), str) else "app-s", tag="<hb-cover> ")
+    sub = f'<div class="cover-sub">{esc(a["sub"])}</div>' if a.get("sub") else ""
+    return (f'<div class="page-cover"><div class="cover-band"></div>'
+            f'<div class="cover-head"><span class="cover-icon">{icon}</span>'
+            f'<div class="cover-title">{esc(title)}</div>{sub}</div></div>')
+
+
+def m_stream(a, body):
+    """动态：每行「人名 | 时间 | 内容…」，人名写 sys:名 出系统动态（铅笔图标）。无标题行。"""
+    out = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 3:
+            raise ExpandError(f"<hb-stream> 每行「人名 | 时间 | 内容」（内容可再用 | 续写多行）：{ln}")
+        who, sysmode = c[0], False
+        if who.startswith("sys:"):
+            who, sysmode = who[4:].strip(), True
+        side = (f'<span class="fd-ic">{ico("edit", tag="<hb-stream> ")}</span>' if sysmode
+                else f'<span class="av">{esc(who[:1])}</span>')
+        ct = "".join(f"<div>{esc(x)}</div>" for x in c[2:] if x.strip())
+        out.append(f'<div class="fd-item">{side}<div class="fd-bd">'
+                   f'<div class="fd-t">{esc(who)} · {esc(c[1])}</div><div class="fd-c">{ct}</div></div></div>')
+    if not out:
+        raise ExpandError("<hb-stream> 没有动态行")
+    card = f'<div class="w-card w-stream"><div class="fd-list">{"".join(out)}</div></div>'
+    return span_wrap(a, card)
+
+
+def m_comment(a, body):
+    """评论：属性 title；每行「人名 | 时间 | 内容」，无行画空态；底部发布条 68。"""
+    out = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 3:
+            raise ExpandError(f"<hb-comment> 每行「人名 | 时间 | 内容」：{ln}")
+        ct = "".join(f"<div>{esc(x)}</div>" for x in c[2:] if x.strip())
+        out.append(f'<div class="fd-item"><span class="av">{esc(c[0][:1])}</span><div class="fd-bd">'
+                   f'<div class="fd-t">{esc(c[0])} · {esc(c[1])}</div><div class="fd-c">{ct}</div></div></div>')
+    inner = (f'<div class="fd-list">{"".join(out)}</div>' if out else
+             f'<div class="empty"><span class="e-ic">{ico("f-text", tag="<hb-comment> ")}</span>暂无评论</div>')
+    pub = ('<div class="cm-publish"><div class="cm-ipt">写评论，@ 提及某人</div>'
+           f'<div class="cm-ops">{ico("at")}{ico("f-attach")}<span class="cm-send">{ico("send")}</span></div></div>')
+    card = f'<div class="w-card w-comment">{card_head(a, "hb-comment")}{inner}{pub}</div>'
+    return span_wrap(a, card)
 
 
 # ── 数据大屏（assets/c5-screen.html）──────────────────────────────────────
@@ -1253,10 +1520,13 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "workbench": dict(
         cn="工作台",
-        allowed={"hb-nav", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-tabcard", "hb-pivot", "hb-filters", "hb-float", "hb-bar", "hb-line", "hb-donut"},
+        allowed={"hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-tabcard",
+                 "hb-pivot", "hb-filters", "hb-float", "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar",
+                 "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal"},
         required=["hb-nav", "hb-banner", "hb-shortcuts"],
-        order=["hb-nav", "hb-banner", "hb-stats", "hb-shortcuts", "hb-row", "hb-tasks", "hb-tabcard", "hb-pivot", "hb-float"],
-        first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-filters"},
+        order=["hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-row", "hb-tasks", "hb-multistats",
+               "hb-procs", "hb-progress", "hb-subtotal", "hb-tabcard", "hb-list", "hb-pivot", "hb-float"],
+        first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-filters"},
         doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 快捷方式（必）与待办（hb-row 并排）→ 页签容器/我的数据。趋势与对比图表、筛选不放首屏（顶层出现会提示），要放收进 hb-tabcard 或页面末尾。",
         example="""<hb-page kind="workbench" ws="永铭世纪" page="库管工作台" me="周">
 <hb-nav>
@@ -1288,9 +1558,11 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "dashboard": dict(
         cn="数据看板",
-        allowed={"hb-nav", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut", "hb-pivot", "hb-tabcard", "hb-float"},
+        allowed={"hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
+                 "hb-area", "hb-hbar", "hb-pivot", "hb-tabcard", "hb-float", "hb-multistats", "hb-list", "hb-progress", "hb-subtotal"},
         required=["hb-nav", "hb-banner"],
-        order=["hb-nav", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut", "hb-pivot", "hb-float"],
+        order=["hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
+               "hb-area", "hb-hbar", "hb-multistats", "hb-progress", "hb-subtotal", "hb-pivot", "hb-list", "hb-float"],
         doc="产品壳 → 横幅（必，一行高）→ 筛选（可选）→ 单指标一行（看板必有）→ 图表行（hb-row 16+8 或 12+12）→ 透视表/明细（底部，≤2 张）。",
         example="""<hb-page kind="dashboard" ws="永铭世纪" page="库存分析" me="周">
 <hb-nav>
@@ -1327,10 +1599,13 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "detail": dict(
         cn="自定义详情页",
-        allowed={"hb-itembar", "hb-hcard", "hb-steps", "hb-row", "hb-tabcard", "hb-flow", "hb-stats", "hb-pivot", "hb-grid", "hb-float"},
+        allowed={"hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-tabcard", "hb-flow",
+                 "hb-stats", "hb-pivot", "hb-grid", "hb-float", "hb-multistats", "hb-list", "hb-progress",
+                 "hb-subtotal", "hb-stream", "hb-comment"},
         required=["hb-itembar", "hb-tabcard"],
-        order=["hb-itembar", "hb-hcard", "hb-steps", "hb-row", "hb-tabcard", "hb-flow", "hb-float"],
-        doc="记录功能区（必）→ 页头卡片（可选）→ 步骤条（可选）→ 字段组/双栏（hb-row spans=13|11）→ 页签容器（必）→ 流程页签。不套产品壳；浮层只能右探出。",
+        order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-tabcard", "hb-list",
+               "hb-flow", "hb-stream", "hb-comment", "hb-float"],
+        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（可选）→ 状态条（可选）→ 字段组/双栏（hb-row spans=13|11）→ 页签容器（必）→ 流程执行记录、动态、评论。不套产品壳；浮层只能右探出。",
         example="""<hb-page kind="detail">
 <hb-itembar title="CK-20260824-0037 领用出库">
 打印出库单:solid | 撤销:line | 复制:line:dis
@@ -1346,9 +1621,9 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "screen": dict(
         cn="数据大屏",
-        allowed={"hb-screen"},
+        allowed={"hb-screen", "hb-cover"},
         required=["hb-screen"],
-        order=["hb-screen"],
+        order=["hb-cover", "hb-screen"],
         doc="只放一个 hb-screen，其体内是 hb-skpi / hb-scard / hb-svisual；不套产品壳、不放浮层。",
         example="""<hb-page kind="screen">
 <hb-screen title="生产车间数字大屏" theme="blue" bg="earth" date="2026-09-14" time="14:32">
@@ -1358,9 +1633,9 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "mobile": dict(
         cn="手机端",
-        allowed={"hb-phone", "hb-screens", "hb-duo"},
+        allowed={"hb-phone", "hb-screens", "hb-duo", "hb-cover"},
         required=[],
-        order=["hb-phone", "hb-screens"],
+        order=["hb-cover", "hb-phone", "hb-screens"],
         doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。",
         example="""<hb-page kind="mobile">
 <hb-screens>
@@ -1593,14 +1868,25 @@ MACROS = {
     "hb-filters": (m_filters, "筛选组件：筛选文本 | 图标"),
     "hb-banner": (m_banner, "横幅组件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
-    "hb-line": (m_line, "折线图卡：同 hb-bar"),
+    "hb-line": (m_line, "折线图卡：同 hb-bar；属性 plain 去掉卡片外壳"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
+    "hb-area": (m_area, "面积图卡：同 hb-line 语法，折线下 20% 透明填充"),
+    "hb-hbar": (m_hbar, "条形图卡（横向条）：每行「名称 | 值 | 颜色」，标签在左、数值在右"),
+    "hb-fields": (m_fields, "字段组：# 开分组；每行「字段名 | 值 | 类型」；属性 title、cols（默认 2）、span"),
+    "hb-multistats": (m_multistats, "多项统计：每行「名称 | 数值 | 颜色」，右侧彩色胶囊；属性 title、span"),
+    "hb-procs": (m_procs, "我发起的：每行「流程名 | 单据 | 当前节点 | 状态:颜色 | 时间」；属性 title、span"),
+    "hb-list": (m_list, "表格列表：体内同 hb-grid（首行表头）；属性 title、span、tools、count"),
+    "hb-progress": (m_progress, "进度条：每行「名称 | 完成值 | 目标值 | 颜色」；属性 title、span、style=bar|text"),
+    "hb-subtotal": (m_subtotal, "分类汇总：首行是合计，其后每行「名称 | 数值」；属性 title、span"),
+    "hb-cover": (m_cover, "页面封面：属性 title、sub、icon；放页面最前，封面 280 高＋80 图标＋40 号大标题"),
+    "hb-stream": (m_stream, "动态：每行「人名 | 时间 | 内容」，人名写 sys:名 出系统动态；属性 span"),
+    "hb-comment": (m_comment, "评论：每行「人名 | 时间 | 内容」，无行出空态；属性 title、span"),
     "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
     "hb-hcard": (m_hcard, "详情页标题卡片：属性 title、sub；体内关键字段行同 hb-info"),
     "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
     "hb-info": (m_info, "详情页标题卡片信息区：字段名 | 值 | 类型"),
-    "hb-steps": (m_steps, "选项字段步骤条：步骤 | *当前 | 步骤"),
+    "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
     "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=blue|teal|gold、bg=earth|city|grid|gold、band；体内放 hb-skpi/hb-scard/hb-svisual"),
@@ -1635,8 +1921,10 @@ GROUPS = [
     ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-screens"]),
     ("产品壳（PC）", ["hb-shell", "hb-nav"]),
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
-    ("自定义页面组件（工作台 / 数据看板）", ["hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-bar", "hb-line", "hb-donut", "hb-pivot"]),
-    ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-steps", "hb-tabcard", "hb-flow"]),
+    ("自定义页面组件（工作台 / 数据看板）", ["hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks",
+                                            "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal",
+                                            "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-pivot"]),
+    ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
     ("数据大屏（2026-09-04 实测，c5-screen.html）", ["hb-screen", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
 ]
@@ -1736,19 +2024,111 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 出库审批 · CK-20260824-0037 | 1.4 小时前 | 陈晓东 扫码创建 · 待仓库主管审批
 </hb-tasks>""",
 "hb-bar": """属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .chart .wc-bd 高度时同步给）。
-每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card w-chart 卡，bare 只出 svg＋图例。
+每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card w-chart 卡，bare 只出 svg＋图例，plain 去掉卡片外壳只留 40 高标题行（产品 common 样式）。
 例：
 <hb-bar title="近 6 个月出入库趋势" labels="3 月|4 月|5 月|6 月|7 月|8 月">
 出库 | 135,165,115,185,212,217
 入库 | 82,102,70,135,117,143
 </hb-bar>""",
-"hb-line": """折线图，属性和行格式同 hb-bar。
+"hb-line": """折线图，属性和行格式同 hb-bar（同样支持 bare / plain）。
 例：
 <hb-line title="近 5 周签约额" labels="W31|W32|W33|W34|W35">
 签约额 | 42,55,38,61,70
 目标 | 50,50,50,50,50 | orange
 </hb-line>""",
-"hb-donut": """每行 名称 | 值 | 颜色（值可带千分位；颜色缺省按 red/blue/purple/teal/green/orange 轮转）；center="标签|值" 出中心文字；百分比自动算，图例画在右侧。默认 w-card w-chart 卡，bare 只出 svg。
+"hb-area": """面积图，属性和行格式同 hb-bar；折线下方铺 20% 透明的同色面积（2026-09-14 实测 chart_area）。
+加 plain 去掉卡片外壳（产品的 common 样式：无底、无边、无影，只剩 40 高标题行）。
+例：
+<hb-area title="近 6 个月库存水位" labels="3 月|4 月|5 月|6 月|7 月|8 月">
+在库总量 | 3820,4010,3960,4180,4290,4386 | teal
+</hb-area>""",
+"hb-hbar": """条形图（官方 chart_bar_y，横向条）。每行 名称 | 值 | 颜色（颜色缺省按 red/blue/purple/teal/green/orange 轮转）；属性 title、span、max（不给按最大值取整）、plain。
+标签在左、条在中、数值在右；条长按 值/max 算。
+例：
+<hb-hbar title="各存放点在库量" plain>
+城建大厦酒窖 | 1,842 | blue
+北京办公室 | 1,097 | teal
+上海仓 | 764 | green
+</hb-hbar>""",
+"hb-fields": """字段组（官方 field_group，详情页最常用的组件）。属性 title、cols=1～4（每行字段数，默认 2）、span、icon、tint。
+体内：# 分组名 开一组（分组标题行 40 高，三种浅色底轮转）；其余每行 字段名 | 值 | 类型。
+类型：缺省文本；user 人员（多人用 / 分）、tag 彩色选项、tags 多选项（/ 分）；multi 多行文本、file 附件、image 图片是不定高类型，自动独占一行。
+字段行 69 高＝标签 24 ＋ 值框 32 ＋ 上下内距（2026-09-14 实测）。
+例：
+<hb-fields title="订单详情" cols="2" tint="blue">
+# 基本信息
+订单编号 | SO-2026-0901
+客户 | 杭州云图 | tag
+# 交付与回款
+负责人 | 周敏 | user
+交付状态 | 已发货:green
+备注 | 客户要求分两批发货，第二批下月初 | multi
+</hb-fields>""",
+"hb-multistats": """多项统计（官方 multi_stats，工作台「待办」那一类）。属性 title、span。
+每行 名称 | 数值 | 颜色（缺省按 orange/green/red/yellow/purple/blue 六色轮转，实测就是按条目顺序轮转）。
+条 40 高，右侧数值是 20 高、圆角 10 的彩色胶囊——这是它和分类汇总最直观的差别。
+例：
+<hb-multistats title="待办" span="8">
+待我审批的出库单 | 3
+待确认的入库单 | 7
+超期未盘点品种 | 2 | red
+</hb-multistats>""",
+"hb-procs": """我发起的（官方 procedure_process）。属性 title、span。
+每行 流程名 | 单据 | 当前节点 | 状态:颜色 | 时间，行 80 高、三行字号 14/12/12；一行都不写时画「暂无」空态。
+例：
+<hb-procs title="我发起的" span="8">
+出库审批 | CK-20260824-0037 领用出库 | 仓库主管审批 | 审批中:orange | 1.4 小时前
+采购申请 | CG-20260820-0012 | 财务复核 | 已完成:green | 8月20日
+</hb-procs>""",
+"hb-list": """表格列表（官方 table_item_list，工作区里用得最多的组件）。属性 title、span、tools（工具图标，| 分：搜索/新建/新增/导出/导入/更多/筛选/打印/分享/设置）、count（记录数，出底部「共 N 条」）、nock / noidx / total 透传给表体。
+体内就是 hb-grid 的写法：首行表头（列名:类型 / :sum=值），其后每行一条记录。
+外壳实测：标题行 40、表头 32、数据行 35、底部分页条 40，白卡圆角 9。
+例：
+<hb-list title="出库记录" tools="搜索|新建|导出" count="1,217" span="12">
+出库单号 | 物资 | 数量 | 领用人:user | 状态:tag
+CK-20260824-0037 | 茅台飞天 53° | 12 | 周敏 | 待审批:orange
+CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
+</hb-list>""",
+"hb-progress": """进度条（官方 progress_bar），一个组件里可以放多条。属性 title、span、style：
+- style="bar"（默认，产品 newStyle）：条 32 高圆角 6，名称与百分比嵌在条内，进度覆盖到的那段文字转白。
+- style="text"（产品 normal）：文字行 24（名称左、百分比右）＋ 下方 4 高圆角 10 的细条。
+两种形态每条都占 40 高。每行 名称 | 完成值 | 目标值 | 颜色（缺省按 blue/green/yellow/purple/orange/teal 轮转），百分比＝完成值/目标值。
+例：
+<hb-progress title="计划完成进度" style="bar" span="8">
+9 月生产计划 | 8200 | 10000 | purple
+9 月发货计划 | 6400 | 10000
+</hb-progress>""",
+"hb-subtotal": """分类汇总（官方 subtotal）。属性 title、span。首行是合计行（加粗），其后每行 名称 | 数值。
+条目 40 高，右侧是纯文本、没有胶囊，顶部多一条合计行——与多项统计的区别就在这两点。
+例：
+<hb-subtotal title="分品类库存金额" span="6">
+共计 | 5,076.8 k
+酒品 | 2,841.2 k
+茶叶 | 1,320.4 k
+礼盒 | 915.2 k
+</hb-subtotal>""",
+"hb-cover": """页面封面（官方 cover 元素，不是组件）。属性 title（必填，页面标题）、sub、icon（图标名，默认 app-s）。
+放页面最前：封面 280 高、取内容区全宽；页面图标 80×80 圆角 8 压在封面下沿；标题 40 号 / 56 行高 / 500 粗（2026-09-14 实测）。
+list 之外的 hb-page 都能用，一页只放一个。
+例：
+<hb-cover title="库存分析" sub="按仓库与品类查看库存结构、周转与预警" icon="chart-s"></hb-cover>""",
+"hb-stream": """动态（官方 stream）。属性 span。没有标题行——实测该组件 is_name_show 为 false。
+每行 人名 | 时间 | 内容，内容可以再用 | 续写成多行（一个字段变更一行，实测多字段变更就是这么排的）。
+人名写成 sys:名 出系统动态：左侧画铅笔图标而不是头像，用来表示自动化、自动计算这类系统来源。
+单行条目 40 高、三行 72 高，条间距 16。
+例：
+<hb-stream span="24">
+周敏 | 12 分钟前 | 订单状态：待审批 → 审批中
+sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：修改为 941 | 订单总利润：修改为 0
+</hb-stream>""",
+"hb-comment": """评论（官方 comment）。属性 title、span。每行 人名 | 时间 | 内容，内容可用 | 续写多行。
+一行都不写时画空态：48 圆图标＋「暂无评论」。底部固定一条 68 高的发布条。
+例：
+<hb-comment title="评论" span="8">
+陈晓东 | 昨天 17:06 | 第二批发货时间已与客户确认
+</hb-comment>
+<hb-comment title="评论" span="8"></hb-comment>""",
+"hb-donut": """每行 名称 | 值 | 颜色（值可带千分位；颜色缺省按 red/blue/purple/teal/green/orange 轮转）；center="标签|值" 出中心文字；百分比自动算，图例画在右侧。默认 w-card w-chart 卡，bare 只出 svg，plain 去掉卡片外壳只留标题行。
 例：
 <hb-donut title="各存放点库存占比" center="在库总量|4,386">
 城建大厦酒窖 | 1,842
@@ -1800,9 +2180,12 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 出库类型 | 领用出库:orange
 申请人 | 陈晓东 | user
 申请日期 | 2026-08-24""",
-"hb-steps": """选项字段步骤条，* 标当前步骤；属性 span（默认 24）。
+"hb-steps": """状态条，* 标当前步骤；属性 span（默认 24）、pill。两种形态实测下来是两个不同的东西：
+- 默认＝官方 status_bar 组件：箭头式分段，整条 40 高、白卡圆角 9；段间重叠 10px 咬合，已过段主色 25% 底＋ink-45 字，当前段主色实底白字，未到段透明底＋ink-85 字。
+- pill＝选项字段的平铺展示（is_tile）：全圆角胶囊、20 高、固定宽，选中段填该选项自身颜色（当前项写 *名称:颜色 指定），其余透明底。
 例：
-<hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>""",
+<hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>
+<hb-steps pill>待派工 | 已派工 | *生产中:orange | 已完工</hb-steps>""",
 "hb-screen": """数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 英文副题、logo 左上企业名、date/week/time 右上日期星期时间、theme 配色 blue（科技蓝，默认）/teal（深青）/gold（黑金）、bg 背景 earth 星空地球（默认）/city 城市夜景/grid 科技网格/gold 黑金菱格、band 标题条带斜切底色。
 体内直接放 hb-skpi / hb-scard / hb-svisual，它们自带 24 栅格跨度（sp-N），一行 24。常用排法：8 个指标框 sp-3 一行；图表卡 sp-8 ＋ 视觉位 sp-8 rs-2 ＋ 图表卡 sp-8；底部播报 sp-16。
 本图补充样式给 .stage 高度；.screen 最低 922 高。
