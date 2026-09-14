@@ -38,3 +38,5 @@ Review 新皮肤＝逐 token 对表：选中底必须明显浅于边线、边线
 皮肤文件必须提供 base.css 引用的全部变量（以 hb-native.css 为准的完整清单）。少一个变量对应组件就会裸奔，新皮肤写完先拼一张列表页冒烟验证。
 
 **--backdrop 现为备用 token**：画布已改透明，衬底不再绘制；token 保留以维持契约完整。
+
+**大屏 token 不在契约里**：`--screen-*`（底色、描边、角标色、光带色、图表系列色）由 base.css 的五个 `.screen.theme-*` 给全，皮肤不必提供。皮肤要改写成 `body .screen { --screen-…: …; }`——皮肤拼在 base.css 之前，同特异度的 `.screen` 盖不住。

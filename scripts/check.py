@@ -26,8 +26,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 HEX = re.compile(r'#[0-9A-Fa-f]{3,8}\b')
 RGB = re.compile(r'\brgba?\(')
 ALLOW_LITERAL = {"#fff", "#ffffff", "#000", "#000000"}
-# 工具类前缀：图标着色、色调、标签色、大屏背景、图标 id、栅格跨度、主题与装饰框
-UTILITY_PREFIXES = ("ic-", "tone-", "c-", "bg-", "i-", "span-", "sp-", "rs-", "stats-", "cols-", "theme-", "frame-", "tint-", "sw-")
+# 工具类前缀：图标着色、色调、标签色、大屏装饰底图、图标 id、栅格跨度与行跨度、主题
+UTILITY_PREFIXES = ("ic-", "tone-", "c-", "bg-", "i-", "span-", "sp-", "rs-", "stats-", "cols-", "theme-", "tint-", "sw-")
 
 SURNAMES = ("赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜"
             "戚谢邹喻柏水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳鲍史唐"

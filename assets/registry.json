@@ -27,6 +27,7 @@
       "tabs",
       "modal",
       "view-grid",
+      "screen-col",
       "screen-card",
       "phone",
       "m-rec",
@@ -2436,16 +2437,16 @@
       "macro": "hb-screen",
       "variants": [],
       "measured": "measured",
-      "note": "官方 page_width=ultra"
+      "note": "官方 page_width=ultra；页面不缩放，24 栅格与行高 20h−20 同普通页面"
     },
     {
       "kind": "component",
       "id": "screen-head",
-      "type_key": null,
-      "cn": "大屏标题条",
+      "type_key": "rich",
+      "cn": "大屏标题行",
       "old_class": "sc-head",
       "file": "c5-screen.html",
-      "name": "大屏标题条",
+      "name": "大屏标题行",
       "group": "大屏",
       "macro": "hb-screen",
       "grid": null,
@@ -2454,7 +2455,49 @@
       "allowed_in": [
         "page:screen"
       ],
-      "note": null
+      "note": "rich 大标题 18 栏 ＋ image logo ＋ timer 时间 3 栏；红色党建与青色自然用页签容器当标题容器"
+    },
+    {
+      "kind": "component",
+      "id": "screen-deco",
+      "type_key": "decoration",
+      "cn": "大屏分隔条",
+      "old_class": null,
+      "file": "c5-screen.html",
+      "name": "大屏分隔条",
+      "group": "大屏",
+      "macro": "hb-screen",
+      "grid": [
+        24,
+        2
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": "官方 decoration 组件本身是空壳，只做留白与分隔；由 hb-screen 随标题行一起产出"
+    },
+    {
+      "kind": "component",
+      "id": "screen-col",
+      "type_key": null,
+      "cn": "大屏分栏",
+      "old_class": null,
+      "file": "c5-screen.html",
+      "name": "大屏分栏",
+      "group": "大屏",
+      "macro": "hb-scol",
+      "grid": [
+        6,
+        38
+      ],
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:screen"
+      ],
+      "note": "主体三列 6｜12｜6，列内组件的 rs 之和等于本列 rs"
     },
     {
       "kind": "component",
@@ -2467,7 +2510,7 @@
       "group": "大屏",
       "macro": "hb-skpi",
       "grid": [
-        6,
+        3,
         6
       ],
       "variants": [],
@@ -2475,46 +2518,49 @@
       "allowed_in": [
         "page:screen"
       ],
-      "note": "内容仍是单指标，装饰框为大屏专有"
+      "note": "内容仍是单指标；官方左列两个 3×6，本 skill 的 hb-skpi 出一整行（screen-kpis）"
     },
     {
       "kind": "component",
       "id": "screen-card",
       "type_key": "chart_*",
-      "cn": "大屏图表卡",
+      "cn": "大屏组件卡",
       "old_class": "sc-card frame-bracket sp-8",
       "file": "c5-screen.html",
-      "name": "大屏图表卡",
+      "name": "大屏组件卡",
       "group": "大屏",
       "macro": "hb-scard",
       "grid": [
-        12,
-        8
+        6,
+        16
       ],
       "variants": [],
       "measured": "measured",
       "allowed_in": [
         "page:screen"
       ],
-      "note": null
+      "note": "标题条 40 高同普通页面，变的只是背后那张铭牌图（官方 border-image，本 skill 用 clip-path 画）"
     },
     {
       "kind": "component",
       "id": "screen-visual",
-      "type_key": null,
+      "type_key": "chart_map",
       "cn": "大屏中央视觉位",
       "old_class": "sc-visual sp-8 rs-2",
       "file": "c5-screen.html",
       "name": "中央视觉位",
       "group": "大屏",
       "macro": "hb-svisual",
-      "grid": null,
+      "grid": [
+        12,
+        38
+      ],
       "variants": [],
       "measured": "measured",
       "allowed_in": [
         "page:screen"
       ],
-      "note": "是否 image 组件待实测（产品里是搭建者上传图片）"
+      "note": "官方是 ECharts 内置中国地图；本 skill 放客户图片，或用网点阵／线框地球占位，不画国界"
     },
     {
       "kind": "component",
@@ -2527,8 +2573,8 @@
       "group": "大屏",
       "macro": "hb-sbars",
       "grid": [
-        12,
-        6
+        6,
+        12
       ],
       "variants": [],
       "measured": "measured",
@@ -2540,23 +2586,24 @@
     },
     {
       "kind": "component",
-      "id": "screen-card",
-      "type_key": null,
-      "cn": "大屏播报表",
+      "id": "table_item_list",
+      "type_key": "table_item_list",
+      "cn": "大屏表格列表",
       "old_class": "sc-card frame-bracket sp-16",
       "file": "c5-screen.html",
-      "name": "播报表",
+      "name": "表格列表",
       "group": "大屏",
-      "macro": "hb-scard",
-      "grid": null,
-      "variants": [
-        "ticker"
+      "macro": "hb-list",
+      "grid": [
+        12,
+        26
       ],
+      "variants": [],
       "measured": "measured",
       "allowed_in": [
         "page:screen"
       ],
-      "note": "chart_table 还是 table_item_list 待实测"
+      "note": "底部通栏 12×26，放进大屏组件卡体内；大屏里脱掉白卡与投影"
     },
     {
       "kind": "component",

@@ -1,0 +1,61 @@
+<hb-page kind="screen">
+<hb-screen title="物资运营数据大屏" logo="永铭世纪" date="2026年09月14日" week="星期一" time="09:41:20" theme="cyan">
+<hb-scol span="6" rs="38">
+<hb-skpi rs="6">
+在库总量 | 4,386 | 件
+本月出库 | 217 | 件
+</hb-skpi>
+<hb-scard title="近 12 个月出库量" rs="16">
+<hb-area bare w="355" h="214" labels="10月|11月|12月|1月|2月|3月|4月|5月|6月|7月|8月|9月">
+出库量 | 186,204,241,198,152,233,268,247,219,262,288,217
+</hb-area>
+</hb-scard>
+<hb-scard title="库存构成" rs="16">
+<hb-donut bare w="355" h="236" center="在库|4,386">
+酒品 | 1842
+茶叶 | 1204
+办公耗材 | 628
+礼品 | 402
+劳保用品 | 310
+</hb-donut>
+</hb-scard>
+</hb-scol>
+<hb-svisual map span="12" rs="38"/>
+<hb-scol span="6" rs="38">
+<hb-scard title="季度盘点完成率" rs="12">
+<hb-sbars>
+城建大厦酒窖 | 92%
+高新库 | 74%
+经开区备件库 | 61%
+临时周转库 | 38%
+</hb-sbars>
+</hb-scard>
+<hb-scard title="各仓库出入库对比" rs="26">
+<hb-bar bare w="355" h="414" labels="城建大厦|高新库|经开区|周转库">
+出库 | 862,517,394,168
+入库 | 705,623,288,241
+</hb-bar>
+</hb-scard>
+</hb-scol>
+<hb-scard title="近 30 日出入库趋势" span="12" rs="26">
+<hb-line bare w="760" h="414" labels="9/1|9/5|9/9|9/13|9/17|9/21|9/25|9/30">
+出库 | 128,164,142,218,186,247,203,231
+入库 | 96,141,118,173,162,194,176,188
+</hb-line>
+</hb-scard>
+<hb-scard title="库存预警明细" span="12" rs="26">
+<hb-list nock noidx count="128">
+物资编号 | 品名 | 仓库 | 在库 | 下限 | 状态:tag
+WZ-JS-0106 | 茅台飞天 53° 500ml | 城建大厦酒窖 | 36 | 60 | 低于下限:red
+WZ-CY-0218 | 明前龙井 250g | 高新库 | 74 | 40 | 正常:green
+WZ-BG-1042 | A4 复印纸 70g | 经开区备件库 | 18 | 50 | 低于下限:red
+WZ-LB-0377 | 防砸安全鞋 42 码 | 临时周转库 | 9 | 30 | 低于下限:red
+WZ-JS-0219 | 五粮液 52° 500ml | 城建大厦酒窖 | 128 | 60 | 正常:green
+WZ-LP-0088 | 中秋礼盒 双支装 | 高新库 | 24 | 80 | 低于下限:red
+WZ-BG-1106 | 中性笔 0.5mm 黑 | 经开区备件库 | 640 | 200 | 正常:green
+WZ-LB-0412 | 劳保手套 12 副装 | 临时周转库 | 47 | 60 | 低于下限:red
+WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
+</hb-list>
+</hb-scard>
+</hb-screen>
+</hb-page>

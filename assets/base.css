@@ -1363,7 +1363,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
   --screen-bg: #0E1C25;                      /* 整页底色 */
   --screen-wash: none;                       /* 底色之上的整屏渐变（红色党建用） */
   --screen-net: rgba(255, 255, 255, .05);    /* 网格纹理线 */
-  --screen-beam: rgba(45, 211, 217, .26);    /* 顶部光带 */
+  --screen-beam: rgba(45, 211, 217, .34);    /* 顶部光带 */
   --screen-edge: rgba(45, 211, 217, .35);    /* 卡片描边 */
   --screen-corner: #2FD3D9;                  /* 四角 L 形角标 */
   --screen-accent: #2FD3D9;                  /* 铭牌箭头、分隔条、视觉位线条 */
@@ -1413,8 +1413,9 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
   --screen-edge: rgba(240, 206, 138, .45); --screen-corner: #F0CE8A; --screen-accent: #F0CE8A; --screen-card: rgba(90, 8, 12, .38);
   --screen-plate: rgba(240, 206, 138, .30);
 }
+.screen.theme-light .screen-kpi, .screen.theme-light .screen-card { box-shadow: 0 6px 18px rgba(16, 42, 66, .06); }
 .screen.theme-light {
-  --screen-bg: #EAF1F8; --screen-net: rgba(62, 132, 180, .08); --screen-beam: rgba(93, 168, 233, .28);
+  --screen-bg: #EAF1F8; --screen-net: rgba(62, 132, 180, .08); --screen-beam: rgba(93, 168, 233, .34);
   --screen-edge: rgba(62, 132, 180, .22); --screen-corner: transparent; --screen-accent: #3E84B4; --screen-card: rgba(255, 255, 255, .78);
   --screen-plate: rgba(93, 168, 233, .26); --screen-radius: 9px;
   --ink-85: rgba(0, 0, 0, .85); --ink-65: rgba(0, 0, 0, .60); --ink-45: rgba(0, 0, 0, .45); --ink-25: rgba(0, 0, 0, .25);
@@ -1532,4 +1533,4 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .screen .grid td { color: var(--ink-85); border-color: var(--line); }
 .screen .grid tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--ink-85) 4%, transparent); }
 .screen .til-foot { border-top: 1px solid var(--line); color: var(--ink-45); }
-.screen .legend { color: var(--ink-65); }
+.screen .legend { color: var(--ink-65); padding: 0 0 2px; gap: 16px; }

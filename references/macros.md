@@ -503,77 +503,84 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 ```
 
 
-## 数据大屏（2026-09-04 实测，c5-screen.html）
+## 数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）
 
 ### hb-screen
-数据大屏画布：属性 title、sub、logo、date、week、time、theme=blue|teal|gold、bg=earth|city|grid|gold、band；体内放 hb-skpi/hb-scard/hb-svisual
+数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light、bg（装饰底图，默认不用）；体内放 hb-scol/hb-scard/hb-svisual
 
 ```
-数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 英文副题、logo 左上企业名、date/week/time 右上日期星期时间、theme 配色 blue（科技蓝，默认）/teal（深青）/gold（黑金）、bg 背景 earth 星空地球（默认）/city 城市夜景/grid 科技网格/gold 黑金菱格、band 标题条带斜切底色。
-体内直接放 hb-skpi / hb-scard / hb-svisual，它们自带 24 栅格跨度（sp-N），一行 24。常用排法：8 个指标框 sp-3 一行；图表卡 sp-8 ＋ 视觉位 sp-8 rs-2 ＋ 图表卡 sp-8；底部播报 sp-16。
-本图补充样式给 .stage 高度；.screen 最低 922 高。
+数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 副题、logo 左上企业名、date/week/time 右上日期星期时间、
+theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色），bg 装饰底图 earth/city/grid/gold（默认不用，五个主题本身就有网格纹理和顶部光带）。
+大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
+体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
+例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。
+```
+
+### hb-scol
+大屏主体分栏：属性 span（默认 6）、rs（默认 38）；体内竖着放 hb-skpi/hb-scard，各组件 rs 之和等于本列 rs
+
+```
+大屏主体分栏。属性 span 列宽（默认 6）、rs 列高行数（默认 38）。体内竖着放 hb-skpi、hb-scard，
+列内各组件的 rs 之和要等于本列的 rs，三列才等高（官方：左 6＝6＋16＋16，中 12＝38，右 6＝12＋26）。
 例：
-<div class="stage">
-<hb-screen title="生产车间大屏" logo="生产制造ERP" date="2026年09月04日" week="星期五" time="17:04:06" theme="blue" bg="earth">
-<hb-skpi span="3">
-本月产量 | 44 | 件
-今日产量 | 2
-在产产品数 | 28 | | up
-</hb-skpi>
-<hb-scard title="近30日产量趋势"><hb-line bare labels="…">…</hb-line></hb-scard>
-<hb-svisual rs="2"/>
-<hb-scard title="生产工单趋势分析"><hb-bar bare labels="…">…</hb-bar></hb-scard>
-<hb-scard title="实时报工播报" span="16" ticker><hb-grid bare nock noidx>…</hb-grid></hb-scard>
-</hb-screen>
-</div>
+<hb-scol span="6" rs="38">
+<hb-skpi rs="6">在库总量 | 4,386 | 件
+本月出库 | 217 | 件</hb-skpi>
+<hb-scard title="近 12 个月出库量" rs="16"><hb-area bare labels="…">…</hb-area></hb-scard>
+<hb-scard title="库存构成" rs="16"><hb-donut bare center="在库|4,386">…</hb-donut></hb-scard>
+</hb-scol>
 ```
 
 ### hb-skpi
-大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 3，一行 8 个）、frame=bracket|round|none
+大屏指标框：每行「指标名 | 值 | 单位 | up/down」，一行 2 个；属性 span（默认 6）、rs（默认 6）
 
 ```
-大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 3＝一行 8 个；6 个一行写 4）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
+大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。一行 2 个（官方左列是两个 3×6 的单指标），最多 3 个。
+属性 span（默认 6）、rs（默认 6，高 100）。指标名 14 白 45% 在上，值 32/500 白 85% 在下，居中。
 例：
-<hb-skpi span="3" frame="round">
-本月产量 | 44 | 件
-今日工序报工量 | 30,000 | | up
+<hb-skpi rs="6">
+在库总量 | 4,386 | 件
+本月出库 | 217 | 件 | up
 </hb-skpi>
 ```
 
 ### hb-scard
-大屏图表卡：属性 title、span（默认 6）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare
+大屏组件卡：属性 title、span（默认 6）、rs（默认 16）；体内放 hb-area/line/bar/donut 的 bare 输出、hb-sbars 或 hb-list
 
 ```
-大屏图表卡。属性 title 图表名（必填）、span（默认 6，中央播报表写 12）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
-体内放 hb-bar/hb-line/hb-donut 的 bare 输出、hb-grid bare nock noidx、hb-sbars 或手绘 SVG，颜色自动走深色 token。同一张图标题条只用一种。
+大屏组件卡：40 高标题条（左侧斜切铭牌）＋ 内容区。属性 title 组件名（必填）、span 列宽（默认 6）、rs 行数（默认 16，高 20rs−20）。
+体内放 hb-area / hb-line / hb-bar / hb-donut 的 bare 输出、hb-sbars 进度条、hb-list 表格列表或手绘 SVG；图表系列色自动走大屏固定配色。
 例：
-<hb-scard title="近30日产量趋势" hd="tag" frame="none">
+<hb-scard title="近 30 日出入库趋势" span="12" rs="26">
 <hb-line bare labels="1|5|10|15|20|25|30">
-产量 | 120,140,90,160,180,150,170
+出库 | 12,18,15,22,19,25,21
+入库 | 9,14,11,17,16,19,18
 </hb-line>
 </hb-scard>
 ```
 
 ### hb-sbars
-大屏进度条列表：每行「名称 | 百分比」
+大屏进度条列表：每行「名称 | 百分比」，条底色蓝/橙/绿/红轮转
 
 ```
-大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。
+大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。条底色按蓝／橙／绿／红轮转（官方实测色序）。
 例：
 <hb-sbars>
-一车间 | 82%
-二车间 | 64%
+城建大厦酒窖 | 92%
+高新库 | 74%
 </hb-sbars>
 ```
 
 ### hb-svisual
-大屏中央视觉位：属性 span、rs、img=客户图片路径；空则默认线框地球图
+大屏中央视觉位：属性 span（默认 12）、rs（默认 38）、title、img=客户图片路径、map=网点阵占位；空则线框地球
 
 ```
-大屏中央视觉位。属性 span（默认 12）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
+大屏中央视觉位（12 栏，跨整个主体高度）。属性 span（默认 12）、rs（默认 38）、title 标题（给了就出标题条）、
+img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.py 会内嵌进单文件）、map 网点阵占位（标题默认「区域分布」）。
+都不给时画线框地球。三种形态都不画国家或省份轮廓（边界准确性与审图号）。
 例：
-<hb-svisual rs="2"/>
-<hb-svisual rs="2" img="素材/厂区3D.png"/>
+<hb-svisual map span="12" rs="38"/>
+<hb-svisual span="12" rs="38" title="厂区实时状态" img="素材/厂区3D.png"/>
 ```
 
 

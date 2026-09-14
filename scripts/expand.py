@@ -619,7 +619,10 @@ def m_donut(a, body):
         raise ExpandError("<hb-donut> 没有数据行")
     total = sum(s["val"] for s in slices) or 1
     W, H = int(a.get("w", 560)), int(a.get("h", 240))
-    cx, cy, r, sw = 150, H / 2, 66, 34
+    # 窄卡（大屏左右列 6 栏）里按 W 收环径与图例列位，避免整张 SVG 被缩到看不清字
+    narrow = W < 480
+    r, sw = (56, 28) if narrow else (66, 34)
+    cx, cy = (r + 42 if narrow else 150), H / 2
     C = 2 * math.pi * r
     inner = [f'<g transform="translate({cx},{cy:.0f})">']
     cum = 0.0
@@ -637,14 +640,15 @@ def m_donut(a, body):
         if len(cl) > 1:
             inner.append(f'<text x="{cx}" y="{cy + 17:.0f}" font-size="20" font-weight="600" fill="var(--ink-85)" text-anchor="middle">{esc(cl[1])}</text>')
     n = len(slices)
-    step = 36 if n <= 5 else 28
+    step = (26 if n <= 5 else 22) if narrow else (36 if n <= 5 else 28)
+    lx = cx + r + 22 if narrow else 290
     y0 = cy - (n - 1) * step / 2
     inner.append('<g font-size="12" fill="var(--ink-65)">')
     for i, s in enumerate(slices):
         y = y0 + i * step
         pct = round(100 * s["val"] / total)
-        inner.append(f'<rect x="290" y="{y - 9:.0f}" width="10" height="10" rx="2" fill="var(--c-{s["color"]})"/>'
-                     f'<text x="308" y="{y:.0f}">{esc(s["name"])}　{esc(s["raw"])}（{pct}%）</text>')
+        inner.append(f'<rect x="{lx:.0f}" y="{y - 9:.0f}" width="10" height="10" rx="2" fill="var(--c-{s["color"]})"/>'
+                     f'<text x="{lx + 18:.0f}" y="{y:.0f}">{esc(s["name"])}　{esc(s["raw"])}（{pct}%）</text>')
     inner.append("</g>")
     return chart_card(a, inner, "", "hb-donut", par="xMidYMid meet")
 
@@ -1022,38 +1026,60 @@ def m_comment(a, body):
 
 
 # ── 数据大屏（assets/c5-screen.html）──────────────────────────────────────
-SCREEN_THEMES = {"blue", "teal", "gold"}
+# 官方六张样板的骨架：标题行（logo 3 ＋ 大标题 18 ＋ 时间 3，高 5）→ 分隔条 24×2 →
+# 主体三列 6 ｜ 12 ｜ 6（各 38 行）→ 底部 12＋12（各 26 行）。大屏不缩放，行高公式同普通页面：h 行 = 20h−20。
+SCREEN_THEMES = {"cyan", "blue", "gold", "red", "light"}
 SCREEN_BGS = {"earth", "city", "grid", "gold"}
-SCREEN_FRAMES = {"bracket", "round", "none"}
-SCREEN_HDS = {"line", "tag", "chevron"}
+
+
+def _span(a, tag, default):
+    n = str(a.get("span", default))
+    if n not in ("3", "4", "5", "6", "8", "10", "12", "14", "16", "18", "24"):
+        raise ExpandError(f"<{tag} span> 只能是 3/4/5/6/8/10/12/14/16/18/24（24 栅格），给的是 {n}")
+    return f"sp-{n}"
+
+
+def _rs(a, tag, default):
+    try:
+        n = int(str(a.get("rs", default)))
+    except ValueError:
+        raise ExpandError(f"<{tag} rs> 要是 2～40 的整数（行数，高 20N−20）")
+    if not 2 <= n <= 40:
+        raise ExpandError(f"<{tag} rs> 要是 2～40 的整数（行数，高 20N−20），给的是 {n}")
+    return f"rs-{n}"
 
 
 def m_screen(a, body):
-    theme = a.get("theme", "blue")
-    bg = a.get("bg", "earth")
+    theme = a.get("theme", "cyan")
+    bg = a.get("bg", "")
     if theme not in SCREEN_THEMES:
         raise ExpandError(f"<hb-screen theme> 只能是 {'/'.join(sorted(SCREEN_THEMES))}")
-    if bg not in SCREEN_BGS:
-        raise ExpandError(f"<hb-screen bg> 只能是 {'/'.join(sorted(SCREEN_BGS))}")
+    if bg is True or (bg and bg not in SCREEN_BGS):
+        raise ExpandError(f"<hb-screen bg> 只能是 {'/'.join(sorted(SCREEN_BGS))}（装饰底图，默认不用）")
     title = a.get("title", "")
     if not title:
         raise ExpandError("<hb-screen> 缺 title（大屏页面名）")
     sub = f"<small>{esc(a['sub'])}</small>" if a.get("sub") else ""
-    logo = f'<div class="screen-logo">{esc(a["logo"])}</div>' if a.get("logo") else ""
+    logo = esc(a["logo"]) if a.get("logo") else ""
     dt = ""
     if a.get("date"):
         week = f"<span>{esc(a['week'])}</span>" if a.get("week") else ""
-        time = f"<small>{esc(a['time'])}</small>" if a.get("time") else ""
-        dt = f'<div class="screen-dt"><b>{esc(a["date"])}</b>{week}{time}</div>'
-    head = f'<div class="screen-head{" band" if "band" in a else ""}">{logo}<h1>{esc(title)}{sub}</h1>{dt}</div>'
-    return f'<div class="screen theme-{theme} bg-{bg}">{head}<div class="screen-grid">{body.strip()}</div></div>'
+        tm = f"<small>{esc(a['time'])}</small>" if a.get("time") else ""
+        dt = f'<b>{esc(a["date"])}</b>{week}{tm}'
+    head = (f'<div class="screen-head sp-24 rs-5"><div class="screen-logo">{logo}</div>'
+            f'<div class="screen-title"><h1>{esc(title)}</h1>{sub}</div>'
+            f'<div class="screen-dt">{dt}</div></div>'
+            f'<div class="screen-deco sp-24 rs-2"></div>')
+    cls = f"screen theme-{theme}" + (f" bg-{bg}" if bg else "")
+    return f'<div class="{cls}"><div class="screen-grid">{head}{body.strip()}</div></div>'
+
+
+def m_scol(a, body):
+    """主体分栏：一列里的组件竖着排；列内各组件 rs 之和要等于本列的 rs，三列才等高。"""
+    return f'<div class="screen-col {_span(a, "hb-scol", "6")} {_rs(a, "hb-scol", "38")}">{body.strip()}</div>'
 
 
 def m_skpi(a, body):
-    frame = a.get("frame", "bracket")
-    if frame not in SCREEN_FRAMES:
-        raise ExpandError(f"<hb-skpi frame> 只能是 {'/'.join(sorted(SCREEN_FRAMES))}")
-    span = a.get("span", "3")
     out = []
     for ln in lines(body):
         c = cells(ln)
@@ -1061,43 +1087,44 @@ def m_skpi(a, body):
             raise ExpandError(f"<hb-skpi> 每行「指标名 | 值 | 单位 | up/down」：{ln}")
         unit = f"<small>{esc(c[2])}</small>" if len(c) > 2 and c[2] else ""
         st = c[3].strip() if len(c) > 3 and c[3].strip() in ("up", "down") else ""
-        out.append(f'<div class="screen-kpi frame-{frame} sp-{span}{" " + st if st else ""}"><div class="lb">{esc(c[0])}</div><div class="vl">{esc(c[1])}{unit}</div></div>')
-    return "".join(out)
+        out.append(f'<div class="screen-kpi{" " + st if st else ""}"><div class="lb">{esc(c[0])}</div>'
+                   f'<div class="vl">{esc(c[1])}{unit}</div></div>')
+    if not out:
+        raise ExpandError("<hb-skpi> 没有数据行")
+    if len(out) > 3:
+        raise ExpandError(f"<hb-skpi> 一行放 2 个指标框（官方样板 3 栏 ×2），最多 3 个，给了 {len(out)} 个")
+    return f'<div class="screen-kpis {_span(a, "hb-skpi", "6")} {_rs(a, "hb-skpi", "6")}">{"".join(out)}</div>'
 
 
 def m_scard(a, body):
     title = a.get("title", "")
     if not title:
-        raise ExpandError("<hb-scard> 缺 title（图表名）")
-    frame = a.get("frame", "bracket")
-    hd = a.get("hd", "line")
-    if frame not in SCREEN_FRAMES or hd not in SCREEN_HDS:
-        raise ExpandError(f"<hb-scard> frame 只能是 {'/'.join(sorted(SCREEN_FRAMES))}，hd 只能是 {'/'.join(sorted(SCREEN_HDS))}")
-    span = a.get("span", "6")
-    rs = f" rs-{a['rs']}" if a.get("rs") else ""
-    acts = "" if "noacts" in a else f'<span class="acts">{ico("linkout")}{ico("more")}</span>'
-    ticker = " sc-ticker" if "ticker" in a else ""
-    return (f'<div class="screen-card frame-{frame} sp-{span}{rs}"><div class="screen-hd {hd}">{esc(title)}{acts}</div>'
-            f'<div class="screen-bd{ticker}">{body.strip()}</div></div>')
+        raise ExpandError("<hb-scard> 缺 title（组件名）")
+    return (f'<div class="screen-card {_span(a, "hb-scard", "6")} {_rs(a, "hb-scard", "16")}">'
+            f'<div class="screen-hd"><span class="t">{esc(title)}</span></div>'
+            f'<div class="screen-bd">{body.strip()}</div></div>')
 
 
 def m_sbars(a, body):
     out = []
-    for ln in lines(body):
+    for i, ln in enumerate(lines(body)):
         c = cells(ln)
         if len(c) < 2:
             raise ExpandError(f"<hb-sbars> 每行「名称 | 百分比」：{ln}")
         pct = num_of(c[1])
-        out.append(f'<div class="screen-bar"><div class="t"><span>{esc(c[0])}</span><span>{esc(c[1])}</span></div><div class="r"><i style="width:{pct:g}%"></i></div></div>')
+        out.append(f'<div class="screen-bar"><div class="t"><span>{esc(c[0])}</span><span>{esc(c[1])}</span></div>'
+                   f'<div class="r"><i style="width:{pct:g}%;--sb:var(--screen-bar-{i % 4 + 1})"></i></div></div>')
+    if not out:
+        raise ExpandError("<hb-sbars> 没有数据行")
     return '<div class="screen-bars">' + "".join(out) + "</div>"
 
 
 def visual_globe():
-    """默认中央视觉：线框地球＋节点连线＋地台光环，全部走 var(--screen-accent)，不含任何真实地图边界。"""
+    """中央视觉位默认形态：线框地球＋节点连线＋地台光环，走 var(--screen-accent)，不含任何真实国界。"""
     import random
     r = random.Random(42)
     A = "var(--screen-accent)"
-    W, H, cx, cy, R = 700, 420, 350, 180, 168
+    W, H, cx, cy, R = 700, 460, 350, 200, 168
     g = [f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">']
     g.append(f'<defs><radialGradient id="gl" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{A}" stop-opacity=".35"/><stop offset=".7" stop-color="{A}" stop-opacity=".06"/><stop offset="1" stop-color="{A}" stop-opacity="0"/></radialGradient>'
              f'<linearGradient id="ring" x1="0" x2="1"><stop offset="0" stop-color="{A}" stop-opacity="0"/><stop offset=".5" stop-color="{A}"/><stop offset="1" stop-color="{A}" stop-opacity="0"/></linearGradient></defs>')
@@ -1112,7 +1139,7 @@ def visual_globe():
     pts = []
     for _ in range(9):
         t = r.uniform(0, 6.283); rr = R * r.uniform(.4, .92)
-        pts.append((cx + rr * __import__("math").cos(t), cy + rr * 0.8 * __import__("math").sin(t)))
+        pts.append((cx + rr * math.cos(t), cy + rr * 0.8 * math.sin(t)))
     for i in range(len(pts) - 1):
         (x1, y1), (x2, y2) = pts[i], pts[i + 1]
         mx, my = (x1 + x2) / 2, min(y1, y2) - 60
@@ -1121,23 +1148,61 @@ def visual_globe():
         g.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="7" fill="{A}" fill-opacity=".18"/><circle cx="{x:.0f}" cy="{y:.0f}" r="3" fill="{A}"/>')
     for i in range(140):
         t = r.uniform(0, 6.283); rr = R * r.uniform(0, .97)
-        x, y = cx + rr * __import__("math").cos(t), cy + rr * __import__("math").sin(t)
+        x, y = cx + rr * math.cos(t), cy + rr * math.sin(t)
         g.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="1.2" fill="{A}" fill-opacity="{r.uniform(.2, .7):.2f}"/>')
-    by = cy + R + 28
+    by = cy + R + 38
     for rx, op in ((R + 60, .8), (R + 100, .45), (R + 140, .2)):
         g.append(f'<ellipse cx="{cx}" cy="{by}" rx="{rx}" ry="{rx * .16:.0f}" fill="none" stroke="url(#ring)" stroke-opacity="{op}" stroke-width="1.5"/>')
     g.append("</svg>")
     return "".join(g)
 
 
+def visual_map():
+    """中央视觉位地图占位：网点阵＋发光标记点＋扩散圈，不画任何国家或省份轮廓（审图号与边界准确性）。"""
+    import random
+    r = random.Random(7)
+    A, M, H2 = "var(--screen-accent)", "var(--screen-series-1)", "var(--screen-bar-2)"
+    W, H = 700, 460
+    g = [f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">']
+    g.append(f'<defs><radialGradient id="mg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{M}" stop-opacity=".55"/><stop offset="1" stop-color="{M}" stop-opacity="0"/></radialGradient>'
+             f'<radialGradient id="mh" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{H2}" stop-opacity=".55"/><stop offset="1" stop-color="{H2}" stop-opacity="0"/></radialGradient></defs>')
+    cx, cy = W / 2, H / 2
+    dots = []
+    for y in range(24, H - 12, 15):
+        for x in range(24, W - 12, 15):
+            d = ((x - cx) / (W / 2)) ** 2 + ((y - cy) / (H / 2)) ** 2
+            if d > 1.05:
+                continue
+            op = (0.5 - 0.34 * d) * r.uniform(.55, 1.25)
+            dots.append(f'<circle cx="{x}" cy="{y}" r="1.6" fill="{A}" fill-opacity="{min(op, .6):.2f}"/>')
+    g += dots
+    marks = [(205, 300, M, 1), (318, 214, M, 0), (392, 330, H2, 1), (470, 188, M, 0), (520, 296, H2, 0), (268, 158, M, 0)]
+    for x, y, col, big in marks:
+        grad = "mh" if col == H2 else "mg"
+        rr = 54 if big else 40
+        g.append(f'<circle cx="{x}" cy="{y}" r="{rr}" fill="url(#{grad})"/>')
+        g.append(f'<circle cx="{x}" cy="{y}" r="{16 if big else 12}" fill="none" stroke="{col}" stroke-opacity=".45"/>')
+        g.append(f'<circle cx="{x}" cy="{y}" r="{26 if big else 20}" fill="none" stroke="{col}" stroke-opacity=".18"/>')
+        g.append(f'<circle cx="{x}" cy="{y}" r="{5 if big else 3.6}" fill="{col}"/>')
+        if big:
+            g.append(f'<line x1="{x}" y1="{y - 12}" x2="{x}" y2="{y - 62}" stroke="{col}" stroke-opacity=".55" stroke-width="2"/>')
+            g.append(f'<circle cx="{x}" cy="{y - 66}" r="3.4" fill="{col}"/>')
+    g.append("</svg>")
+    return "".join(g)
+
+
 def m_svisual(a, body):
-    span = a.get("span", "12")
-    rs = f" rs-{a['rs']}" if a.get("rs") else ""
     inner = body.strip()
+    title = a.get("title", "")
     if a.get("img") and isinstance(a["img"], str):
         inner = f'<img src="{a["img"]}" alt="">'
+    elif "map" in a and not inner:
+        inner = visual_map()
+        title = title or "区域分布"
     inner = inner or visual_globe()
-    return f'<div class="screen-visual sp-{span}{rs}">{inner}</div>'
+    hd = f'<div class="screen-hd"><span class="t">{esc(title)}</span></div>' if title else ""
+    return (f'<div class="screen-card {_span(a, "hb-svisual", "12")} {_rs(a, "hb-svisual", "38")}">'
+            f'{hd}<div class="screen-bd screen-visual">{inner}</div></div>')
 
 
 # ── 卡片与看板 ──────────────────────────────────────────────────────────
@@ -1625,11 +1690,68 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         allowed={"hb-screen", "hb-cover"},
         required=["hb-screen"],
         order=["hb-cover", "hb-screen"],
-        doc="只放一个 hb-screen，其体内是 hb-skpi / hb-scard / hb-svisual；不套产品壳、不放浮层。",
+        doc=("只放一个 hb-screen，不套产品壳、不放浮层。体内按官方骨架排：左列 hb-scol（6 栏：指标框 ×2 → 面积图 → 饼图）"
+             "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：进度条 → 对比图），底部两张 hb-scard 各 12 栏。"
+             "标题行与分隔条由 hb-screen 产出。大屏不缩放：24 栅格、行高 20h−20、间距 20 与其他页面一致。"),
         example="""<hb-page kind="screen">
-<hb-screen title="生产车间数字大屏" theme="blue" bg="earth" date="2026-09-14" time="14:32">
-<hb-skpi>本月产量 | 12,480 | 件 | up</hb-skpi>
-…
+<hb-screen title="物资运营数据大屏" logo="永铭世纪" date="2026年09月14日" week="星期一" time="09:41:20" theme="cyan">
+<hb-scol span="6" rs="38">
+<hb-skpi rs="6">
+在库总量 | 4,386 | 件
+本月出库 | 217 | 件
+</hb-skpi>
+<hb-scard title="近 12 个月出库量" rs="16">
+<hb-area bare w="355" h="214" labels="10月|11月|12月|1月|2月|3月|4月|5月|6月|7月|8月|9月">
+出库量 | 186,204,241,198,152,233,268,247,219,262,288,217
+</hb-area>
+</hb-scard>
+<hb-scard title="库存构成" rs="16">
+<hb-donut bare w="355" h="236" center="在库|4,386">
+酒品 | 1842
+茶叶 | 1204
+办公耗材 | 628
+礼品 | 402
+劳保用品 | 310
+</hb-donut>
+</hb-scard>
+</hb-scol>
+<hb-svisual map span="12" rs="38"/>
+<hb-scol span="6" rs="38">
+<hb-scard title="季度盘点完成率" rs="12">
+<hb-sbars>
+城建大厦酒窖 | 92%
+高新库 | 74%
+经开区备件库 | 61%
+临时周转库 | 38%
+</hb-sbars>
+</hb-scard>
+<hb-scard title="各仓库出入库对比" rs="26">
+<hb-bar bare w="355" h="414" labels="城建大厦|高新库|经开区|周转库">
+出库 | 862,517,394,168
+入库 | 705,623,288,241
+</hb-bar>
+</hb-scard>
+</hb-scol>
+<hb-scard title="近 30 日出入库趋势" span="12" rs="26">
+<hb-line bare w="760" h="414" labels="9/1|9/5|9/9|9/13|9/17|9/21|9/25|9/30">
+出库 | 128,164,142,218,186,247,203,231
+入库 | 96,141,118,173,162,194,176,188
+</hb-line>
+</hb-scard>
+<hb-scard title="库存预警明细" span="12" rs="26">
+<hb-list nock noidx count="128">
+物资编号 | 品名 | 仓库 | 在库 | 下限 | 状态:tag
+WZ-JS-0106 | 茅台飞天 53° 500ml | 城建大厦酒窖 | 36 | 60 | 低于下限:red
+WZ-CY-0218 | 明前龙井 250g | 高新库 | 74 | 40 | 正常:green
+WZ-BG-1042 | A4 复印纸 70g | 经开区备件库 | 18 | 50 | 低于下限:red
+WZ-LB-0377 | 防砸安全鞋 42 码 | 临时周转库 | 9 | 30 | 低于下限:red
+WZ-JS-0219 | 五粮液 52° 500ml | 城建大厦酒窖 | 128 | 60 | 正常:green
+WZ-LP-0088 | 中秋礼盒 双支装 | 高新库 | 24 | 80 | 低于下限:red
+WZ-BG-1106 | 中性笔 0.5mm 黑 | 经开区备件库 | 640 | 200 | 正常:green
+WZ-LB-0412 | 劳保手套 12 副装 | 临时周转库 | 47 | 60 | 低于下限:red
+WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
+</hb-list>
+</hb-scard>
 </hb-screen>
 </hb-page>"""),
     "mobile": dict(
@@ -1890,11 +2012,12 @@ MACROS = {
     "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
-    "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=blue|teal|gold、bg=earth|city|grid|gold、band；体内放 hb-skpi/hb-scard/hb-svisual"),
-    "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」；属性 span（默认 3，一行 8 个）、frame=bracket|round|none"),
-    "hb-scard": (m_scard, "大屏图表卡：属性 title、span（默认 6）、rs、hd=line|tag|chevron、frame、ticker、noacts；体内放 hb-bar/line/donut bare 或 hb-grid bare"),
-    "hb-sbars": (m_sbars, "大屏进度条列表：每行「名称 | 百分比」"),
-    "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span、rs、img=客户图片路径；空则默认线框地球图"),
+    "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light、bg（装饰底图，默认不用）；体内放 hb-scol/hb-scard/hb-svisual"),
+    "hb-scol": (m_scol, "大屏主体分栏：属性 span（默认 6）、rs（默认 38）；体内竖着放 hb-skpi/hb-scard，各组件 rs 之和等于本列 rs"),
+    "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」，一行 2 个；属性 span（默认 6）、rs（默认 6）"),
+    "hb-scard": (m_scard, "大屏组件卡：属性 title、span（默认 6）、rs（默认 16）；体内放 hb-area/line/bar/donut 的 bare 输出、hb-sbars 或 hb-list"),
+    "hb-sbars": (m_sbars, "大屏进度条列表：每行「名称 | 百分比」，条底色蓝/橙/绿/红轮转"),
+    "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span（默认 12）、rs（默认 38）、title、img=客户图片路径、map=网点阵占位；空则线框地球"),
     "hb-phone": (m_phone, "手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容"),
     "hb-mhome": (m_mhome, "工作区首页：属性 tabs=表格|*流程…；每行一个分组，- 前缀为展开的表"),
     "hb-vbar": (m_vbar, "列表页视图条：属性 view、count、icon、nosearch"),
@@ -1926,7 +2049,7 @@ GROUPS = [
                                             "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal",
                                             "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-pivot"]),
     ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
-    ("数据大屏（2026-09-04 实测，c5-screen.html）", ["hb-screen", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
+    ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
 ]
 
@@ -2187,47 +2310,48 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 例：
 <hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>
 <hb-steps pill>待派工 | 已派工 | *生产中:orange | 已完工</hb-steps>""",
-"hb-screen": """数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 英文副题、logo 左上企业名、date/week/time 右上日期星期时间、theme 配色 blue（科技蓝，默认）/teal（深青）/gold（黑金）、bg 背景 earth 星空地球（默认）/city 城市夜景/grid 科技网格/gold 黑金菱格、band 标题条带斜切底色。
-体内直接放 hb-skpi / hb-scard / hb-svisual，它们自带 24 栅格跨度（sp-N），一行 24。常用排法：8 个指标框 sp-3 一行；图表卡 sp-8 ＋ 视觉位 sp-8 rs-2 ＋ 图表卡 sp-8；底部播报 sp-16。
-本图补充样式给 .stage 高度；.screen 最低 922 高。
+"hb-screen": """数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 副题、logo 左上企业名、date/week/time 右上日期星期时间、
+theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色），bg 装饰底图 earth/city/grid/gold（默认不用，五个主题本身就有网格纹理和顶部光带）。
+大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
+体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
+例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。""",
+"hb-scol": """大屏主体分栏。属性 span 列宽（默认 6）、rs 列高行数（默认 38）。体内竖着放 hb-skpi、hb-scard，
+列内各组件的 rs 之和要等于本列的 rs，三列才等高（官方：左 6＝6＋16＋16，中 12＝38，右 6＝12＋26）。
 例：
-<div class="stage">
-<hb-screen title="生产车间大屏" logo="生产制造ERP" date="2026年09月04日" week="星期五" time="17:04:06" theme="blue" bg="earth">
-<hb-skpi span="3">
-本月产量 | 44 | 件
-今日产量 | 2
-在产产品数 | 28 | | up
-</hb-skpi>
-<hb-scard title="近30日产量趋势"><hb-line bare labels="…">…</hb-line></hb-scard>
-<hb-svisual rs="2"/>
-<hb-scard title="生产工单趋势分析"><hb-bar bare labels="…">…</hb-bar></hb-scard>
-<hb-scard title="实时报工播报" span="16" ticker><hb-grid bare nock noidx>…</hb-grid></hb-scard>
-</hb-screen>
-</div>""",
-"hb-skpi": """大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。属性 span 栅格跨度（默认 3＝一行 8 个；6 个一行写 4）、frame 装饰框 bracket 四角括号（默认）/round 圆角发光/none 无框。同一张图只用一种框。
+<hb-scol span="6" rs="38">
+<hb-skpi rs="6">在库总量 | 4,386 | 件
+本月出库 | 217 | 件</hb-skpi>
+<hb-scard title="近 12 个月出库量" rs="16"><hb-area bare labels="…">…</hb-area></hb-scard>
+<hb-scard title="库存构成" rs="16"><hb-donut bare center="在库|4,386">…</hb-donut></hb-scard>
+</hb-scol>""",
+"hb-skpi": """大屏指标框，每行「指标名 | 值 | 单位 | up/down」（up 绿 down 红）。一行 2 个（官方左列是两个 3×6 的单指标），最多 3 个。
+属性 span（默认 6）、rs（默认 6，高 100）。指标名 14 白 45% 在上，值 32/500 白 85% 在下，居中。
 例：
-<hb-skpi span="3" frame="round">
-本月产量 | 44 | 件
-今日工序报工量 | 30,000 | | up
+<hb-skpi rs="6">
+在库总量 | 4,386 | 件
+本月出库 | 217 | 件 | up
 </hb-skpi>""",
-"hb-scard": """大屏图表卡。属性 title 图表名（必填）、span（默认 6，中央播报表写 12）、rs 行跨度、hd 标题条 line 左标题渐变底线（默认，科技蓝）/tag 斜切标签（深青）/chevron 雁翎居中（黑金）、frame 同 hb-skpi、ticker 播报表斑马底、noacts 不出右侧图标钮。
-体内放 hb-bar/hb-line/hb-donut 的 bare 输出、hb-grid bare nock noidx、hb-sbars 或手绘 SVG，颜色自动走深色 token。同一张图标题条只用一种。
+"hb-scard": """大屏组件卡：40 高标题条（左侧斜切铭牌）＋ 内容区。属性 title 组件名（必填）、span 列宽（默认 6）、rs 行数（默认 16，高 20rs−20）。
+体内放 hb-area / hb-line / hb-bar / hb-donut 的 bare 输出、hb-sbars 进度条、hb-list 表格列表或手绘 SVG；图表系列色自动走大屏固定配色。
 例：
-<hb-scard title="近30日产量趋势" hd="tag" frame="none">
+<hb-scard title="近 30 日出入库趋势" span="12" rs="26">
 <hb-line bare labels="1|5|10|15|20|25|30">
-产量 | 120,140,90,160,180,150,170
+出库 | 12,18,15,22,19,25,21
+入库 | 9,14,11,17,16,19,18
 </hb-line>
 </hb-scard>""",
-"hb-sbars": """大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。
+"hb-sbars": """大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。条底色按蓝／橙／绿／红轮转（官方实测色序）。
 例：
 <hb-sbars>
-一车间 | 82%
-二车间 | 64%
+城建大厦酒窖 | 92%
+高新库 | 74%
 </hb-sbars>""",
-"hb-svisual": """大屏中央视觉位。属性 span（默认 12）、rs 行跨度（常写 2）、img 客户图片路径（3D 厂区图/地图/产品图；本地文件 build.py 会内嵌进单文件）；不给 img 则默认画线框地球＋节点连线（颜色跟主题），不画真实地图边界、不画灰图标。
+"hb-svisual": """大屏中央视觉位（12 栏，跨整个主体高度）。属性 span（默认 12）、rs（默认 38）、title 标题（给了就出标题条）、
+img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.py 会内嵌进单文件）、map 网点阵占位（标题默认「区域分布」）。
+都不给时画线框地球。三种形态都不画国家或省份轮廓（边界准确性与审图号）。
 例：
-<hb-svisual rs="2"/>
-<hb-svisual rs="2" img="素材/厂区3D.png"/>""",
+<hb-svisual map span="12" rs="38"/>
+<hb-svisual span="12" rs="38" title="厂区实时状态" img="素材/厂区3D.png"/>""",
 "hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-screens 里必加）、nobar。体内按页面形态放手机端其他宏。
 .stage 宽度由 hb-page 按屏数给（单屏 520、两屏 1100、三屏 1640）。
 例：
