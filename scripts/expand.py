@@ -1604,7 +1604,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
                  "hb-stats", "hb-pivot", "hb-grid", "hb-float", "hb-multistats", "hb-list", "hb-progress",
                  "hb-subtotal", "hb-stream", "hb-comment"},
         required=["hb-itembar", "hb-tabcard"],
-        order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-tabcard", "hb-list",
+        order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-list", "hb-tabcard",
                "hb-flow", "hb-stream", "hb-comment", "hb-float"],
         doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（可选）→ 状态条（可选）→ 字段组/双栏（hb-row spans=13|11）→ 页签容器（必）→ 流程执行记录、动态、评论。不套产品壳；浮层只能右探出。",
         example="""<hb-page kind="detail">
