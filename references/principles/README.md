@@ -1,6 +1,6 @@
 # 界面设计原则（索引）
 
-画图前按 SKILL.md 的原则路由表读：所有图读通用四篇；再按页面类型读对应一篇；工作台、看板、详情页另读组件选取。
+画图前按 SKILL.md 的原则路由表读：所有图读通用两篇（visual-four-principles、visual-color），多张营销配图另读 anti-sameness；再按页面类型读对应一篇；工作台、看板、详情页另读组件选取。
 
 ## 页面原则（按页面类型读一篇）
 
@@ -24,7 +24,6 @@
 |---|---|
 | [visual-four-principles.md](visual-four-principles.md) | 对齐、亲密性、对比、重复；组件宽度与留白、间距一致 |
 | [visual-color.md](visual-color.md) | 三色原则、状态色红绿灯、纯色优先、品牌植入 |
-| [visual-components.md](visual-components.md) | 按钮分级、页面层级 |
 | [assets/layout-gallery.html](../../assets/layout-gallery.html) | 各页面版式的线框示意（看板 5、工作台 3、详情页 2），改版式表时同步改 |
 | [anti-sameness.md](anti-sameness.md) | 防千篇一律：数据毛边、非理想态、版式错开（多张营销配图必读） |
 
