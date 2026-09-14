@@ -252,6 +252,8 @@ def acceptance(path):
 
 
 def main():
+    if "--help" in sys.argv or "-h" in sys.argv or len(sys.argv) < 2:
+        print(__doc__.strip()); return 0
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
         print(__doc__)

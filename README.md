@@ -35,7 +35,7 @@
 骨架样式 assets/base.css            尺寸布局，无颜色
 皮肤    assets/skins/*.css         纯色彩 token，9 套
 版式    assets/layout-gallery.html 各页面版式线框示意（人看，浏览器打开），与页面原则的版式表同步
-宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 40 余个组件宏；模型只填内容，外壳与栅格由脚本产出
+宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 50 余个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
 配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；`--render` 有 Chrome 时加渲染检查；`--acceptance` 起草验收表）、`export.py`（PNG／SVG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。

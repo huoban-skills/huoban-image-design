@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="hb-skill" content="huoban-image-design 2.1">
+<meta name="hb-skill" content="huoban-image-design 2.0">
 <title>fig1-物资档案与二维码</title>
 <style>
 /* 皮肤：藏蓝金。沉稳商务、纸感（navy #24466B / gold #A67C3D）。
@@ -43,6 +43,11 @@
   --tint-blue: #E4EAF1;
   --tint-teal: #E2EEE9;
   --tint-yellow: #F3ECDF;
+  --tint-cyan: #DEE9F0;
+
+  /* 产品固定色（不随工作区主题色变，2026-09-14 实测）：流程链接色、流程启动事件的应用图标底色 */
+  --flow-accent: #A8514F;
+  --flow-app-bg: #B4634A;
 
   /* 横幅渐变 */
   --banner-bg: linear-gradient(180deg, #3A5C82, #24466B);
@@ -145,6 +150,13 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .mk-float.left { justify-self: start; }
 .stage.auto .float-title { font-size: 13px; font-weight: 500; color: var(--ink-45); margin-bottom: 8px; }
 .stage.auto.product .window { border-radius: 0; border: 0; }
+/* ── 栅格换算（2026-09-14 实测，三个工作区的自定义页面与详情页都成立）──
+   自定义页面与详情页都是 24 列、列间距 20、行间距 20。配置里的 w×h 换成像素：
+     像素高 = 20 × h − 20        （h=3→40、7→120、16→300、27→520、44→860、55→1080）
+     列宽 C = (容器宽 − 460) / 24 ，像素宽 = w × C + (w − 1) × 20
+   容器宽实测：工作台 ultra 1297、页签容器内 1257、快捷工作台 full 1145；
+   详情页弹窗 ultra ＝弹窗宽 − 40，full ＝弹窗宽 − 192，fit ＝固定 1200。
+   本文件的组件高度是照这套换算落下来的：定组件高度先算 20h−20，再减标题行 40 得内容区高。 */
 /* hb-row spans：按跨度比例分配（flex-grow），组件自身宽度不撑开 */
 .w-row > .span-2 { flex: 2 1 0%; } .w-row > .span-3 { flex: 3 1 0%; } .w-row > .span-4 { flex: 4 1 0%; }
 .w-row > .span-5 { flex: 5 1 0%; } .w-row > .span-6 { flex: 6 1 0%; } .w-row > .span-7 { flex: 7 1 0%; }
@@ -686,6 +698,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .page-tabs-body { min-height: 0; }
 /* 页签内直接放字段时，沿用快捷表单实测的字段容器规则（左右 16、行间 12、首行留顶）。
    缺这条时字段会贴着卡片边缘且行行相连，一排灰色值框糊成一片，看不出「白卡片＋灰值框」的层次。 */
+/* 页签内容区实测 padding 20：直接放整张组件卡时按这条留边，放 bare 表格时贴边由内容自己管 */
+.page-tabs-body > .w-card, .page-tabs-body > .w-row { margin: 20px; }
 .page-tabs-body > .field { padding: 0 16px 12px; }
 .page-tabs-body > .field:first-child { padding-top: 12px; }
 .procedure_task { border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; min-height: 220px; }
@@ -761,23 +775,50 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .progress-row b small { color: var(--ink-45); font-weight: 400; }
 .progress-row i { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--field-bg); display: block; }
 .progress-row em { display: block; height: 100%; border-radius: 3px; background: var(--primary); }
-.multi_stats, .subtotal { padding-bottom: 8px; }
-.multi-stat-row, .subtotal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; }
-.pill { min-width: 28px; text-align: center; border-radius: 100px; color: #fff; padding: 1px 8px; font-weight: 500; }
-.pill.teal { background: var(--c-teal); } .pill.blue { background: var(--c-blue); }
-.pill.yellow { background: var(--c-yellow); color: rgba(0,0,0,.78); } .pill.green { background: var(--c-green); }
-.subtotal-head { display: flex; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid var(--line); }
-.item-steps { display: flex; height: 40px; border-radius: 9px; overflow: hidden; }
+/* 多项统计（2026-09-14 实测）：内容区左右内距 20；每条 40 高；右侧数值＝20 高、圆角 10、padding 0 8 的彩色胶囊，
+   颜色按条目顺序六色轮转（实测 #FFA526 #2FBA2F #F25555 #FFCA28 #9161F2 #F25589，这里按最接近的状态色 token 取） */
+.multi_stats, .subtotal { padding-bottom: 10px; }
+.multi-stat-row, .subtotal-row { display: flex; justify-content: space-between; align-items: center; height: 40px; padding: 0 20px; }
+.multi-stat-row > span { font-size: 14px; line-height: 20px; color: var(--ink-85); padding-right: 16px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 数值胶囊限定写在 <b> 上：页签容器的胶囊式用的也是 .pill（.w-card.tabs.pill），两者不能串味 */
+b.pill {
+  height: 20px; min-width: 28px; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px; color: #fff; padding: 0 8px; font-size: 14px; line-height: 20px; font-weight: 400;
+}
+b.pill.teal { background: var(--c-teal); } b.pill.blue { background: var(--c-blue); }
+b.pill.yellow { background: var(--c-yellow); color: rgba(0,0,0,.78); } b.pill.green { background: var(--c-green); }
+b.pill.orange { background: var(--c-orange); } b.pill.red { background: var(--c-red); }
+b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--tag-bg); color: var(--ink-85); }
+/* 分类汇总（2026-09-14 实测）：顶部合计行 40 高 fw700，明细每条 40 高、右侧纯文本无胶囊、全组件无分隔线 */
+.subtotal-head { display: flex; justify-content: space-between; align-items: center; height: 40px; padding: 0 20px; }
+.subtotal-head strong { font-size: 14px; line-height: 22px; font-weight: 700; color: var(--ink-85); }
+.subtotal-row > span { font-size: 14px; line-height: 22px; color: var(--ink-85); }
+.subtotal-row > span + span { padding-left: 16px; text-align: right; }
+/* 状态条 status_bar（2026-09-14 项目管理 v2.0「项目档案」实测）：通栏 24×3＝40 高，白卡圆角 9 有阴影、无标题行；
+   段高＝组件全高，段宽按文字自适应并铺满整行，padding 0 20（首段左 16、末段右 16），相邻段 x 重叠 10 ＝箭头咬合；
+   四态：首段/已过＝选项色 25% 底＋ink-45 字，当前＝选项色实底白字 fw500，未到＝透明底＋ink-85 字。
+   产品在整块上还压了一层 rgba(255,255,255,.45) 遮罩，这里直接用压过的观感值，不再叠遮罩层。 */
+.item-steps { display: flex; height: 40px; border-radius: 9px; overflow: hidden; background: var(--card-bg); box-shadow: 0 20px 40px rgba(0,0,0,.08); }
 .item-steps span {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  background: var(--card-bg); color: var(--ink-65);
+  flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 20px;
+  background: transparent; color: var(--ink-85); font-size: 14px; white-space: nowrap;
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
   margin-left: -10px;
 }
-.item-steps span:first-child { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%); margin-left: 0; }
-.item-steps .preceding { background: color-mix(in srgb, var(--primary) 25%, transparent); color: var(--ink-45); } /* 实测已过段＝主色 25% */
+.item-steps span:first-child { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%); margin-left: 0; padding-left: 16px; }
+.item-steps span:last-child { padding-right: 16px; }
+.item-steps .preceding { background: color-mix(in srgb, var(--primary) 25%, transparent); color: var(--ink-45); }
 .item-steps .current { background: var(--primary); color: #fff; font-weight: 500; }
-.item-steps .following { background: var(--card-bg); color: var(--ink-65); }
+.item-steps .following { background: transparent; color: var(--ink-85); }
+.page.flat .item-steps { border: 1px solid var(--line); box-shadow: none; }
+/* 选项字段平铺（is_tile，2026-09-14 ERP 生产工单详情页实测）：整块字段底 圆角 6；
+   每个选项＝全圆角 100 的胶囊、20 高、固定宽 58、padding 0 4；未选中透明底＋ink-65 字，选中填该选项自身颜色＋白字 */
+.item-tiles { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 6px; background: var(--tint-blue); }
+.item-tiles .tile {
+  min-width: 58px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 4px; border-radius: 100px; font-size: 14px; line-height: 20px; color: var(--ink-65); white-space: nowrap;
+}
+.item-tiles .tile.on { background: var(--pg, var(--primary)); color: #fff; }
 /* 看板视图（2026-08-10 实测校正）：列透明无底色仅靠间距分隔；列头＝彩底胶囊分组名＋数量；卡片白底描边影 */
 .view-kanban { background: var(--card-bg); }
 .kanban-columns { display: flex; gap: 24px; align-items: flex-start; padding: 4px 20px 16px; overflow: hidden; }
@@ -987,6 +1028,132 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .portal .pa-nm { font-size: 14px; }
 .portal-foot { margin-top: auto; align-self: flex-start; opacity: .9; }
 
+/* ══ 十四 骨架层组件（2026-09-14 实测：ERP 演示 v7.1 / 项目管理 v2.0 / 进销存 v6.0 三个工作区的真实 DOM）══
+   通用外壳：卡片形态＝白底、圆角 9、阴影 rgba(0,0,0,.08) 0 20px 40px 0；标题行 40 高，标题 16/500，左边距 16。
+   common 形态（图表、日历、进度条、嵌入）＝没有白底那层，只剩标题行和内容区。 */
+
+/* 页面封面 cover：封面 280 高、取内容区全宽（不受页面内边距约束）；
+   页面图标 80×80 圆角 8 压在封面下沿（跨出约 40）；页面标题 40/56/500。纵向节奏：封面 280 → 图标压边 → 标题 → 栅格 */
+.page-cover { overflow: hidden; }
+.page > .page-cover { margin: -20px -24px 0; }
+.item-grid > .span-24 > .page-cover { margin: -48px -96px 0; }
+.page-cover .cover-band { height: 280px; background: var(--banner-bg); }
+.page-cover .cover-head { padding: 0 24px 4px; }
+.item-grid > .span-24 > .page-cover .cover-head { padding: 0 96px 4px; }
+.page-cover .cover-icon {
+  width: 80px; height: 80px; border-radius: 8px; margin-top: -40px; position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-card);
+}
+.page-cover .cover-icon svg { width: 36px; height: 36px; }
+.page-cover .cover-title { margin-top: 24px; font-size: 40px; line-height: 56px; font-weight: 500; color: var(--ink-85); }
+.page-cover .cover-sub { margin-top: 4px; font-size: 14px; line-height: 22px; color: var(--ink-45); }
+
+/* 字段组 field_group：外框白卡圆角 9 有阴影；标题行 40（底色走 tint-*）；
+   内容区左右各距卡片 20、上 14；字段行 69＝标签 24 ＋ 值框 32 ＋ 上下各 6 的单元格内距；
+   标签 14/16/ink-65 padding 4 8；值框 32 高、底色 --field-bg、圆角 6、padding 5 8、文字 14/22/ink-85；
+   不定高类型（多行文本、附件、图片）独占整行。每行字段数实测 1～4 个都有。 */
+.w-field-group { box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+.fg-grid { display: grid; padding: 14px; }
+.fg-c1 { grid-template-columns: minmax(0, 1fr); }
+.fg-c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fg-c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fg-c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fg-field { padding: 6px; min-width: 0; }
+.fg-field.full { grid-column: 1 / -1; }
+.fg-label { height: 24px; padding: 4px 8px; font-size: 14px; line-height: 16px; color: var(--ink-65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fg-value {
+  height: 32px; padding: 5px 8px; border-radius: 6px; background: var(--field-bg);
+  font-size: 14px; line-height: 22px; color: var(--ink-85);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fg-field.full .fg-value { height: 72px; white-space: normal; }
+/* 分组标题行 40 高，三种浅色底按出现顺序轮转（实测 cyan/teal/lightblue 三档 100 号浅色） */
+.fg-group {
+  grid-column: 1 / -1; height: 40px; display: flex; align-items: center;
+  margin: 0 -6px 6px; padding: 0 12px; border-radius: 6px;
+  font-size: 14px; font-weight: 500; color: var(--ink-85);
+}
+.fg-group.t0 { background: var(--tint-cyan); }
+.fg-group.t1 { background: var(--tint-teal); }
+.fg-group.t2 { background: var(--tint-blue); }
+
+/* 我发起的 procedure_process：行 80 高、三行 14/12/12，45%/65%/85% 三档灰；无数据出「暂无」一行 */
+.proc-list { padding-bottom: 10px; }
+.proc { height: 80px; padding: 10px 20px; border-bottom: 1px solid var(--line); }
+.proc:last-child { border-bottom: 0; }
+.proc-t1 { display: flex; align-items: center; height: 20px; font-size: 14px; line-height: 20px; color: var(--ink-85); }
+.proc-t1 > .proc-time { margin-left: auto; padding-left: 12px; font-size: 12px; color: var(--ink-45); flex: none; }
+.proc-t2 { height: 20px; margin-top: 2px; font-size: 12px; line-height: 20px; color: var(--ink-65); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proc-t3 { display: flex; align-items: center; gap: 8px; height: 20px; margin-top: 2px; font-size: 12px; line-height: 20px; color: var(--ink-45); }
+.proc-t3 .tag { height: 18px; font-size: 12px; padding: 0 6px; }
+.proc-empty { height: 40px; display: flex; align-items: center; justify-content: center; color: var(--ink-45); }
+
+/* 表格列表 table_item_list：标题行 40（右侧工具图标 24）＋ 表体（表头 32、数据行 35）＋ 分页条 40 */
+.table_item_list { box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+.table_item_list .wc-hd .acts { margin-left: auto; display: flex; align-items: center; gap: 4px; color: var(--ink-45); }
+.table_item_list > .grid { border-top: 1px solid var(--line); }
+.table_item_list > .grid td:last-child { border-right: 0; }
+.til-foot { height: 40px; display: flex; align-items: center; padding: 0 20px; border-top: 1px solid var(--line); color: var(--ink-45); font-size: 12px; }
+.til-count { color: var(--ink-45); }
+.til-pager { margin-left: auto; display: flex; align-items: center; gap: 1px; }
+.til-pager .pg { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 12px; line-height: 24px; color: var(--ink-85); }
+.til-pager .pg.on { background: var(--primary-08); color: var(--primary); font-weight: 500; }
+
+/* 进度条 progress_bar：内容区 padding 10 20，两种形态每条都占 40。
+   bar＝newStyle：条体 32 高圆角 6，底层铺主题色淡底、上层按百分比裁切实色，名称与百分比嵌在条内，被覆盖那段文字转白。
+   text＝normal：文字行 24（名称左、百分比右）＋ 条区内 4 高圆角 10 的细条。 */
+.pg-list { padding: 10px 20px; }
+.pg-row { position: relative; height: 40px; }
+.pg-bar { padding: 4px 0; }
+.pg-bar .pg-track, .pg-bar .pg-fill { position: absolute; left: 0; top: 4px; height: 32px; border-radius: 6px; }
+.pg-bar .pg-track { width: 100%; background: color-mix(in srgb, var(--pg, var(--primary)) 16%, transparent); }
+.pg-bar .pg-fill { width: var(--pct, 0%); background: var(--pg, var(--primary)); }
+.pg-bar .pg-txt { position: absolute; left: 0; top: 4px; right: 0; height: 32px; display: flex; align-items: center; padding: 0 8px; font-size: 14px; color: var(--ink-85); }
+.pg-bar .pg-txt.light { color: #fff; clip-path: inset(0 calc(100% - var(--pct, 0%)) 0 0); }
+.pg-txt .pg-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-txt .pg-num { margin-left: auto; padding-left: 16px; flex: none; }
+.pg-text .pg-txt { display: flex; align-items: center; height: 24px; padding-top: 4px; font-size: 14px; line-height: 20px; color: var(--ink-85); }
+.pg-text .pg-track { display: block; position: relative; height: 16px; padding: 6px 0; }
+.pg-text .pg-track::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 4px; border-radius: 10px; background: var(--field-bg); }
+.pg-text .pg-track i { position: relative; display: block; width: var(--pct, 0%); height: 4px; border-radius: 10px; background: var(--pg, var(--primary)); }
+
+/* 条形图 chart_bar_y：横向条，名称在左、数值在右；行 32、条区 8 高圆角 10 */
+.chart_bar_y { min-width: 0; }
+.hbar-list { padding: 8px 16px 12px; }
+.hbar-row { display: flex; align-items: center; gap: 12px; height: 32px; font-size: 13px; color: var(--ink-65); }
+.hbar-name { width: 112px; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar-track { flex: 1; min-width: 0; height: 8px; border-radius: 10px; background: var(--field-bg); }
+.hbar-track i { display: block; height: 8px; border-radius: 10px; background: var(--pg, var(--primary)); }
+.hbar-val { width: 72px; flex: none; text-align: right; color: var(--ink-85); }
+/* common 样式的图表：没有白底那层，只剩 40 高标题行和内容区 */
+.chart.plain { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.chart.plain > .wc-hd { padding-left: 0; }
+
+/* 动态 stream 与评论 comment：产品里共用同一套列表壳（_stream-comment-wrapper_）。
+   动态无标题行、内容区上下 20；每条左侧 20 宽（人＝20 圆头像，系统／自动化＝20 铅笔图标 ink-45），
+   正文距左 26：标题行 20 高「人名 · 时间」12/ink-65，内容行每行 16 高 12/ink-85，距标题 4；单行条 40、三行条 72，条间距 16。
+   评论有标题行，列表区之下是 68 高发布条（rgba(0,0,0,.04) 底、圆角 6、左右缩进 20）；空态＝48 圆图标＋「暂无评论」16/500。 */
+.w-stream, .w-comment { box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+.fd-list { padding: 20px 0; }
+.w-comment .fd-list { padding: 12px 0 0; }
+.fd-item { display: flex; gap: 6px; padding: 0 20px; margin-bottom: 16px; }
+.fd-item:last-child { margin-bottom: 0; }
+.fd-item .av, .fd-ic { width: 20px; height: 20px; flex: none; }
+.fd-ic { color: var(--ink-45); display: inline-flex; align-items: center; justify-content: center; } /* 实测系统动态就是一个 20 的铅笔图标，没有圆底 */
+.fd-ic svg { width: 16px; height: 16px; }
+.fd-bd { min-width: 0; flex: 1; }
+.fd-t { height: 20px; font-size: 12px; line-height: 20px; color: var(--ink-65); }
+.fd-c { margin-top: 4px; }
+.fd-c > div { height: 16px; font-size: 12px; line-height: 16px; color: var(--ink-85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.w-comment .empty { min-height: 120px; }
+.cm-publish { height: 68px; margin: 20px; padding: 8px 12px 0; border-radius: 6px; background: rgba(0,0,0,.04); }
+.cm-ipt { height: 22px; font-size: 14px; line-height: 22px; color: var(--ink-25); }
+.cm-ops { height: 30px; display: flex; align-items: center; gap: 12px; color: var(--ink-45); }
+.cm-ops svg { width: 20px; height: 20px; }
+.cm-send { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,.04); color: var(--ink-25); display: inline-flex; align-items: center; justify-content: center; }
+.cm-send svg { width: 12px; height: 12px; }
+
 /* ── 浮层通用（营销类第二画布） ── */
 .mk-float .comp, .mk-float .w-card {
   background: var(--card-bg); border-radius: 12px; border: 1px solid var(--line);
@@ -994,37 +1161,43 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .mk-float .accent-ring { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
 
-/* ── 流程页签（记录详情弹窗右栏，2026-08-20 app.huoban.com 真实 DOM 实测）──
-   hb-flow-message：白底、下边线 1px rgba(0,0,0,.08)；body pad 16＝圆形应用图标 32（主色底白图标 18）＋流程名 13/500＋发起人·时间 12/ink-45；
-   actions 行 32 高、居中文字「撤销流程」14/ink-65。
-   hb-flowbox-timeline：浅灰底（page-bg）、pad 16，节点自上而下倒序。
-   hb-flowbox：白卡 r6、border 1px rgba(0,0,0,.04)、卡间 12；head 32 pad 8 12 0（thumb 24 r6 灰底图标＋节点名 12/500 ink-85）；
-   body pad 4 12 12：状态行 12（执行中=orange、同意=green、驳回=red、未开始=ink-45），时间行 12/ink-45（日期＋⏱耗时）；
-   links 行 pad 8 12、上边线 1px rgba(0,0,0,.04)、居中 12px 主色链接（催办）。
-   面板底部「查看详细记录」32 高居中 14/ink-65。 */
-.process { flex: none; background: var(--card-bg); border-bottom: 1px solid rgba(0,0,0,.08); }
-.flow-msg-body { display: flex; gap: 8px; padding: 16px; align-items: center; }
-.process .app-ic { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+/* ── 流程执行记录 process（2026-09-14 进销存 v6.0 订单详情页实测有数据形态，校正 2026-08-20 那版）──
+   启动事件行 hb-flow-message 共 93＝body 52（padding 16 16 0：圆形应用图标 32＋流程名 14/20/500＋发起人·时间 12/16/ink-45）
+   ＋ foot 41（上边线 .56px、整宽 40 高居中「撤销流程」14）。应用图标底是产品固定色 --flow-app-bg，不是工作区主题色。
+   hb-flowbox-timeline：浅灰底（page-bg）、pad 16，节点倒序（最新的执行中节点在最上，启动事件在最下）。
+   hb-flowbox：白卡 r6、border .56px rgba(0,0,0,.08)；head 32 pad 8 12 0（thumb 24 r6＋节点名 12/18.86/500 ink-85）；
+   body 57（padding 5 12 12）＝状态行 16（执行中 orange、同意 green、驳回 red、未开始 ink-45）＋ 距上 8 的时间行 16/ink-45（相对时间＋⏱耗时）；
+   links 行 39（上边线 .56px、居中 14 的动作链接）。所以：已完成/已取消节点 32＋57＝89，执行中节点 32＋57＋39＝128。
+   节点间距 12，由 2×12 的竖线填满。面板底部「查看详细记录」40 高居中 14。
+   链接色（去办理 / 查看详细记录）实测 rgb(252,61,109)，与工作区主题色无关，走 --flow-accent。 */
+.process { flex: none; background: var(--card-bg); }
+.flow-msg-body { display: flex; gap: 8px; height: 52px; padding: 16px 16px 0; align-items: flex-start; }
+.process .app-ic { width: 32px; height: 32px; border-radius: 50%; background: var(--flow-app-bg); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex: none; }
 .process .app-ic .ico { width: 18px; height: 18px; }
-.process b { display: block; font-size: 13px; font-weight: 500; color: var(--ink-85); line-height: 1.4; }
-.process small { font-size: 12px; color: var(--ink-45); }
-.flow-msg-actions { height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink-65); }
+.process b { display: block; height: 20px; font-size: 14px; font-weight: 500; color: var(--ink-85); line-height: 20px; }
+.process small { display: block; height: 16px; font-size: 12px; line-height: 16px; color: var(--ink-45); }
+.flow-msg-actions { height: 41px; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 40px; color: var(--ink-65); border-top: 1px solid rgba(0,0,0,.04); }
 .flowbox-timeline { flex: 1; min-height: 0; overflow: hidden; background: var(--page-bg); padding: 16px; }
-.flowbox { background: var(--card-bg); border: 1px solid rgba(0,0,0,.04); border-radius: 6px; margin-bottom: 12px; }
+.flowbox { position: relative; background: var(--card-bg); border: 1px solid rgba(0,0,0,.08); border-radius: 6px; }
+.flowbox + .flowbox { margin-top: 12px; }
+/* 节点连接线：2 宽 × 12 高、水平居中，正好填满 12px 的节点间距（2026-09-14 实测） */
+.flowbox + .flowbox::before { content: ""; position: absolute; left: 50%; top: -12px; width: 2px; height: 12px; margin-left: -1px; background: rgba(0,0,0,.08); }
 .flowbox-head { height: 32px; display: flex; align-items: center; gap: 8px; padding: 8px 12px 0; }
 .flowbox-head .n-ic { width: 24px; height: 24px; border-radius: 6px; background: var(--field-bg); color: var(--ink-45); display: inline-flex; align-items: center; justify-content: center; flex: none; }
 .flowbox-head .n-ic .ico { width: 13px; height: 13px; }
 .flowbox-head strong { font-size: 12px; font-weight: 500; color: var(--ink-85); }
-.flowbox-body { padding: 4px 12px 12px; font-size: 12px; }
-.flowbox-body .st { color: var(--c-orange); line-height: 16px; }
+.flowbox-body { padding: 5px 12px 12px; font-size: 12px; } /* 32＋57＝89（已完成/已取消节点实测高） */
+.flowbox-body .st { height: 16px; color: var(--c-orange); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .flowbox-body .st.green { color: var(--c-green); }
 .flowbox-body .st.red { color: var(--c-red); }
 .flowbox-body .st.gray { color: var(--ink-45); }
-.flowbox-body .txt { color: var(--ink-85); line-height: 16px; }
-.flowbox-body .tm { display: flex; gap: 12px; color: var(--ink-45); margin-top: 2px; align-items: center; }
+.flowbox-body .txt { height: 16px; color: var(--ink-85); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flowbox-body .tm { display: flex; height: 16px; gap: 12px; color: var(--ink-45); margin-top: 8px; align-items: center; line-height: 16px; }
+.flowbox-body .tm span + span { margin-left: auto; }
 .flowbox-body .tm .ico { width: 11px; height: 11px; }
-.flowbox-links { padding: 8px 12px; border-top: 1px solid rgba(0,0,0,.04); text-align: center; font-size: 12px; color: var(--primary); }
-.flow-foot { flex: none; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink-65); border-top: 1px solid var(--line); background: var(--card-bg); }
+/* 执行中节点 32＋57＋39＝128（实测）；链接色是样式表里的产品固定色，不跟工作区主题色 */
+.flowbox-links { height: 39px; display: flex; align-items: center; justify-content: center; padding: 8px 12px; border-top: 1px solid rgba(0,0,0,.04); font-size: 14px; color: var(--flow-accent); }
+.flow-foot { flex: none; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 40px; color: var(--flow-accent); border-top: 1px solid rgba(0,0,0,.08); background: var(--card-bg); }
 
 /* ══════════════════ 手机端（H5 / 企业微信内打开）══════════════════
    来源：2026-09-03 app.huoban.com 安卓 UA、375×812 视口实测 H5 真实 DOM（计算样式）。
