@@ -36,6 +36,11 @@
   --tint-blue: #E3EEF7;
   --tint-teal: #E2EEEE;
   --tint-yellow: #F6EEDC;
+  --tint-cyan: #DDEEF6;
+
+  /* 产品固定色（不随工作区主题色变，2026-09-14 实测）：流程链接色、流程启动事件的应用图标底色 */
+  --flow-accent: #B9455B;
+  --flow-app-bg: #C25A4A;
 
   /* 横幅渐变 */
   --banner-bg: linear-gradient(180deg, #1E639C, #124C77);

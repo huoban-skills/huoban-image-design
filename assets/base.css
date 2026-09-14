@@ -1094,14 +1094,15 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .mk-float .accent-ring { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
 
-/* ── 流程页签（记录详情弹窗右栏，2026-08-20 app.huoban.com 真实 DOM 实测）──
-   hb-flow-message：白底、下边线 1px rgba(0,0,0,.08)；body pad 16＝圆形应用图标 32（主色底白图标 18）＋流程名 13/500＋发起人·时间 12/ink-45；
-   actions 行 32 高、居中文字「撤销流程」14/ink-65。
-   hb-flowbox-timeline：浅灰底（page-bg）、pad 16，节点自上而下倒序。
-   hb-flowbox：白卡 r6、border 1px rgba(0,0,0,.04)、卡间 12；head 32 pad 8 12 0（thumb 24 r6 灰底图标＋节点名 12/500 ink-85）；
-   body pad 4 12 12：状态行 12（执行中=orange、同意=green、驳回=red、未开始=ink-45），时间行 12/ink-45（日期＋⏱耗时）；
-   links 行 pad 8 12、上边线 1px rgba(0,0,0,.04)、居中 12px 主色链接（催办）。
-   面板底部「查看详细记录」32 高居中 14/ink-65。 */
+/* ── 流程执行记录 process（2026-09-14 进销存 v6.0 订单详情页实测有数据形态，校正 2026-08-20 那版）──
+   启动事件行 hb-flow-message 共 93＝body 52（padding 16 16 0：圆形应用图标 32＋流程名 14/20/500＋发起人·时间 12/16/ink-45）
+   ＋ foot 41（上边线 .56px、整宽 40 高居中「撤销流程」14）。应用图标底是产品固定色 --flow-app-bg，不是工作区主题色。
+   hb-flowbox-timeline：浅灰底（page-bg）、pad 16，节点倒序（最新的执行中节点在最上，启动事件在最下）。
+   hb-flowbox：白卡 r6、border .56px rgba(0,0,0,.08)；head 32 pad 8 12 0（thumb 24 r6＋节点名 12/18.86/500 ink-85）；
+   body 57（padding 5 12 12）＝状态行 16（执行中 orange、同意 green、驳回 red、未开始 ink-45）＋ 距上 8 的时间行 16/ink-45（相对时间＋⏱耗时）；
+   links 行 39（上边线 .56px、居中 14 的动作链接）。所以：已完成/已取消节点 32＋57＝89，执行中节点 32＋57＋39＝128。
+   节点间距 12，由 2×12 的竖线填满。面板底部「查看详细记录」40 高居中 14。
+   链接色（去办理 / 查看详细记录）实测 rgb(252,61,109)，与工作区主题色无关，走 --flow-accent。 */
 .process { flex: none; background: var(--card-bg); }
 .flow-msg-body { display: flex; gap: 8px; height: 52px; padding: 16px 16px 0; align-items: flex-start; }
 .process .app-ic { width: 32px; height: 32px; border-radius: 50%; background: var(--flow-app-bg); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex: none; }
@@ -1125,7 +1126,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .flowbox-body .st.gray { color: var(--ink-45); }
 .flowbox-body .txt { height: 16px; color: var(--ink-85); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .flowbox-body .tm { display: flex; height: 16px; gap: 12px; color: var(--ink-45); margin-top: 8px; align-items: center; line-height: 16px; }
-.flowbox-body .tm span:last-child { margin-left: auto; }
+.flowbox-body .tm span + span { margin-left: auto; }
 .flowbox-body .tm .ico { width: 11px; height: 11px; }
 /* 执行中节点 32＋57＋39＝128（实测）；链接色是样式表里的产品固定色，不跟工作区主题色 */
 .flowbox-links { height: 39px; display: flex; align-items: center; justify-content: center; padding: 8px 12px; border-top: 1px solid rgba(0,0,0,.04); font-size: 14px; color: var(--flow-accent); }
