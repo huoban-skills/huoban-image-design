@@ -5,6 +5,7 @@
     python3 scripts/registry.py --check            # 三向核对：登记表 ↔ 结构文件 ↔ base.css
     python3 scripts/registry.py --list [页面类型]   # 按页面类型列可用组件（id、官方名、宏）
     python3 scripts/registry.py --find 关键词       # 按 id / 官方 type / 中文名 / 旧类名查
+    python3 scripts/registry.py --coverage         # 各页面允许的官方组件是否都在页面原则或组件辞典里提到
 
 --check 报三类问题：
   1. 结构文件里有 data-component/data-architecture 但登记表没有
@@ -104,14 +105,38 @@ def find(kw):
                              ensure_ascii=False))
 
 
+def coverage():
+    import re
+    reg = load()
+    root = SKILL / "references" / "principles"
+    guide = (root / "component-guide.md").read_text(encoding="utf-8")
+    docs = {"workbench": "workbench.md", "dashboard": "dashboard.md", "detail": "item-detail.md"}
+    bad = 0
+    for kind, doc in docs.items():
+        text = (root / doc).read_text(encoding="utf-8")
+        for e in reg["entries"]:
+            if e.get("kind") != "component" or not e.get("type_key"):
+                continue
+            if f"page:{kind}" not in (e.get("allowed_in") or []):
+                continue
+            cn = re.sub(r"（.*?）", "", e["cn"]).strip()
+            if cn not in text and cn not in guide:
+                print(f"{doc} 与组件辞典都没提到：{cn}（{e['type_key']}）"); bad += 1
+    print("✓ 各页面允许的组件都有出处" if not bad else f"{bad} 处未覆盖")
+    return 1 if bad else 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--list", nargs="?", const="", metavar="页面类型")
     ap.add_argument("--find")
+    ap.add_argument("--coverage", action="store_true")
     a = ap.parse_args()
     if a.check:
         return check()
+    if a.coverage:
+        return coverage()
     if a.list is not None:
         list_(a.list)
         return 0

@@ -2647,10 +2647,7 @@
       "variants": [],
       "measured": "unverified",
       "allowed_in": [
-        "page:workbench",
-        "page:dashboard",
-        "page:detail",
-        "row"
+        "page:detail"
       ],
       "note": "官方有、skill 未采集；不画"
     },
