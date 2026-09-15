@@ -9,7 +9,7 @@
     python3 scripts/check.py 图.html --acceptance  # 起草十条人工验收表，机器能答的先填
 
 检查的是"该由机器判定、肉眼容易漏"的项：色值有没有写死、有没有用不存在的组件类或 token、
-规模是否超出出图约束、几条踩过坑的结构禁令。对齐与观感仍要看渲染，见 references/canvas/verify-export.md。
+规模是否超出出图约束、几条踩过坑的结构禁令、列丢了行容器、待办竖叠、并排不等高（按实测行高静态估算）。对齐与观感仍要看渲染，见 references/canvas/verify-export.md。
 
 退出码：有 Blocker 返回 1，其余返回 0。
 """
@@ -76,6 +76,123 @@ def line_of(text, idx):
 def suggest(name, pool):
     c = difflib.get_close_matches(name, pool, n=3, cutoff=0.6)
     return f"，是不是 {' / '.join(c)}" if c else ""
+
+
+
+# ── 结构解析与静态高度估算（不依赖 Chrome）─────────────────────────
+def top_divs(seg):
+    """seg 里顶层 <div>…</div> 列表 [(class, inner)]；只数 div，其他标签不影响深度。"""
+    out, depth, start, inner_start, cls = [], 0, None, 0, ""
+    for t in re.finditer(r"<div\b[^>]*>|</div>", seg):
+        if t.group(0) == "</div>":
+            depth -= 1
+            if depth == 0 and start is not None:
+                out.append((cls, seg[inner_start:t.start()]))
+                start = None
+        else:
+            if depth == 0:
+                start, inner_start = t.start(), t.end()
+                m = re.search(r'class="([^"]*)"', t.group(0))
+                cls = m.group(1) if m else ""
+            depth += 1
+    return out
+
+
+PAGE_W = 1160          # 页面内容区常见宽度，只用于估算按钮组换行
+ROW_GAP = 20           # .page / .w-row 组件间距
+
+
+def _span_of(cls):
+    m = re.fullmatch(r"span-(\d+)", cls.strip())
+    return int(m.group(1)) if m else None
+
+
+def est_card(cls, inner, col_w):
+    """按 base.css 实测行高估算一张组件卡的高度；估不了返回 None。"""
+    c = cls.split()
+    head = 40 if re.match(r'\s*<div class="(wc-hd|ws-hd)', inner) else 0
+    if "chart_single" in c:
+        return 80 if "strip" in c else 120
+    if "multi_stats" in c:
+        return head + 40 * inner.count('class="multi-stat-row"') + 10
+    if "subtotal" in c:
+        return head + 40 * inner.count('class="subtotal-head"') + 40 * inner.count('class="subtotal-row"') + 10
+    if "procedure_process" in c:
+        return head + 80 * inner.count('class="proc"') + 40 * inner.count('class="proc-empty"') + 10
+    if "procedure_task" in c:
+        return head + 80 * inner.count('class="task"') + 10
+    if "w-field-group" in c:
+        m = re.search(r"fg-grid fg-c(\d+)", inner)
+        cols = int(m.group(1)) if m else 2
+        fields = len(re.findall(r'class="fg-field"', inner))
+        full = len(re.findall(r'class="fg-field full"', inner))
+        groups = len(re.findall(r'class="fg-group', inner))
+        return head + 40 * groups + -(-fields // cols) * 69 + full * 110
+    if "table_item_list" in c:
+        rows = max(len(re.findall(r"<tr\b", inner)) - 1, 0)
+        return head + 32 + 35 * rows + (40 if "til-foot" in inner else 0)
+    if "chart_table" in c:
+        return head + 35 * len(re.findall(r"<tr\b", inner)) + 14
+    if "chart" in c:
+        return head + 240 + 28
+    if "progress_bar" in c:
+        return head + 40 * inner.count('class="pg-row') + 10
+    if "button" in c and "shortcuts" in c:
+        n = inner.count('class="sc"')
+        per_row = max(1, int((col_w - 28 + 20) // 182))
+        return head + 28 + -(-n // per_row) * 54 - 14
+    if "tabs" in c:
+        m = re.search(r'<div class="(wt-body|page-tabs-body)">', inner)
+        if not m:
+            return None
+        body = est_col(inner[m.end():], col_w)
+        return None if body is None else 44 + body
+    return None
+
+
+def est_col(seg, col_w):
+    """一栏（或页面）里顶层组件竖叠的总高；有一块估不了就返回 None。"""
+    total, n = 0, 0
+    for cls, inner in top_divs(seg):
+        if "w-row" in cls.split():
+            h = est_row(inner, col_w)
+        elif "w-card" in cls.split():
+            h = est_card(cls, inner, col_w)
+        elif _span_of(cls) is not None:
+            h = est_col(inner, col_w)
+        else:
+            h = None
+        if h is None:
+            return None
+        total += h
+        n += 1
+    return total + ROW_GAP * (n - 1) if n else 0
+
+
+def est_row(inner, row_w):
+    kids = top_divs(inner)
+    hs = []
+    for cls, kin in kids:
+        sp = _span_of(cls)
+        if sp is not None:
+            h = est_col(kin, (row_w - ROW_GAP * (len(kids) - 1)) * sp / 24)
+        elif "w-card" in cls.split():
+            h = est_card(cls, kin, row_w / max(len(kids), 1))
+        else:
+            h = None
+        if h is None:
+            return None
+        hs.append(h)
+    return max(hs) if hs else 0
+
+
+def walk_divs(seg, parent_cls, fn, col_w=PAGE_W):
+    """深度优先遍历所有 div，对每个 (class, inner, parent_class, 兄弟列表, col_w) 调 fn。"""
+    kids = top_divs(seg)
+    for cls, inner in kids:
+        fn(cls, inner, parent_cls, kids, col_w)
+        sp = _span_of(cls)
+        walk_divs(inner, cls, fn, (col_w - ROW_GAP * (len(kids) - 1)) * sp / 24 if sp else col_w)
 
 
 def check(path, render=False, allow_local=False):
@@ -164,6 +281,50 @@ def check(path, render=False, allow_local=False):
             add("Medium", "tabs-nested", "页签容器里又套了页签容器：拆成两页或改用段落标题", line_of(body, m.start()))
             break
 
+    # ── 结构：列丢了行容器、待办竖叠、并排不等高（静态估算） ─────────
+    TODO_CARDS = {"multi_stats", "procedure_process", "procedure_task"}
+    seen_rows = set()
+
+    def _struct(cls, inner, parent_cls, kids, col_w):
+        sp = _span_of(cls)
+        if sp is not None and sp < 24 and not {"w-row", "item-grid"} & set(parent_cls.split()):
+            n = sum(1 for k, _ in kids if _span_of(k) is not None)
+            if not any(f["rule"] == "orphan-span" and f.get("key") == id(kids) for f in findings):
+                findings.append({"level": "Blocker", "rule": "orphan-span", "key": id(kids),
+                                 "msg": f"{n} 个 .span-N 列外面没有 w-row 行容器，会退化成通栏竖叠：并排的组件写进同一个 <hb-row spans=…>，不要自己包 span 列", "line": None})
+        toks = cls.split()
+        if "w-row" in toks:
+            key = id(inner)
+            if key in seen_rows:
+                return
+            seen_rows.add(key)
+            cols = [(k, kin) for k, kin in top_divs(inner) if _span_of(k) is not None]
+            if len(cols) >= 2:
+                hs = []
+                for k, kin in cols:
+                    h = est_col(kin, (col_w - ROW_GAP * (len(cols) - 1)) * _span_of(k) / 24)
+                    if h is None:
+                        return
+                    kk = top_divs(kin)
+                    stretch = len(kk) == 1 and "w-card" in kk[0][0].split()   # 单张卡会被 base.css 拉到等高
+                    hs.append((h, k, stretch))
+                short, tall = min(hs), max(hs)
+                if tall[0] - short[0] > 100 and not short[2]:
+                    add("Medium", "column-short", f"并排不等高（按实测行高估算）：.{short[1]} 约 {int(short[0])}px，.{tall[1]} 约 {int(tall[0])}px，差约 {int(tall[0] - short[0])}px；给短栏补 1～2 张图表、数值字段组或待办列表，或改成单栏，不用固定高度硬撑")
+        if "page" in toks or "item-page-canvas" in toks:
+            run = 0
+            for k, _ in top_divs(inner):
+                kt = set(k.split())
+                if "w-card" in kt and kt & TODO_CARDS:
+                    run += 1
+                    if run == 2:
+                        add("High", "todo-stacked", "待办、我处理的、我发起的各占通栏竖着叠，每块只有几行，整屏都是空：并排写进一个 <hb-row spans=\"8|8|8\">（或 8|16）")
+                        break
+                else:
+                    run = 0
+
+    walk_divs(body, "", _struct)
+
     # ── Medium：规模上限（本 skill 出图约束） ────────────────────────
     for m in re.finditer(r'<div class="[^"]*\bview-grid\b[^"]*">.*?</table>', body, re.S):
         rows = len(re.findall(r"<tr(?![^>]*class=\"group\")", m.group(0))) - 1
@@ -209,6 +370,7 @@ def check(path, render=False, allow_local=False):
                     add("High", "content-clipped", f"cut 窗口内容比窗口高 {e['over']}px，底部被裁：调 cut 值或减内容")
                 else:
                     add("High", "float-out", f"浮层探出画布 {e['over']}px：调 hb-float 的 top 或减少浮层内容")
+            findings[:] = [f for f in findings if f["rule"] != "column-short"]
             for u in r.get("uneven", []):
                 add("Medium", "column-uneven", f"并排底部不齐：.{u['short']} 高 {u['shortH']}，.{u['tall']} 高 {u['tallH']}，差 {u['diff']}px；给短栏补数据行或调 spans")
             for g in r.get("gaps", []):
@@ -222,6 +384,8 @@ def check(path, render=False, allow_local=False):
     else:
         note = "渲染检查未执行：未加 --render（空隙、裁切、浮层出界、并排不齐四项未检）"
 
+    for f in findings:
+        f.pop("key", None)
     order = {"Blocker": 0, "High": 1, "Medium": 2, "Nit": 3}
     findings.sort(key=lambda f: (order[f["level"]], f["rule"], f["line"] or 0))
     return findings, note
