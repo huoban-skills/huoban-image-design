@@ -730,10 +730,10 @@ def m_biaxial(a, body):
     for i in range(ticks + 1):
         y = T + ph * (1 - i / ticks)
         inner.append(f'<text x="{W - R + 8}" y="{y + 4:.1f}" font-size="11" fill="var(--ink-45)">{fmt_num(vmax_r * i / ticks)}</text>')
-    bfill = f'fill="var(--c-{bar["color"]})"' if bar["color"] else 'fill="var(--primary)"'
+    bfill = f'fill="{ctok(bar["color"])}"' if bar["color"] else 'fill="var(--primary)"'
     bop = "" if bar["color"] else ' opacity=".45"'
-    lstroke = f'stroke="var(--c-{line["color"]})"' if line["color"] else 'stroke="var(--primary)"'
-    lfill = f'fill="var(--c-{line["color"]})"' if line["color"] else 'fill="var(--primary)"'
+    lstroke = f'stroke="{ctok(line["color"])}"' if line["color"] else 'stroke="var(--primary)"'
+    lfill = f'fill="{ctok(line["color"])}"' if line["color"] else 'fill="var(--primary)"'
     bw = min(26, gw * 0.5)
     for j, v in enumerate(bar["vals"]):
         h = ph * v / vmax_l
