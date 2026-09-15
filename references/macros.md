@@ -583,11 +583,11 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 ## 数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）
 
 ### hb-screen
-数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light、bg（装饰底图，默认不用）；体内放 hb-scol/hb-scard/hb-svisual
+数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light；体内放 hb-scol/hb-scard/hb-svisual
 
 ```
 数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 副题、logo 左上企业名、date/week/time 右上日期星期时间、
-theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色），bg 装饰底图 earth/city/grid/gold（默认不用，五个主题本身就有网格纹理和顶部光带）。
+theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色）；背景由主题自带的网格纹理和顶部光带产出。
 大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
 体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
 例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。
@@ -598,7 +598,7 @@ theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/r
 
 ```
 大屏主体分栏。属性 span 列宽（默认 6）、rs 列高行数（默认 38）。体内竖着放 hb-skpi、hb-scard，
-列内各组件的 rs 之和要等于本列的 rs，三列才等高（官方：左 6＝6＋16＋16，中 12＝38，右 6＝12＋26）。
+列内各组件的 rs 之和要等于本列的 rs，三列才等高（左 6＝6＋16＋16，右 6＝6＋12＋20，中 12＝38；左右两列顶部都放指标框或都不放）。
 例：
 <hb-scol span="6" rs="38">
 <hb-skpi rs="6">在库总量 | 4,386 | 件

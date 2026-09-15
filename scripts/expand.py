@@ -1216,7 +1216,6 @@ def m_comment(a, body):
 # 官方六张样板的骨架：标题行（logo 3 ＋ 大标题 18 ＋ 时间 3，高 5）→ 分隔条 24×2 →
 # 主体三列 6 ｜ 12 ｜ 6（各 38 行）→ 底部 12＋12（各 26 行）。大屏不缩放，行高公式同普通页面：h 行 = 20h−20。
 SCREEN_THEMES = {"cyan", "blue", "gold", "red", "light"}
-SCREEN_BGS = {"earth", "city", "grid", "gold"}
 
 
 def _span(a, tag, default):
@@ -1238,11 +1237,8 @@ def _rs(a, tag, default):
 
 def m_screen(a, body):
     theme = a.get("theme", "cyan")
-    bg = a.get("bg", "")
     if theme not in SCREEN_THEMES:
         raise ExpandError(f"<hb-screen theme> 只能是 {'/'.join(sorted(SCREEN_THEMES))}")
-    if bg is True or (bg and bg not in SCREEN_BGS):
-        raise ExpandError(f"<hb-screen bg> 只能是 {'/'.join(sorted(SCREEN_BGS))}（装饰底图，默认不用）")
     title = a.get("title", "")
     if not title:
         raise ExpandError("<hb-screen> 缺 title（大屏页面名）")
@@ -1257,7 +1253,7 @@ def m_screen(a, body):
             f'<div class="screen-title"><h1>{esc(title)}</h1>{sub}</div>'
             f'<div class="screen-dt">{dt}</div></div>'
             f'<div class="screen-deco sp-24 rs-2"></div>')
-    cls = f"screen theme-{theme}" + (f" bg-{bg}" if bg else "")
+    cls = f"screen theme-{theme}"
     return f'<div class="{cls}"><div class="screen-grid">{head}{body.strip()}</div></div>'
 
 
@@ -1896,7 +1892,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         required=["hb-screen"],
         order=["hb-screen"],
         doc=("只放一个 hb-screen，不套产品壳、不放浮层。体内按官方骨架排：左列 hb-scol（6 栏：指标框 ×2 → 面积图 → 饼图）"
-             "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：进度条 → 对比图），底部两张 hb-scard 各 12 栏。"
+             "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：指标框 ×2 → 进度条 → 对比图），左右对称，底部两张 hb-scard 各 12 栏。"
              "标题行与分隔条由 hb-screen 产出。大屏不缩放：24 栅格、行高 20h−20、间距 20 与其他页面一致。"),
         example="""<hb-page kind="screen">
 <hb-screen title="物资运营数据大屏" logo="云图贸易" date="2026年09月14日" week="星期一" time="09:41:20" theme="cyan">
@@ -1922,6 +1918,10 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-scol>
 <hb-svisual map span="12" rs="38"/>
 <hb-scol span="6" rs="38">
+<hb-skpi rs="6">
+待审批出库 | 12 | 单
+超期未盘点 | 3 | 项
+</hb-skpi>
 <hb-scard title="季度盘点完成率" rs="12">
 <hb-sbars>
 城建大厦酒窖 | 92%
@@ -1930,7 +1930,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 临时周转库 | 38%
 </hb-sbars>
 </hb-scard>
-<hb-scard title="各仓库出入库对比" rs="26">
+<hb-scard title="各仓库出入库对比" rs="20">
 <hb-bar bare w="355" h="414" labels="城建大厦|高新库|经开区|周转库">
 出库 | 862,517,394,168
 入库 | 705,623,288,241
@@ -2256,7 +2256,7 @@ MACROS = {
     "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
-    "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light、bg（装饰底图，默认不用）；体内放 hb-scol/hb-scard/hb-svisual"),
+    "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light；体内放 hb-scol/hb-scard/hb-svisual"),
     "hb-scol": (m_scol, "大屏主体分栏：属性 span（默认 6）、rs（默认 38）；体内竖着放 hb-skpi/hb-scard，各组件 rs 之和等于本列 rs"),
     "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」，一行 2 个；属性 span（默认 6）、rs（默认 6）"),
     "hb-scard": (m_scard, "大屏组件卡：属性 title、span（默认 6）、rs（默认 16）；体内放 hb-area/line/bar/donut 的 bare 输出、hb-sbars 或 hb-list"),
@@ -2609,12 +2609,12 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 <hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>
 <hb-steps pill>待派工 | 已派工 | *生产中:orange | 已完工</hb-steps>""",
 "hb-screen": """数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 副题、logo 左上企业名、date/week/time 右上日期星期时间、
-theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色），bg 装饰底图 earth/city/grid/gold（默认不用，五个主题本身就有网格纹理和顶部光带）。
+theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色）；背景由主题自带的网格纹理和顶部光带产出。
 大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
 体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
 例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。""",
 "hb-scol": """大屏主体分栏。属性 span 列宽（默认 6）、rs 列高行数（默认 38）。体内竖着放 hb-skpi、hb-scard，
-列内各组件的 rs 之和要等于本列的 rs，三列才等高（官方：左 6＝6＋16＋16，中 12＝38，右 6＝12＋26）。
+列内各组件的 rs 之和要等于本列的 rs，三列才等高（左 6＝6＋16＋16，右 6＝6＋12＋20，中 12＝38；左右两列顶部都放指标框或都不放）。
 例：
 <hb-scol span="6" rs="38">
 <hb-skpi rs="6">在库总量 | 4,386 | 件
