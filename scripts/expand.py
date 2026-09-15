@@ -2253,7 +2253,6 @@ MACROS = {
     "hb-hcard": (m_hcard, "详情页页头卡片：属性 title、sub；体内关键字段行同 hb-info"),
     "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
-    "hb-info": (m_info, "详情页页头卡片信息区：字段名 | 值 | 类型"),
     "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
@@ -2294,7 +2293,7 @@ GROUPS = [
                                             "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal",
                                             "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial",
                                             "hb-funnel", "hb-scatter", "hb-map", "hb-pivot"]),
-    ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-info", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
+    ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
     ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
 ]
@@ -2603,11 +2602,6 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 仓库主管审批 | 周敏 执行中 | 8月24日 09:40 | 1.4小时 | 催办
 启动事件 | 陈晓东 扫码创建了「CK-20260824-0037 领用出库单」 | 8月24日 09:12
 </hb-flow>""",
-"hb-info": """页头卡片信息区，每行 字段名 | 值 | 类型（类型 user/tag/tags，缺省文本；值带 :颜色 自动成标签）。放在 .header_card 里、标题区之后。
-例：
-出库类型 | 领用出库:orange
-申请人 | 陈晓东 | user
-申请日期 | 2026-08-24""",
 "hb-steps": """状态条，* 标当前步骤；属性 span（默认 24）、pill。两种形态实测下来是两个不同的东西：
 - 默认＝官方 status_bar 组件：箭头式分段，整条 40 高、白卡圆角 9；段间重叠 10px 咬合，已过段主色 25% 底＋ink-45 字，当前段主色实底白字，未到段透明底＋ink-85 字。
 - pill＝选项字段的平铺展示（is_tile）：全圆角胶囊、20 高、固定宽，选中段填该选项自身颜色（当前项写 *名称:颜色 指定），其余透明底。
