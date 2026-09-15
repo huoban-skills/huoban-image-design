@@ -98,7 +98,7 @@ def top_divs(seg):
     return out
 
 
-PAGE_W = 1160          # 页面内容区常见宽度，只用于估算按钮组换行
+PAGE_W = 1160          # 页面内容区常见宽度，只用于估算按钮组件换行
 ROW_GAP = 20           # .page / .w-row 组件间距
 
 
@@ -280,7 +280,7 @@ def check(path, render=False, allow_local=False):
                 end = t.start()
                 break
         if 'class="w-card tabs' in inner[:end]:
-            add("Medium", "tabs-nested", "页签容器里又套了页签容器：拆成两页或改用段落标题", line_of(body, m.start()))
+            add("Medium", "tabs-nested", "标签页里又套了标签页：拆成两页或改用段落标题", line_of(body, m.start()))
             break
 
     # ── 结构：列丢了行容器、待办竖叠、并排不等高（静态估算） ─────────
@@ -312,7 +312,7 @@ def check(path, render=False, allow_local=False):
                     hs.append((h, k, stretch))
                 short, tall = min(hs), max(hs)
                 if tall[0] - short[0] > 150 and short[2]:
-                    add("Medium", "card-stretched", f"并排里 .{short[1]} 只有一张矮卡（内容约 {int(short[0])}px），会被拉到和 .{tall[1]}（约 {int(tall[0])}px）等高，卡里空一大块：用 <hb-col> 在这一栏再叠一个组件（如按钮组＋多项统计），或换更高的组件")
+                    add("Medium", "card-stretched", f"并排里 .{short[1]} 只有一张矮卡（内容约 {int(short[0])}px），会被拉到和 .{tall[1]}（约 {int(tall[0])}px）等高，卡里空一大块：用 <hb-col> 在这一栏再叠一个组件（如按钮组件＋多项统计），或换更高的组件")
                 if tall[0] - short[0] > 100 and not short[2]:
                     add("Medium", "column-short", f"并排不等高（按实测行高估算）：.{short[1]} 约 {int(short[0])}px，.{tall[1]} 约 {int(tall[0])}px，差约 {int(tall[0] - short[0])}px；给短栏补 1～2 张图表、数值字段组或待办列表，或改成单栏，不用固定高度硬撑")
         if "page" in toks or "item-page-canvas" in toks:

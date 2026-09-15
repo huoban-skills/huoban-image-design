@@ -360,12 +360,12 @@ def m_pivot(a, body):
         raise ExpandError("<hb-pivot> 要有表头和至少一行数据")
     header = parse_header(cells(ls[0]))
     if any(c["type"] in ("user", "tag", "tags", "ops") for c in header):
-        raise ExpandError("<hb-pivot> 是维度 × 指标的统计表，列里不放人员、状态标签、操作这类记录字段；一条条记录（编号、门店、负责人、日期、状态）用 hb-list（表格列表）")
+        raise ExpandError("<hb-pivot> 是透视表，做维度 × 指标的统计，列里不放人员、状态标签、操作这类记录字段；一条条记录（编号、门店、负责人、日期、状态）用 hb-list（表格列表）")
     _num = re.compile(r"^[+\-−]?[\d,]+(?:\.\d+)?\s*(?:%|万|亿|元|件|天|次|家|个|人|条|单|台|kg|k)?$")
     _cells = [v.split(":")[0].strip() for ln in ls[1:] for v in cells(ln)[1:]]
     _cells = [v for v in _cells if v and v not in ("—", "-", "–")]
     if _cells and sum(1 for v in _cells if _num.match(v)) / len(_cells) < 0.6:
-        raise ExpandError("<hb-pivot> 里大部分格子是文字，这是记录列表不是统计表：透视表首列是维度（区域／产品／月份），其余列都是数字；一条条记录用 hb-list（表格列表）")
+        raise ExpandError("<hb-pivot> 里大部分格子是文字，这是记录列表不是透视表：透视表首列是维度（区域／产品／月份），其余列都是数字；一条条记录用 hb-list（表格列表）")
     ths = "".join(f"<th>{esc(c['name'])}</th>" for c in header)
     rows = []
     for i, ln in enumerate(ls[1:], 1):
@@ -1275,7 +1275,7 @@ def m_skpi(a, body):
     if not out:
         raise ExpandError("<hb-skpi> 没有数据行")
     if len(out) > 3:
-        raise ExpandError(f"<hb-skpi> 一行放 2 个指标框（官方样板 3 栏 ×2），最多 3 个，给了 {len(out)} 个")
+        raise ExpandError(f"<hb-skpi> 一行放 2 个大屏指标框（官方样板 3 栏 ×2），最多 3 个，给了 {len(out)} 个")
     return f'<div class="screen-kpis {_span(a, "hb-skpi", "6")} {_rs(a, "hb-skpi", "6")}">{"".join(out)}</div>'
 
 
@@ -1303,7 +1303,7 @@ def m_sbars(a, body):
 
 
 def visual_globe():
-    """中央视觉位默认形态：线框地球＋节点连线＋地台光环，走 var(--screen-accent)，不含任何真实国界。"""
+    """大屏中央视觉位默认形态：线框地球＋节点连线＋地台光环，走 var(--screen-accent)，不含任何真实国界。"""
     import random
     r = random.Random(42)
     A = "var(--screen-accent)"
@@ -1341,7 +1341,7 @@ def visual_globe():
 
 
 def visual_map():
-    """中央视觉位地图占位：网点阵＋发光标记点＋扩散圈，不画任何国家或省份轮廓（审图号与边界准确性）。"""
+    """大屏中央视觉位地图占位：网点阵＋发光标记点＋扩散圈，不画任何国家或省份轮廓（审图号与边界准确性）。"""
     import random
     r = random.Random(7)
     A, M, H2 = "var(--screen-accent)", "var(--screen-series-1)", "var(--screen-bar-2)"
@@ -1784,7 +1784,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         order_free={"hb-tabcard"},
         first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel",
                           "hb-scatter", "hb-map", "hb-filters"},
-        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 快捷方式（必）与待办（hb-row 并排）→ 表格列表（我名下的记录）→ 页签容器。趋势与对比图表、筛选不放首屏（顶层出现会提示），要收进 hb-tabcard 或放页面末尾；hb-tabcard 位置自由，放在 hb-list、hb-pivot 之后把图表收进末位页签也可以。",
+        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 按钮组件（快捷方式版式，必）与待办（hb-row 并排）→ 表格列表（我名下的记录）→ 标签页。趋势与对比图表、筛选不放首屏（顶层出现会提示），要收进 hb-tabcard 或放页面末尾；hb-tabcard 位置自由，放在 hb-list、hb-pivot 之后把图表收进末位页签也可以。",
         example="""<hb-page kind="workbench" ws="云图贸易" page="库管工作台" me="周">
 <hb-nav>
 # 物资台账
@@ -1864,7 +1864,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         required=["hb-itembar", "hb-hcard", "hb-fields", "hb-tabcard"],
         order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-list", "hb-tabcard",
                "hb-flow", "hb-stream", "hb-comment", "hb-float"],
-        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必；单栏通栏，双栏 hb-row spans=13|11 左字段右分析区，主从 hb-row spans=8|16 或 16|8 主栏页签容器放子表、从栏字段组或流程页签，主栏叠两个页签容器用 hb-col）→ 页签容器（必）→ 流程执行记录、动态、评论。"
+        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必；单栏通栏，双栏 hb-row spans=13|11 左字段右分析区，主从 hb-row spans=8|16 或 16|8 主栏标签页放子表、从栏字段组或流程执行记录，主栏叠两个标签页用 hb-col）→ 标签页（必）→ 流程执行记录、动态、评论。"
             "页头卡片、字段组必有：一条记录先说清是哪条、有哪些字段，页签内的字段组也算。图表宏只能放在 hb-row 或 hb-tabcard 体内，不在顶层。"
             "不套产品壳；浮层只能右探出（side=\"left\" 会报错）。",
         example="""<hb-page kind="detail">
@@ -1891,8 +1891,8 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         allowed={"hb-screen"},
         required=["hb-screen"],
         order=["hb-screen"],
-        doc=("只放一个 hb-screen，不套产品壳、不放浮层。体内按官方骨架排：左列 hb-scol（6 栏：指标框 ×2 → 面积图 → 饼图）"
-             "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：指标框 ×2 → 进度条 → 对比图），左右对称，底部两张 hb-scard 各 12 栏。"
+        doc=("只放一个 hb-screen，不套产品壳、不放浮层。体内按官方骨架排：左列 hb-scol（6 栏：大屏指标框 ×2 → 面积图 → 饼图）"
+             "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：大屏指标框 ×2 → 进度条 → 对比图），左右对称，底部两张 hb-scard 各 12 栏。"
              "标题行与分隔条由 hb-screen 产出。大屏不缩放：24 栅格、行高 20h−20、间距 20 与其他页面一致。"),
         example="""<hb-page kind="screen">
 <hb-screen title="物资运营数据大屏" logo="云图贸易" date="2026年09月14日" week="星期一" time="09:41:20" theme="cyan">
@@ -2108,7 +2108,7 @@ def m_page(a, body):
     parts = _top_level(a.get("_raw", body))
     names = [n for n, _ in parts if n]
     deep = list(names)          # 「必有」用：容器体内的宏也算出现过
-    first_screen = list(names)   # 首屏禁令用：并排行仍在首屏，页签容器里的不算
+    first_screen = list(names)   # 首屏禁令用：并排行仍在首屏，标签页里的不算
     _ban = spec.get("first_screen_ban", set())
     _tail = 0
     for _n in reversed(first_screen):
@@ -2215,7 +2215,7 @@ def render_page(kind):
 MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
-    "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组、多项统计、进度条）别单独占一栏被拉高"),
+    "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
     "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-duo": (m_duo, "hb-screens 的旧名"),
@@ -2227,9 +2227,9 @@ MACROS = {
     "hb-pivot": (m_pivot, "透视表（维度 × 指标的统计，做数据分析用）：首行表头，其后数据行，值是数字；一条条记录用 hb-list"),
     "hb-stats": (m_stats, "单指标一行：指标名 | 值 | 单位 | spark:1,2,3 或 trend:red；mode=center|strip"),
     "hb-tasks": (m_tasks, "待办子区：标题 | 时间 | 节点说明；属性 title"),
-    "hb-shortcuts": (m_shortcuts, "快捷方式：名称 | 图标；属性 title"),
+    "hb-shortcuts": (m_shortcuts, "按钮组件（快捷方式版式）：名称 | 图标；属性 title"),
     "hb-filters": (m_filters, "筛选组件：筛选文本 | 图标"),
-    "hb-banner": (m_banner, "横幅组件：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
+    "hb-banner": (m_banner, "横幅（富文本大标题预设）：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
     "hb-line": (m_line, "折线图卡：同 hb-bar；属性 plain 去掉卡片外壳"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
@@ -2250,8 +2250,8 @@ MACROS = {
     "hb-comment": (m_comment, "评论：每行「人名 | 时间 | 内容」，无行出空态；属性 title、span"),
     "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
     "hb-hcard": (m_hcard, "详情页页头卡片：属性 title、sub；体内每行「字段名 | 值 | 类型」，类型 user/tag/tags 可选"),
-    "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
-    "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
+    "hb-tabcard": (m_tabcard, "标签页：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
+    "hb-flow": (m_flow, "流程执行记录时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
     "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
@@ -2259,7 +2259,7 @@ MACROS = {
     "hb-scol": (m_scol, "大屏主体分栏：属性 span（默认 6）、rs（默认 38）；体内竖着放 hb-skpi/hb-scard，各组件 rs 之和等于本列 rs"),
     "hb-skpi": (m_skpi, "大屏指标框：每行「指标名 | 值 | 单位 | up/down」，一行 2 个；属性 span（默认 6）、rs（默认 6）"),
     "hb-scard": (m_scard, "大屏组件卡：属性 title、span（默认 6）、rs（默认 16）；体内放 hb-area/line/bar/donut 的 bare 输出、hb-sbars 或 hb-list"),
-    "hb-sbars": (m_sbars, "大屏进度条列表：每行「名称 | 百分比」，条底色蓝/橙/绿/红轮转"),
+    "hb-sbars": (m_sbars, "大屏进度条：每行「名称 | 百分比」，条底色蓝/橙/绿/红轮转"),
     "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span（默认 12）、rs（默认 38）、title、img=客户图片路径、map=网点阵占位；空则线框地球"),
     "hb-phone": (m_phone, "手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容"),
     "hb-mhome": (m_mhome, "工作区首页：属性 tabs=表格|*流程…；每行一个分组，- 前缀为展开的表"),
@@ -2271,7 +2271,7 @@ MACROS = {
     "hb-taskbar": (m_taskbar, "任务办理区：属性 who、sub；体内按钮名 | 按钮名"),
     "hb-ptasks": (m_ptasks, "流程任务列表：属性 tabs、count、dot、app；每行「发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮」"),
     "hb-wpage": (m_wpage, "手机工作台：# 页面名；sc: 名:图标 | …；tabs: *页签 | 页签；sub: 子区名 | 全部 | *待执行 | 已完成"),
-    "hb-chat": (m_chat, "企微会话流：@时间；[标签] 标题 开一条消息；k = v；> 链接；其余为正文"),
+    "hb-chat": (m_chat, "企业微信会话：@时间；[标签] 标题 开一条消息；k = v；> 链接；其余为正文"),
     "hb-conn": (m_conn, "屏间中缝说明：每行「步骤标题 | 一句说明」，行间自动加箭头"),
 }
 
@@ -2301,7 +2301,7 @@ DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
-并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
+并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
 例：
 <hb-row spans="8|16">
 <hb-col>
@@ -2366,7 +2366,7 @@ DOCS = {
 <hb-tools search="搜索品名或编号" new="新建物资">字段 | 筛选:1 | 排序 | 导入 | 打印二维码:print</hb-tools>""",
 "hb-grid": """首行表头，列名后可接类型 :tag（彩色选项）:tags（多值，值用 / 分）:user（人员，多人用 / 分）:ops（行内按钮，名:图标:颜色，多个用 / 分）；统计 :sum=值 :avg= :max= :min= :count=。
 其后每行一条记录，列数必须与表头一致。# 分组值:颜色 插分组行；! 前缀＝选中行。
-属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、页签容器内时用），默认带 .table-view.view-grid 和横向滚动条。
+属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、标签页内时用），默认带 .table-view.view-grid 和横向滚动条。
 例：
 <hb-grid total="1,217条">
 物资编号 | 品名 | 品类:tag | 当前库存:sum=4,386 | 建档人:user | 操作:ops
@@ -2383,7 +2383,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 "hb-cards": """卡片视图，每行 标题 | 字段=值; 字段=值 | 操作:图标:颜色。
 例：
 杭州云图 | 行业=制造; 年采购=¥1,204,000 | 拜访:arrow-right:blue""",
-"hb-banner": """第一行页面名称，第二行一句话介绍（口吻规则见 references/principles/workbench.md）；属性 solid 铺纯色背景。
+"hb-banner": """横幅（富文本大标题预设）。第一行页面名称，第二行一句话介绍（口吻规则见 references/principles/workbench.md）；属性 solid 铺纯色背景。
 属性 card 出背景图卡片式（120 高白卡，实测工作台常用）：date="2026年09月04日"、time="16:51:17" 出日期时间行；img 出右侧图片位（值写 <img src="…"> 放客户配图，空值留渐变占位）。卡片式不放介绍句。
 例：
 <hb-banner>库管工作台
@@ -2403,7 +2403,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 <hb-stats mode="strip">
 今日扫码开单 | 14 | spark:28,22,25,14,17,9,6
 </hb-stats>""",
-"hb-shortcuts": """行：名称 | 图标；属性 title 出标题栏。按钮宽度自适应内容、文字不折行，一行排不下自动换第二行（2026-09-04 实测）。
+"hb-shortcuts": """按钮组件（快捷方式版式）。行：名称 | 图标；属性 title 出标题栏。按钮宽度自适应内容、文字不折行，一行排不下自动换第二行（2026-09-04 实测）。
 例：
 <hb-shortcuts title="常用">
 扫码出入库 | f-barcode
@@ -2578,7 +2578,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 申请人 | 陈晓东 | user
 申请日期 | 2026-08-24
 </hb-hcard>""",
-"hb-tabcard": """页签卡（页签容器）。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
+"hb-tabcard": """标签页。属性 tabs="*出库明细|历史出入库|现场照片"（* 当前页签，必填）、span（给了就外包一层 .span-N 栅格）。体内放页签内容：hb-grid bare、字段、hb-flow、form-hint 等。
 默认是详情页的下划线页签，靠左；工作台/看板要胶囊式页签（选中主色 20% 底条）写 pill，胶囊只在居中时成立，pill 一律居中；页签按角色工作流程从左到右或按业务分类编排。
 例：
 <hb-tabcard tabs="*出库明细|历史出入库|现场照片" span="16">
@@ -2594,7 +2594,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 <hb-tabcard tabs="*进行中任务|已完成任务|工作报告|跟进汇总" pill>
 <hb-grid bare nock>…</hb-grid>
 </hb-tabcard>""",
-"hb-flow": """流程页签时间线（放在 tabs="*流程|动态|评论" 的 hb-tabcard 里）。属性 name 流程名（必填）、by="发起人 · 时间"、foot（默认「查看详细记录」）、nocancel 不出「撤销流程」。
+"hb-flow": """流程执行记录时间线（放在 tabs="*流程|动态|评论" 的 hb-tabcard 里）。属性 name 流程名（必填）、by="发起人 · 时间"、foot（默认「查看详细记录」）、nocancel 不出「撤销流程」。
 每行一个节点，倒序（最新在上）：节点名 | 状态文本:颜色 | 日期 | 耗时 | 链接；颜色 orange 执行中（缺省）/ green 同意 / red 驳回 / gray 未开始；启动事件写「启动事件 | 事件描述 | 日期」。
 例：
 <hb-flow name="出库审批" by="陈晓东 · 8月24日 09:12">
@@ -2613,7 +2613,7 @@ theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/r
 体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
 例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。""",
 "hb-scol": """大屏主体分栏。属性 span 列宽（默认 6）、rs 列高行数（默认 38）。体内竖着放 hb-skpi、hb-scard，
-列内各组件的 rs 之和要等于本列的 rs，三列才等高（左 6＝6＋16＋16，右 6＝6＋12＋20，中 12＝38；左右两列顶部都放指标框或都不放）。
+列内各组件的 rs 之和要等于本列的 rs，三列才等高（左 6＝6＋16＋16，右 6＝6＋12＋20，中 12＝38；左右两列顶部都放大屏指标框或都不放）。
 例：
 <hb-scol span="6" rs="38">
 <hb-skpi rs="6">在库总量 | 4,386 | 件
@@ -2637,7 +2637,7 @@ theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/r
 入库 | 9,14,11,17,16,19,18
 </hb-line>
 </hb-scard>""",
-"hb-sbars": """大屏进度条列表（放进 hb-scard 体内），每行「名称 | 百分比」。条底色按蓝／橙／绿／红轮转（官方实测色序）。
+"hb-sbars": """大屏进度条（放进 hb-scard 体内），每行「名称 | 百分比」。条底色按蓝／橙／绿／红轮转（官方实测色序）。
 例：
 <hb-sbars>
 城建大厦酒窖 | 92%
@@ -2683,7 +2683,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 <hb-mtool mode="obar"/>
 <hb-mtool>列统计 | 筛选 | 排序</hb-mtool>""",
 "hb-rec": """记录页（详情/编辑/新建/任务办理共用）。属性 title（记录标题；新建写表名）、edit（编辑态白值框）、noqr、elapsed="1.7天"（任务页顶部耗时条）。
-体内：# 分组名 出居中分组标题；字段名 | 值 | 类型——类型缺省文本，sel 带下拉箭头，opt 选项并排（值写 当前值:blue / 其他 / 其他），mem 成员胶囊（多人 / 分），rel 关联（值写 主行 / 副行），img 图片（值写张数），num:元 数值带单位；值前缀 ~ 出占位灰字（「请先选择：仓库」「保存后显示计算结果」）；字段名前缀 ! 整块青绿高亮（计算字段、本节点可编辑字段）；> 页签1 | 页签2 | 来自 出库明细 的数据 · 共 1 条 出子表页签容器。
+体内：# 分组名 出居中分组标题；字段名 | 值 | 类型——类型缺省文本，sel 带下拉箭头，opt 选项并排（值写 当前值:blue / 其他 / 其他），mem 成员胶囊（多人 / 分），rel 关联（值写 主行 / 副行），img 图片（值写张数），num:元 数值带单位；值前缀 ~ 出占位灰字（「请先选择：仓库」「保存后显示计算结果」）；字段名前缀 ! 整块青绿高亮（计算字段、本节点可编辑字段）；> 页签1 | 页签2 | 来自 出库明细 的数据 · 共 1 条 出子表页签。
 例：
 <hb-rec title="CK_20260902_001 直接出库" elapsed="1.7天">
 !出库状态 | 待审批:blue / 已出库 / 已驳回 / 作废 | opt
@@ -2697,7 +2697,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 "hb-fbar": """编辑/新建底部保存条 57。属性 cancel、save、more（新建页左侧方钮）。
 例：
 <hb-fbar more/>""",
-"hb-taskbar": """任务办理页底部 100 高。属性 who="詹达富 · 出库审批"、sub 记录标题；体内 按钮名 | 按钮名。任务页＝hb-rec elapsed ＋ hb-taskbar，本节点可改字段加 !。
+"hb-taskbar": """任务办理区，任务页底部 100 高。属性 who="詹达富 · 出库审批"、sub 记录标题；体内 按钮名 | 按钮名。任务页＝hb-rec elapsed ＋ hb-taskbar，本节点可改字段加 !。
 例：
 <hb-taskbar who="詹达富 · 出库审批" sub="CK_20260902_001 直接出库">确认出库 | 驳回修改</hb-taskbar>""",
 "hb-ptasks": """企业级流程任务列表。属性 tabs（默认 我发起的|*我处理的|发起流程）、count="筛选出 1990 条/共 17842 条"、dot（当前页签红点）、app（带底部应用页签栏）；每行 发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮（按钮缺省「办理 ▾」，可写「领取任务」）。
@@ -2706,7 +2706,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 詹达富 | 昨天 19:28 | 付款审批 · 待审批-啥都有集团 | 财务审批 | 领取任务
 詹达富 | 昨天 01:37 | 出库审批 · CK_20260902_001 直接出库 | 出库审批
 </hb-ptasks>""",
-"hb-wpage": """手机工作台。# 页面名 横幅；sc: 库存看板:pie-s | 出库管理:check-s 快捷方式两列；tabs: *出入库情况 | 仓库报表 页签容器；sub: 出库审批 | 全部 | *待执行 | 已完成 流程任务子区（空态）。
+"hb-wpage": """手机工作台。# 页面名 横幅；sc: 库存看板:pie-s | 出库管理:check-s 快捷方式两列；tabs: *出入库情况 | 仓库报表 标签页；sub: 出库审批 | 全部 | *待执行 | 已完成 流程任务子区（空态）。
 例：
 <hb-wpage>
 # 库管工作台
@@ -2714,7 +2714,7 @@ sc: 库存看板:pie-s | 出库管理:check-s | 入库管理:trend-s | 库存盘
 tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
 </hb-wpage>""",
-"hb-chat": """企微会话流（微信端样式，未实测）。@时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
+"hb-chat": """企业微信会话（微信端样式，未实测）。@时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
 例：
 @今天 09:21
 [取货审批 · 待办] 王丽娟 的取货申请待你确认
@@ -2728,7 +2728,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 企业微信收到待办 | 不用另装 App，消息点进去就能办
 进入本人工作台 | 销售只看得到自己名下的客户与存货""",
 }
-MOBILE_NOTE = "手机上没有独立的「审批流程条」组件：审批走流程页签的任务列表（hb-ptasks）和任务办理页（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。"
+MOBILE_NOTE = "手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。"
 
 
 def render_docs(names):

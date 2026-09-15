@@ -92,7 +92,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
    自定义页面与详情页都是 24 列、列间距 20、行间距 20。配置里的 w×h 换成像素：
      像素高 = 20 × h − 20        （h=3→40、7→120、16→300、27→520、44→860、55→1080）
      列宽 C = (容器宽 − 460) / 24 ，像素宽 = w × C + (w − 1) × 20
-   容器宽实测：工作台 ultra 1297、页签容器内 1257、快捷工作台 full 1145；
+   容器宽实测：工作台 ultra 1297、标签页内 1257、快捷工作台 full 1145；
    详情页弹窗 ultra ＝弹窗宽 − 40，full ＝弹窗宽 − 192，fit ＝固定 1200。
    本文件的组件高度是照这套换算落下来的：定组件高度先算 20h−20，再减标题行 40 得内容区高。 */
 /* hb-row spans：按跨度比例分配（flex-grow），组件自身宽度不撑开 */
@@ -620,12 +620,12 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .st-spark { width: 69px; height: 40px; color: var(--c-green); }
 .st-spark.purple { color: var(--c-purple); }
 .st-spark svg { width: 100%; height: 100%; }
-/* 页签容器（页签 40 高 16px） */
+/* 标签页（页签 40 高 16px） */
 .wt-hd { height: 40px; display: flex; gap: 24px; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--line); font-size: 16px; color: var(--ink-65); overflow: hidden; white-space: nowrap; }
 .wt-hd .on { color: var(--ink-85); font-weight: 500; box-shadow: inset 0 -2px 0 var(--primary); height: 100%; display: inline-flex; align-items: center; }
 .wt-bd { padding: 16px; }
 .wt-bd.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-/* 页签容器-胶囊式（2026-09-04 自定义页面实测 page-widget-tabs）：页签行上下 20 无边线；页签 40 高 pad 0 16 字 16；
+/* 标签页（胶囊式）（2026-09-04 自定义页面实测 page-widget-tabs）：页签行上下 20 无边线；页签 40 高 pad 0 16 字 16；
    选中 600 主色＋主色 20% r9 底条；间距 8；对齐由 .center 切换（默认靠左） */
 .tabs.pill .wt-nav { display: flex; align-items: center; gap: 8px; margin: 20px 0; padding: 0 16px; }
 .tabs.pill .wt-nav.center { justify-content: center; }
@@ -682,7 +682,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .w-filter.ph { color: var(--ink-25); }
 .w-filter .cal { margin-left: auto; color: var(--ink-45); }
-/* 统计表组件（交叉表） */
+/* 透视表（交叉表） */
 .chart_table table { border-collapse: collapse; width: 100%; }
 .chart_table th { height: 34px; font-weight: 400; color: var(--ink-65); border: 1px solid rgba(0,0,0,.08); padding: 0 12px; text-align: left; }
 .chart_table td { height: 33px; border: 1px solid rgba(0,0,0,.08); padding: 0 12px; }
@@ -722,7 +722,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .multi_stats, .subtotal { padding-bottom: 10px; }
 .multi-stat-row, .subtotal-row { display: flex; justify-content: space-between; align-items: center; height: 40px; padding: 0 20px; }
 .multi-stat-row > span { font-size: 14px; line-height: 20px; color: var(--ink-85); padding-right: 16px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* 数值胶囊限定写在 <b> 上：页签容器的胶囊式用的也是 .pill（.w-card.tabs.pill），两者不能串味 */
+/* 数值胶囊限定写在 <b> 上：标签页的胶囊式用的也是 .pill（.w-card.tabs.pill），两者不能串味 */
 b.pill {
   height: 20px; min-width: 28px; flex: none; display: inline-flex; align-items: center; justify-content: center;
   border-radius: 10px; color: #fff; padding: 0 8px; font-size: 14px; line-height: 20px; font-weight: 400;
@@ -1249,7 +1249,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .fv.img .up { height: 40px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--ink-65); }
 .phone .fv.img .up .ico { width: 16px; height: 16px; }
 
-/* 子表页签容器 */
+/* 子表页签 */
 .phone .m-subtabs { margin-top: 19px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
 .phone .stab-hd { height: 40px; display: flex; align-items: center; gap: 20px; padding: 0 10px; background: var(--card-bg); font-size: 13px; color: var(--ink-85); }
 .phone .stab-hd .on { color: var(--primary); font-weight: 500; }
@@ -1469,7 +1469,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
     linear-gradient(var(--screen-corner), var(--screen-corner)) 100% 100% / 14px 2px no-repeat,
     linear-gradient(var(--screen-corner), var(--screen-corner)) 100% 100% / 2px 14px no-repeat;
 }
-/* 指标框行：一行两个，各 3 栏、6 行（100 高） */
+/* 大屏指标框行：一行两个，各 3 栏、6 行（100 高） */
 .screen-kpis { display: flex; gap: 20px; }
 .screen-kpis > .screen-kpi { flex: 1; }
 .screen-kpi { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; text-align: center; overflow: hidden; }
@@ -1503,11 +1503,11 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .screen .screen-bd svg > g > rect:nth-of-type(5) { fill: var(--screen-pie-5); }
 .screen .screen-bd svg > g > rect:nth-of-type(6) { fill: var(--screen-pie-6); }
 
-/* 中央视觉位：客户的地图/3D 图放 img；没有就用线框地球或网点阵占位，都不画国界 */
+/* 大屏中央视觉位：客户的地图/3D 图放 img；没有就用线框地球或网点阵占位，都不画国界 */
 .screen-visual { padding: 0; position: relative; overflow: hidden; }
 .screen-visual > img, .screen-visual > svg { width: 100%; height: 100%; object-fit: contain; }
 
-/* 进度条列表：条底色蓝／橙／绿／红轮转（实测色序） */
+/* 大屏进度条：条底色蓝／橙／绿／红轮转（实测色序） */
 .screen-bars { display: flex; flex-direction: column; justify-content: center; gap: 14px; flex: 1; padding: 2px 2px 4px; }
 .screen-bar { font-size: 14px; line-height: 20px; color: var(--ink-85); }
 .screen-bar .t { display: flex; justify-content: space-between; margin-bottom: 6px; }
@@ -1515,7 +1515,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .screen-bar .r { height: 8px; background: var(--tag-bg); overflow: hidden; }
 .screen-bar .r i { display: block; height: 100%; background: var(--sb, var(--screen-bar-1)); }
 
-/* 放进大屏的普通组件（表格列表、透视表、统计表）：脱掉白卡与投影，跟着大屏 token 走 */
+/* 放进大屏的普通组件（表格列表、透视表）：脱掉白卡与投影，跟着大屏 token 走 */
 .screen .w-card, .screen .chart, .screen .chart_single, .screen .chart_table { background: transparent; box-shadow: none; border: 0; border-radius: 0; }
 .screen .screen-bd > .w-card { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .screen .screen-bd > .w-card > .grid { flex: 1; }

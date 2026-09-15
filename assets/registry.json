@@ -1102,7 +1102,7 @@
       "kind": "architecture",
       "id": "w-row",
       "page_kind": "workbench",
-      "cn": "大标题 16 栏＋按钮组 8 栏同行",
+      "cn": "大标题 16 栏＋按钮组件 8 栏同行",
       "old_class": "w-row",
       "file": "c3-page-detail.html",
       "name": "横幅带操作按钮",
@@ -2461,7 +2461,7 @@
       "allowed_in": [
         "page:screen"
       ],
-      "note": "rich 大标题 18 栏 ＋ image logo ＋ timer 时间 3 栏；红色党建与青色自然用页签容器当标题容器"
+      "note": "rich 大标题 18 栏 ＋ image logo ＋ timer 时间 3 栏；红色党建与青色自然用标签页当标题容器"
     },
     {
       "kind": "component",

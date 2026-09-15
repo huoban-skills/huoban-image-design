@@ -21,7 +21,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视放在视图位 |
 | 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗随视口减 48 宽减 60 高，字段区一到四列等分 |
 | 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；记录详情弹窗仅明确要求时用 c3 模板手写 |
-| 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组与待办 → 页签 |
+| 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组件与待办 → 标签页 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端（上面任一页面的手机版） | mobile | 对应页面篇＋c4 注释 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
@@ -54,7 +54,7 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 ```
 
 - 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏。
-- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float top="…" w="…">`，体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
+- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组件、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float top="…" w="…">`，体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
 - 外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 - 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
@@ -119,7 +119,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 ```
 库管工作台.html：库管一进来就能扫码出入库、发起盘点，看到待审批的出库单；皮肤晨光蓝；进度条按实测仿写。
-出库审批.html：主管在企微里收到待办，点开核对明细后一键通过；皮肤晨光蓝；企微会话流为仿写，未实测。
+出库审批.html：主管在企微里收到待办，点开核对明细后一键通过；皮肤晨光蓝；企业微信会话为仿写，未实测。
 ```
 
 输出物落点：
