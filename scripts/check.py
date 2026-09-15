@@ -347,6 +347,15 @@ def check(path, render=False, allow_local=False):
     n_cols = len(re.findall(r'class="kanban-group', body))
     if n_cols and not SCALE["kanban_cols"][0] <= n_cols <= SCALE["kanban_cols"][1]:
         add("Medium", "scale-limit", f"看板 {n_cols} 列：常态 3～5 列")
+    _num = re.compile(r"^[+\-−]?[\d,]+(?:\.\d+)?\s*(?:%|万|亿|元|件|天|次|家|个|人|条|单|台|kg|k)?$")
+    for m in re.finditer(r'<div class="w-card chart_table">.*?</table>', body, re.S):
+        trs = re.findall(r"<tr>(.*?)</tr>", m.group(0), re.S)[1:]
+        vals = []
+        for tr in trs:
+            tds = [re.sub(r"<[^>]+>", "", x).strip() for x in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)][1:]
+            vals += [v for v in tds if v and v not in ("—", "-", "–")]
+        if vals and sum(1 for v in vals if _num.match(v)) / len(vals) < 0.6:
+            add("High", "pivot-as-list", "透视表里装的是一条条记录（大部分格子是文字）：透视表是维度 × 指标的统计，做数据分析用；记录列表改 hb-list（表格列表）", line_of(body, m.start()))
     n_pivot = len(re.findall(r'class="w-card chart_table', body))
     if n_pivot > SCALE["pivot_per_page"][1]:
         add("Medium", "scale-limit", f"透视表 {n_pivot} 张：默认 ≤2 张，多了先并成一张多维透视")

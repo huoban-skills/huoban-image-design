@@ -29,6 +29,11 @@ SKILL = Path(__file__).resolve().parent.parent
 ASSETS = SKILL / "assets"
 
 COLORS = {"red", "blue", "green", "orange", "teal", "purple", "yellow", "gray"}
+
+
+def ctok(c):
+    """系列色 token：皮肤只定义 --c-红蓝绿橙青紫黄，gray 走墨色 25%。"""
+    return "var(--ink-25)" if c == "gray" else f"var(--c-{c})"
 NAV_ICONS = {"home", "table", "doc", "flow"}
 TOOL_ICONS = {"字段": "fields", "分组": "group", "筛选": "filter", "排序": "sort", "冻结": "freeze",
               "行高": "rowheight", "导入": "import", "导出": "export", "打印": "print", "分享": "share"}
@@ -354,6 +359,13 @@ def m_pivot(a, body):
     if len(ls) < 2:
         raise ExpandError("<hb-pivot> 要有表头和至少一行数据")
     header = parse_header(cells(ls[0]))
+    if any(c["type"] in ("user", "tag", "tags", "ops") for c in header):
+        raise ExpandError("<hb-pivot> 是维度 × 指标的统计表，列里不放人员、状态标签、操作这类记录字段；一条条记录（编号、门店、负责人、日期、状态）用 hb-list（表格列表）")
+    _num = re.compile(r"^[+\-−]?[\d,]+(?:\.\d+)?\s*(?:%|万|亿|元|件|天|次|家|个|人|条|单|台|kg|k)?$")
+    _cells = [v.split(":")[0].strip() for ln in ls[1:] for v in cells(ln)[1:]]
+    _cells = [v for v in _cells if v and v not in ("—", "-", "–")]
+    if _cells and sum(1 for v in _cells if _num.match(v)) / len(_cells) < 0.6:
+        raise ExpandError("<hb-pivot> 里大部分格子是文字，这是记录列表不是统计表：透视表首列是维度（区域／产品／月份），其余列都是数字；一条条记录用 hb-list（表格列表）")
     ths = "".join(f"<th>{esc(c['name'])}</th>" for c in header)
     rows = []
     for i, ln in enumerate(ls[1:], 1):
@@ -511,13 +523,13 @@ def parse_series(body, tagname):
 def series_fill(i, s):
     """主系列 var(--primary)，同系第二层加 opacity .45，再往后用状态色；显式给了颜色就用状态色。"""
     if s["color"]:
-        return f'fill="var(--c-{s["color"]})"', f'stroke="var(--c-{s["color"]})"', ""
+        return f'fill="{ctok(s["color"])}"', f'stroke="{ctok(s["color"])}"', ""
     if i == 0:
         return 'fill="var(--primary)"', 'stroke="var(--primary)"', ""
     if i == 1:
         return 'fill="var(--primary)"', 'stroke="var(--primary)"', ' opacity=".45"'
     c = SERIES_COLORS[(i - 2) % len(SERIES_COLORS)]
-    return f'fill="var(--c-{c})"', f'stroke="var(--c-{c})"', ""
+    return f'fill="{ctok(c)}"', f'stroke="{ctok(c)}"', ""
 
 
 def axes(labels, vmax, ticks, W, H, L, T, B, R):
@@ -632,7 +644,7 @@ def m_donut(a, body):
         color = s["color"] or SERIES_COLORS[i % len(SERIES_COLORS)]
         s["color"] = color
         length = C * s["val"] / total
-        inner.append(f'<circle r="{r}" fill="none" stroke="var(--c-{color})" stroke-width="{sw}" '
+        inner.append(f'<circle r="{r}" fill="none" stroke="{ctok(color)}" stroke-width="{sw}" '
                      f'stroke-dasharray="{length:.1f} {C - length:.1f}" transform="rotate({-90 + 360 * cum:.1f})"/>')
         cum += s["val"] / total
     inner.append("</g>")
@@ -649,7 +661,7 @@ def m_donut(a, body):
     for i, s in enumerate(slices):
         y = y0 + i * step
         pct = round(100 * s["val"] / total)
-        inner.append(f'<rect x="{lx:.0f}" y="{y - 9:.0f}" width="10" height="10" rx="2" fill="var(--c-{s["color"]})"/>'
+        inner.append(f'<rect x="{lx:.0f}" y="{y - 9:.0f}" width="10" height="10" rx="2" fill="{ctok(s["color"])}"/>'
                      f'<text x="{lx + 18:.0f}" y="{y:.0f}">{esc(s["name"])}　{esc(s["raw"])}（{pct}%）</text>')
     inner.append("</g>")
     return chart_card(a, inner, "", "hb-donut", par="xMidYMid meet")
@@ -873,7 +885,7 @@ def m_hbar(a, body):
             raise ExpandError(f"<hb-hbar> 颜色「{color}」不认识，可用：{'、'.join(sorted(COLORS))}")
         pct = max(0.0, min(100.0, 100 * r["val"] / vmax))
         out.append(f'<div class="hbar-row"><span class="hbar-name">{esc(r["name"])}</span>'
-                   f'<span class="hbar-track"><i style="width:{pct:.1f}%;--pg:var(--c-{color})"></i></span>'
+                   f'<span class="hbar-track"><i style="width:{pct:.1f}%;--pg:{ctok(color)}"></i></span>'
                    f'<span class="hbar-val">{esc(r["raw"])}</span></div>')
     return chart_shell(a, "hb-hbar", f'<div class="hbar-list">{"".join(out)}</div>', extra="chart_bar_y")
 
@@ -906,7 +918,7 @@ def m_steps(a, body):
         for i, it in enumerate(items):
             name, color = split_color(it[1:].strip() if it.startswith("*") else it)
             cls = "tile" + (" on" if i == cur else "")
-            style = f' style="--pg:var(--c-{color})"' if i == cur and color else ""
+            style = f' style="--pg:{ctok(color)}"' if i == cur and color else ""
             out.append(f'<span class="{cls}"{style}>{esc(name)}</span>')
         return f'<div class="item-tiles span-{span}">' + "".join(out) + "</div>"
     out = []
@@ -1118,7 +1130,7 @@ def m_progress(a, body):
         color = c[3].strip() if len(c) > 3 and c[3].strip() else PG_COLORS[i % len(PG_COLORS)]
         if color not in COLORS:
             raise ExpandError(f"<hb-progress> 颜色「{color}」不认识，可用：{'、'.join(sorted(COLORS))}")
-        st = f'style="--pct:{pct:.1f}%;--pg:var(--c-{color})"'
+        st = f'style="--pct:{pct:.1f}%;--pg:{ctok(color)}"'
         txt = f'<span class="pg-name">{esc(c[0])}</span><span class="pg-num">{pct:.0f}%</span>'
         if style == "bar":
             out.append(f'<div class="pg-row pg-bar" {st}><span class="pg-track"></span><span class="pg-fill"></span>'
@@ -2207,7 +2219,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的组件（bare 模式）"),
+    "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-duo": (m_duo, "hb-screens 的旧名"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
@@ -2215,7 +2227,7 @@ MACROS = {
     "hb-views": (m_views, "视图页签行：名称 | 图标，* 前缀＝当前视图"),
     "hb-tools": (m_tools, "工具栏：字段|筛选:1|排序|导入|自定义:图标；属性 search、new"),
     "hb-grid": (m_grid, "网格表格：首行表头（列名:类型 / :sum=值），其后每行一条记录；# 分组行，! 选中行"),
-    "hb-pivot": (m_pivot, "统计表（w-pivot 白卡）：首行表头，其后数据行；属性 title、icon、tint、dim"),
+    "hb-pivot": (m_pivot, "透视表（维度 × 指标的统计，做数据分析用）：首行表头，其后数据行，值是数字；一条条记录用 hb-list"),
     "hb-stats": (m_stats, "单指标一行：指标名 | 值 | 单位 | spark:1,2,3 或 trend:red；mode=center|strip"),
     "hb-tasks": (m_tasks, "待办子区：标题 | 时间 | 节点说明；属性 title"),
     "hb-shortcuts": (m_shortcuts, "快捷方式：名称 | 图标；属性 title"),
@@ -2316,10 +2328,15 @@ DOCS = {
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西：bare 模式的宏（hb-grid bare、hb-ocards bare）或 extract_templates.py 提的模板；不复制底层已有内容；最多两张卡。
+"hb-float": """营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
-<hb-float top="120" w="404" title="扫码开单">
-<hb-ocards bare>…</hb-ocards>
+<hb-float side="left" top="220" w="392" title="华北区整改超期门店">
+<hb-list title="整改超期门店" nock noidx count="3">
+门店 | 督导 | 超期:tag | 状态:tag
+味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
+味小捷·天津和平路店 | 刘洋 | 4 天:red | 待跟进
+味捷·石家庄万象城店 | 张伟 | 2 天:orange | 已催办:green
+</hb-list>
 </hb-float>""",
 "hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微会话那一屏用 hb-chat 写在第一个 hb-phone 里。""",
 "hb-duo": """hb-screens 的旧名，语法相同。""",
@@ -2547,7 +2564,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 城建大厦酒窖 | 1,842
 北京办公室 | 1,097
 </hb-donut>""",
-"hb-pivot": """统计表白卡，首行表头，其后数据行，值可带 :red 做成标签。属性 title、icon、tint（yellow/blue/teal 标题栏底色，浮层里常用）、dim（首列维度灰底）、bare 只出 <table>。
+"hb-pivot": """透视表（官方 chart_table），做数据分析用：首列是维度（区域、产品、月份、人员），其余列是该维度下的数字指标，值可带 :red 做成标签。它不是记录列表，编号、门店、负责人、日期、状态这种一条条的记录用 hb-list（表格列表）；列里带 :user/:tag、或大部分格子是文字时会报错。属性 title、icon、tint（yellow/blue/teal 标题栏底色）、dim（首列维度灰底）、bare 只出 <table>。
 例：
 <hb-pivot title="分存放点库存统计" dim>
 存放点 | 品种数 | 在库数量
@@ -2662,7 +2679,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 "hb-vbar": """列表页视图条 48。属性 view 视图名、count 条数、icon（默认 grid-s）、nosearch。自闭合写法。
 例：
 <hb-vbar view="全部数据" count="11"/>""",
-"hb-ocards": """三槽卡片列表（产品默认卡片形态，最多 3 个字段）。每行 标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮名:图标 | img；副标题可留空；值后缀 :gray 做灰底标签、:orange 等做彩色选项标签；第四列省略则无按钮；第五列写 img 出右侧图片位。
+"hb-ocards": """手机专用，只放在 hb-phone 里。三槽卡片列表（产品默认卡片形态，最多 3 个字段）。每行 标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮名:图标 | img；副标题可留空；值后缀 :gray 做灰底标签、:orange 等做彩色选项标签；第四列省略则无按钮；第五列写 img 出右侧图片位。
 属性 fab 出悬浮新建钮、pager="20 行/页" 出分页条、bare 只出卡片不带列表底。
 例：
 <hb-ocards fab>

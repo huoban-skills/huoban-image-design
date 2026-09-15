@@ -16,6 +16,7 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 - `orphan-span`：`.span-N` 列外面没有 `w-row` 行容器，列会退化成通栏竖叠；并排的组件写进同一个 `<hb-row spans=…>`，不要自己包 span 列。
 - `todo-stacked`：待办、我处理的、我发起的各占通栏竖着叠；并排写进一个 `<hb-row spans="8|8|8">`（或 8|16）。
 - `card-stretched`：并排里某栏只有一张矮卡，会被拉到与邻栏等高、卡里空一大块；用 `<hb-col>` 在这栏再叠一个组件，或换更高的组件。
+- `pivot-as-list`：透视表里装的是记录（大部分格子是文字）；透视表是维度 × 指标的统计，记录列表改 hb-list。
 - `mobile-in-pc`：PC 图里出现手机组件（订单卡、手机工作台、会话流），样式只在 hb-phone 里生效，会散成裸文字；PC 浮层改用 PC 组件。
 - `empty-state`：画面里出现「没有找到任务／暂无数据」空态；营销图每块都要有内容。
 - `column-short`：同一行里短栏比长栏矮 100px 以上（按 base.css 实测行高估算，不用 Chrome）；单张卡会被拉到等高不算，栏里是单指标行或多张卡才报。修法同 `column-uneven`。

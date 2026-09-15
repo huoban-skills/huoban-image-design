@@ -58,13 +58,18 @@ hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组、多项统计
 ```
 
 ### hb-float
-营销浮层：属性 side=right|left、top、w、title；体内放底层没有的组件（bare 模式）
+营销浮层：属性 side=right|left、top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏
 
 ```
-营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西：bare 模式的宏（hb-grid bare、hb-ocards bare）或 extract_templates.py 提的模板；不复制底层已有内容；最多两张卡。
+营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
-<hb-float top="120" w="404" title="扫码开单">
-<hb-ocards bare>…</hb-ocards>
+<hb-float side="left" top="220" w="392" title="华北区整改超期门店">
+<hb-list title="整改超期门店" nock noidx count="3">
+门店 | 督导 | 超期:tag | 状态:tag
+味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
+味小捷·天津和平路店 | 刘洋 | 4 天:red | 待跟进
+味捷·石家庄万象城店 | 张伟 | 2 天:orange | 已催办:green
+</hb-list>
 </hb-float>
 ```
 
@@ -441,10 +446,10 @@ CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
 ```
 
 ### hb-pivot
-统计表（w-pivot 白卡）：首行表头，其后数据行；属性 title、icon、tint、dim
+透视表（维度 × 指标的统计，做数据分析用）：首行表头，其后数据行，值是数字；一条条记录用 hb-list
 
 ```
-统计表白卡，首行表头，其后数据行，值可带 :red 做成标签。属性 title、icon、tint（yellow/blue/teal 标题栏底色，浮层里常用）、dim（首列维度灰底）、bare 只出 <table>。
+透视表（官方 chart_table），做数据分析用：首列是维度（区域、产品、月份、人员），其余列是该维度下的数字指标，值可带 :red 做成标签。它不是记录列表，编号、门店、负责人、日期、状态这种一条条的记录用 hb-list（表格列表）；列里带 :user/:tag、或大部分格子是文字时会报错。属性 title、icon、tint（yellow/blue/teal 标题栏底色）、dim（首列维度灰底）、bare 只出 <table>。
 例：
 <hb-pivot title="分存放点库存统计" dim>
 存放点 | 品种数 | 在库数量
@@ -712,7 +717,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 三槽卡片列表：标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮:图标 | img；属性 fab、pager、bare
 
 ```
-三槽卡片列表（产品默认卡片形态，最多 3 个字段）。每行 标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮名:图标 | img；副标题可留空；值后缀 :gray 做灰底标签、:orange 等做彩色选项标签；第四列省略则无按钮；第五列写 img 出右侧图片位。
+手机专用，只放在 hb-phone 里。三槽卡片列表（产品默认卡片形态，最多 3 个字段）。每行 标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮名:图标 | img；副标题可留空；值后缀 :gray 做灰底标签、:orange 等做彩色选项标签；第四列省略则无按钮；第五列写 img 出右侧图片位。
 属性 fab 出悬浮新建钮、pager="20 行/页" 出分页条、bare 只出卡片不带列表底。
 例：
 <hb-ocards fab>
