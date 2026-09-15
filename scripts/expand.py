@@ -896,10 +896,10 @@ def m_info(a, body):
     for ln in lines(body):
         c = cells(ln)
         if len(c) < 2:
-            raise ExpandError(f"<hb-info> 每行「字段名 | 值」：{ln}")
+            raise ExpandError(f"<hb-hcard> 体内每行「字段名 | 值」：{ln}")
         typ = c[2] if len(c) > 2 else "text"
         out.append(f'<div class="page-header-info-item"><div class="page-header-info-label">{esc(c[0])}</div>'
-                   f'<div class="page-header-info-value">{render_val(c[1], typ, "hb-info")}</div></div>')
+                   f'<div class="page-header-info-value">{render_val(c[1], typ, "hb-hcard")}</div></div>')
     return '<div class="page-header-info">' + "".join(out) + "</div>"
 
 
@@ -2250,7 +2250,7 @@ MACROS = {
     "hb-stream": (m_stream, "动态：每行「人名 | 时间 | 内容」，人名写 sys:名 出系统动态；属性 span"),
     "hb-comment": (m_comment, "评论：每行「人名 | 时间 | 内容」，无行出空态；属性 title、span"),
     "hb-itembar": (m_itembar, "详情页记录功能区：属性 title；体内快捷按钮「名:solid|名:line|名:line:dis」"),
-    "hb-hcard": (m_hcard, "详情页页头卡片：属性 title、sub；体内关键字段行同 hb-info"),
+    "hb-hcard": (m_hcard, "详情页页头卡片：属性 title、sub；体内每行「字段名 | 值 | 类型」，类型 user/tag/tags 可选"),
     "hb-tabcard": (m_tabcard, "页签卡：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程页签时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
     "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
