@@ -58,12 +58,12 @@ hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统
 ```
 
 ### hb-float
-营销浮层：属性 side=right|left、top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏
+营销浮层（只从右侧探出）：属性 top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏
 
 ```
-营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
+营销浮层，从右侧探出。属性 top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
-<hb-float side="left" top="220" w="392" title="华北区整改超期门店">
+<hb-float top="220" w="392" title="华北区整改超期门店">
 <hb-list title="整改超期门店" nock noidx count="3">
 门店 | 督导 | 超期:tag | 状态:tag
 味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进

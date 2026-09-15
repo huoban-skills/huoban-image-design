@@ -8,7 +8,7 @@
     python3 scripts/export.py 图.html --probe               # 渲染探针 JSON（空隙、裁切、浮层出界、并排不齐）
 
 默认交付物是 HTML，本脚本只在用户或报告明确要 PNG/SVG 时用。
-Chrome 探测顺序：CHROME_BIN → macOS 本机 Chrome → PATH 里的 chrome-headless-shell/google-chrome/chromium → ~/chrome-headless-shell-linux64。
+Chrome 探测顺序：CHROME_BIN → macOS 本机 Chrome → ~/chrome-headless-shell-linux64 → PATH 里的 chrome-headless-shell/google-chrome/chromium。
 不自动下载；沙箱里没有 Chrome 就跳过 PNG，交 HTML。
 """
 import argparse

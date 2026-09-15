@@ -24,7 +24,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组件与待办 → 标签页 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
-| 手机端（上面任一页面的手机版） | mobile | 对应页面篇＋c4 注释 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
+| 手机端（上面任一页面的手机版） | mobile | 对应页面篇；手机组件用途用 `extract_templates.py assets/c4-mobile.html --list` 看 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
 
 要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
 
@@ -36,11 +36,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ### 1. 追问并确认需求单（闸门）
 
-- 按 [references/intake.md](references/intake.md) 追问，只问决定、事实自己定，每条消息发出即停，等用户答完再发下一条：
-  1. 定盘子：画布、配色（皮肤按 [references/skin/routing.md](references/skin/routing.md) 选），加定不下来的清单维度（主角、讲哪些事、颗粒度）。
-  2. 需求单初稿单独一条，只让用户增删图，不带题、不问"确认吗"。
-  3. 逐图决定，每轮 3 张图、一题一个编号、推荐带理由；有依赖的题推到下一轮，问完为止。
-  4. 发终稿需求单，问"按这份做吗"。
+- 按 [references/intake.md](references/intake.md) 追问，依次发四种消息：定盘子 → 需求单初稿 → 逐图决定（可多轮）→ 终稿；每条发出即停，等用户答完再发下一条。配色按 [references/skin/routing.md](references/skin/routing.md) 推荐。
 - 完成标准：题库问空、终稿"决定与默认"列没有"待问"、用户对终稿回了确认。**初稿被认可不算确认；三条不齐，不进入步骤 2。**
 
 ### 2. 写骨架片段
@@ -118,7 +114,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 交付说明（回复正文里的一段，每张图一行）：
 
 ```
-库管工作台.html：库管一进来就能扫码出入库、发起盘点，看到待审批的出库单；皮肤晨光蓝；进度条按实测仿写。
+库管工作台.html：库管一进来就能扫码出入库、发起盘点，看到待审批的出库单；皮肤晨光蓝。
 出库审批.html：主管在企微里收到待办，点开核对明细后一键通过；皮肤晨光蓝；企业微信会话为仿写，未实测。
 ```
 
@@ -133,7 +129,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 ## 写作规则
 
-页面级规则（横幅写角色不写人、页头卡片不放按钮、浮层只放底层没有的内容、标注气泡只在用户要求时加、页面底色二选一）写在各页面原则和 references/canvas/marketing.md 里；这里只列跨页面的硬约束。
+横幅、页签、页面底色这类自定义页面通用规则在 visual-four-principles，页头卡片这类页面级规则在各页面原则，浮层与标注气泡在 references/canvas/marketing.md；这里只列跨页面的硬约束。
 
 | 约束 | 内容 |
 | --- | --- |

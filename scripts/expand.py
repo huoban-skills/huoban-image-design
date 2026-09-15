@@ -1735,7 +1735,7 @@ def m_conn(a, body):
     return '<div class="conn">' + arrow.join(steps) + "</div>"
 
 
-# ── 页面骨架：hb-page / hb-row / hb-float / hb-duo ─────────────────────
+# ── 页面骨架：hb-page / hb-row / hb-float ─────────────────────
 # 模型只填槽位内容，外壳（.stage、.window、.page、详情页画布）由这里产出；
 # 槽位表来自 references/principles/ 五篇页面原则里的"固定顺序"。
 WARNINGS = []
@@ -1784,7 +1784,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         order_free={"hb-tabcard"},
         first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel",
                           "hb-scatter", "hb-map", "hb-filters"},
-        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 按钮组件（快捷方式版式，必）与待办（hb-row 并排）→ 表格列表（我名下的记录）→ 标签页。趋势与对比图表、筛选不放首屏（顶层出现会提示），要收进 hb-tabcard 或放页面末尾；hb-tabcard 位置自由，放在 hb-list、hb-pivot 之后把图表收进末位页签也可以。",
+        doc="产品壳 → 横幅（必）→ 单指标一行（可选，4～6 个）→ 按钮组件（快捷方式版式，必；4 个按钮以上独占一行，3 个以下与单指标或待办 hb-row 并排）→ 待办行（hb-row 8|8|8：多项统计＋我处理的＋我发起的）→ 表格列表（我名下的记录）→ 标签页。这是层叠式，其余版式见 references/principles/workbench.md。趋势与对比图表、筛选不放首屏（顶层出现会提示），要收进 hb-tabcard 或放页面末尾；hb-tabcard 位置自由，放在 hb-list、hb-pivot 之后把图表收进末位页签也可以。",
         example="""<hb-page kind="workbench" ws="云图贸易" page="库管工作台" me="周">
 <hb-nav>
 # 物资台账
@@ -1800,17 +1800,33 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 本仓在库 | 1,842 | 件
 库存预警品种 | 6
 </hb-stats>
-<hb-row spans="8|16">
 <hb-shortcuts title="快捷方式">
-扫码出入库 | f-barcode
+扫码出库 | f-barcode
+扫码入库 | f-barcode
 发起盘点 | chart-s
+新建调拨单 | check-s
 </hb-shortcuts>
-<hb-tasks title="待我办理的流程">
-出库审批 · CK-20260824-0037 领用出库 | 1.4 小时前 | 库管审批
+<hb-row spans="8|8|8">
+<hb-multistats title="待办">
+待我审批的出库单 | 3
+待确认的入库单 | 7
+超期未盘点品种 | 2 | red
+</hb-multistats>
+<hb-tasks title="我处理的">
+出库审批 · CK-20260824-0037 | 1.4 小时前 | 待仓库主管审批
+入库确认 · RK-20260823-0112 | 5 小时前 | 待库管确认
 </hb-tasks>
+<hb-procs title="我发起的">
+盘点任务 | PD-20260820-0005 | 仓库主管复核 | 审批中:orange | 8月20日
+调拨申请 | DB-20260818-0009 | 调入仓确认 | 已完成:green | 8月18日
+</hb-procs>
 </hb-row>
 <hb-tabcard pill tabs="*出库明细|历史出入库">
-<hb-grid bare>…</hb-grid>
+<hb-grid bare>
+出库单号 | 物资 | 数量 | 领用人:user | 状态:tag
+CK-20260824-0037 | 茅台飞天 53° | 12 | 周敏 | 待审批:orange
+CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
+</hb-grid>
 </hb-tabcard>
 </hb-page>"""),
     "dashboard": dict(
@@ -1851,10 +1867,11 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 茶叶 | 1204 | green
 </hb-donut>
 </hb-row>
-<hb-pivot title="库存预警明细">
+<hb-list title="库存预警明细" count="6">
 品名 | 仓库 | 在库 | 下限 | 状态:tag
 茅台飞天 53° | 城建大厦酒窖 | 36 | 60 | 低于下限:red
-</hb-pivot>
+武夷山大红袍 | 东区仓 | 18 | 25 | 低于下限:orange
+</hb-list>
 </hb-page>"""),
     "detail": dict(
         cn="自定义详情页",
@@ -1960,7 +1977,7 @@ WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
 </hb-page>"""),
     "mobile": dict(
         cn="手机端",
-        allowed={"hb-phone", "hb-screens", "hb-duo", "hb-cover"},
+        allowed={"hb-phone", "hb-screens", "hb-cover"},
         required=[],
         order=["hb-cover", "hb-phone", "hb-screens"],
         doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。",
@@ -2004,16 +2021,15 @@ def _top_level(raw):
 
 
 def m_float(a, body):
-    side = a.get("side", "right")
-    if side not in ("right", "left"):
-        raise ExpandError('<hb-float side> 只能是 right 或 left')
+    if a.get("side", "right") != "right":
+        raise ExpandError('<hb-float> 只从右侧探出：PC 页面左边是导航（详情页左边是页头与字段），浮层放左会盖住它们；去掉 side 属性')
     top = str(a.get("top", "96")).rstrip("px")
     w = str(a.get("w", "356")).rstrip("px")
     n_cards = len(re.findall(r'class="w-card', body))
     if n_cards > 2:
         warn(f"浮层里放了 {n_cards} 个组件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
     title = f'<div class="float-title">{esc(a["title"])}</div>' if a.get("title") else ""
-    return (f'<div class="mk-float{" left" if side == "left" else ""}" data-side="{side}" '
+    return (f'<div class="mk-float" '
             f'style="--float-top:{top}px;--float-w:{w}px">{title}{body.strip()}</div>')
 
 
@@ -2057,7 +2073,6 @@ def m_screens(a, body):
     return f'<div class="duo" data-screens="{phones}">{html}</div>'
 
 
-m_duo = m_screens  # 旧名，保留给已有片段
 
 
 def _check_slots(kind, spec, names, deep, first_screen=None):
@@ -2141,19 +2156,17 @@ def m_page(a, body):
             nav_html = m_nav(attrs_of(mm.group(2)), mm.group(3) or "")
             continue
         html_ = expand(raw) if name else raw
+        if name == "hb-shortcuts" and kind == "workbench" and 0 < html_.count('class="sc"') <= 3:
+            warn(f"按钮组件只有 {html_.count('class=\"sc\"')} 个按钮却独占一行，右侧会空一大条：3 个以下写进 <hb-row>，与单指标或待办并排（4 个以上才独占一行）")
         if name == "hb-float":
             if canvas == "product":
                 raise ExpandError("产品设计类画布不放浮层：去掉 <hb-float>，或改 canvas=\"marketing\"")
-            if kind == "detail" and 'data-side="left"' in html_:
-                raise ExpandError("自定义详情页的浮层只能右探出：把 <hb-float> 的 side 改成 right（详情页左边是字段与正文，左探会盖住记录本身）")
             floats.append(html_)
         else:
             main_parts.append((name, html_))
     stage_cls = ["stage", "auto"]
     if floats:
         stage_cls.append("has-float")
-        if any('data-side="left"' in f for f in floats):
-            stage_cls.append("float-left")
     if canvas == "product":
         stage_cls.append("product")
     stage_style = ""
@@ -2201,14 +2214,14 @@ def m_page(a, body):
 
 def render_page(kind):
     if kind not in PAGE_SLOTS:
-        raise ExpandError(f"没有页面类型 {kind}。可用：{'/'.join(k for k in PAGE_SLOTS if k != 'analysis')}")
+        raise ExpandError(f"没有页面类型 {kind}。可用：{'/'.join(PAGE_SLOTS)}")
     spec = PAGE_SLOTS[kind]
     lines_ = [f"[{spec['cn']}] <hb-page kind=\"{kind}\">", spec["doc"],
               f"必有：{'、'.join(spec['required']) or '无'}；顺序：{' → '.join(spec['order'])}",
-              "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"]) if n != "hb-duo"),
+              "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"])),
               "hb-page 通用属性：canvas=marketing|product（默认 marketing）、ws/page/nav/me/theme/logo/bottom（产品壳，同 hb-shell）、level=flat|card（页面底色，默认 flat）、cut=高度px（窗口截到主要内容为止，默认按内容撑高）",
               "", "最小示例：", spec["example"], "",
-              "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(n for n in spec["allowed"] if n != "hb-duo"))]
+              "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(spec["allowed"]))]
     return "\n".join(lines_)
 
 
@@ -2216,9 +2229,8 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
+    "hb-float": (m_float, "营销浮层（只从右侧探出）：属性 top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
-    "hb-duo": (m_duo, "hb-screens 的旧名"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
     "hb-views": (m_views, "视图页签行：名称 | 图标，* 前缀＝当前视图"),
@@ -2324,9 +2336,9 @@ DOCS = {
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层。属性 side=right（默认）/left、top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
+"hb-float": """营销浮层，从右侧探出。属性 top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
-<hb-float side="left" top="220" w="392" title="华北区整改超期门店">
+<hb-float top="220" w="392" title="华北区整改超期门店">
 <hb-list title="整改超期门店" nock noidx count="3">
 门店 | 督导 | 超期:tag | 状态:tag
 味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
@@ -2335,7 +2347,6 @@ DOCS = {
 </hb-list>
 </hb-float>""",
 "hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微会话那一屏用 hb-chat 写在第一个 hb-phone 里。""",
-"hb-duo": """hb-screens 的旧名，语法相同。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。

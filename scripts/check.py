@@ -328,6 +328,10 @@ def check(path, render=False, allow_local=False):
                     run = 0
 
     walk_divs(body, "", _struct)
+    if "mk-float" in body and ('shell-side' in body or 'item-page' in body):
+        left_css = re.search(r"\.mk-float[^{]*\{[^}]*\bleft\s*:\s*0", tail)
+        if "float-left" in body or re.search(r'class="mk-float[^"]*\bleft\b', body) or left_css:
+            add("High", "float-left", "浮层放在了左侧：左边是导航（详情页是页头与字段），会被盖住；浮层只从右侧探出，用 <hb-float> 默认位置")
     if re.search(r'class="(ocard|m-workbench|m-chat|rec-card|obar)\b', body) and 'class="phone' not in body:
         add("High", "mobile-in-pc", "PC 图里出现了手机组件（订单卡、手机工作台、会话流等），样式只在 hb-phone 里生效，会散成一堆裸文字：PC 页和 PC 浮层改用 hb-fields、hb-list、hb-multistats 这类 PC 组件")
     if 'class="wempty"' in body or "暂无数据" in body:

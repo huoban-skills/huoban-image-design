@@ -64,7 +64,6 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
   border: 1px solid var(--line); /* 画布层无投影，细边界定窗口范围 */
 }
 .stage.has-float .window { width: 1440px; } /* 有浮层时窗口收窄 200，浮层探出补满 1640 */
-.stage.has-float.float-left .window { margin-left: 200px; } /* 浮层放左侧时窗口右移，浮层从左缘探出 */
 .mk-float { position: absolute; z-index: 3; } /* 位置每图自定（1.x 手写外壳时） */
 /* ── 2.0 骨架宏画布（hb-page 产出 .stage.auto）：高度按内容撑，不再手写 .stage 的 height ── */
 .stage.auto { height: auto; }
@@ -79,13 +78,10 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .item-page-scroll { overflow: visible; }
 .stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
 .stage.auto.has-float .window { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
-.stage.auto.has-float.float-left { grid-template-columns: 200px 1440px; }
-.stage.auto.has-float.float-left .window { grid-area: 1 / 2 / 2 / 3; margin: 0; }
 .stage.auto .mk-float {
   position: relative; z-index: 3; grid-area: 1 / 1 / 2 / 3; justify-self: end; align-self: start;
   width: var(--float-w, 356px); margin-top: var(--float-top, 96px); margin-bottom: 24px;
 }
-.stage.auto .mk-float.left { justify-self: start; }
 .stage.auto .float-title { font-size: 13px; font-weight: 500; color: var(--ink-45); margin-bottom: 8px; }
 .stage.auto.product .window { border-radius: 0; border: 0; }
 /* ── 栅格换算（2026-09-14 实测，三个工作区的自定义页面与详情页都成立）──

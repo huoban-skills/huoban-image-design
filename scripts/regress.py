@@ -44,6 +44,9 @@ def main():
     if "--help" in args or "-h" in args or any(a not in ("--update",) for a in args):
         print(__doc__.strip() if __doc__ else "用法：python3 scripts/regress.py [--update]"); return 0 if ("--help" in args or "-h" in args) else 2
     update = "--update" in args
+    if not FRAGS.is_dir() or not any(FRAGS.glob("*.frag.html")):
+        print(f"✗ 回归集不存在或没有片段：{FRAGS}（放回 huoban-image-design-tests/，或用 HB_TESTS_DIR 指到它）")
+        return 1
     GOLD.mkdir(parents=True, exist_ok=True)
     tmp = TESTS / "_out"
     tmp.mkdir(exist_ok=True)

@@ -20,6 +20,7 @@
 改过 base.css 或皮肤后重跑本脚本即可重拼既有图（图里嵌的是拼装时的快照）。
 """
 import argparse
+import base64
 import re
 import sys
 from pathlib import Path
