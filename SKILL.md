@@ -109,7 +109,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 ## 输出物模板
 
-需求单模板在 [references/intake.md](references/intake.md)「需求单」一节，对内对外同一格式。
+需求单模板在 [references/intake.md](references/intake.md)「需求单」一节，初稿和终稿同一格式。
 
 交付说明（回复正文里的一段，每张图一行）：
 
