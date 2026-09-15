@@ -1868,7 +1868,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         required=["hb-itembar", "hb-hcard", "hb-fields", "hb-tabcard"],
         order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-list", "hb-tabcard",
                "hb-flow", "hb-stream", "hb-comment", "hb-float"],
-        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必，单栏或 hb-row spans=13|11 双栏）→ 页签容器（必）→ 流程执行记录、动态、评论。"
+        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必；单栏通栏，双栏 hb-row spans=13|11 左字段右分析区，主从 hb-row spans=8|16 或 16|8 主栏页签容器放子表、从栏字段组或流程页签，主栏叠两个页签容器用 hb-col）→ 页签容器（必）→ 流程执行记录、动态、评论。"
             "页头卡片、字段组必有：一条记录先说清是哪条、有哪些字段，页签内的字段组也算。图表宏只能放在 hb-row 或 hb-tabcard 体内，不在顶层。"
             "不套产品壳；浮层只能右探出（side=\"left\" 会报错）。",
         example="""<hb-page kind="detail">
@@ -2120,18 +2120,17 @@ def m_page(a, body):
             break
     if _tail:
         first_screen = first_screen[:len(first_screen) - _tail]   # 页面末尾的图表不算首屏
+    def _walk(raw_, into_first):
+        inner_ = TAG_RE.match(raw_).group(3) or ""
+        for m_ in TAG_RE.finditer(inner_):
+            deep.append(m_.group(1))
+            if into_first:
+                first_screen.append(m_.group(1))
+            if m_.group(1) in ("hb-row", "hb-tabcard", "hb-col"):
+                _walk(m_.group(0), into_first and m_.group(1) != "hb-tabcard")
     for n, raw in parts:
         if n in ("hb-row", "hb-tabcard", "hb-col"):
-            inner = TAG_RE.match(raw).group(3) or ""
-            for m in TAG_RE.finditer(inner):
-                deep.append(m.group(1))
-                if n == "hb-row":
-                    first_screen.append(m.group(1))
-                if m.group(1) in ("hb-row", "hb-tabcard", "hb-col"):
-                    sub = TAG_RE.match(m.group(0)).group(3) or ""
-                    deep += [x.group(1) for x in TAG_RE.finditer(sub)]
-                    if n == "hb-row" and m.group(1) == "hb-col":
-                        first_screen += [x.group(1) for x in TAG_RE.finditer(sub)]
+            _walk(raw, n == "hb-row")
     if kind != "mobile":
         bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn))\b", a.get("_raw", body))
         if bad:
