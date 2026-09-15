@@ -104,6 +104,10 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .w-row > .span-18 { flex: 18 1 0%; } .w-row > .span-20 { flex: 20 1 0%; } .w-row > .span-24 { flex: 24 1 0%; }
 .w-row > [class*="span-"] { min-width: 0; }
 .w-row > [class*="span-"] > .w-card, .w-row > [class*="span-"] > .procedure_task { height: 100%; }
+/* hb-col：一栏里竖叠 2～3 个组件；最后一张卡吃掉剩余高度，整栏与邻栏等高 */
+.w-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.w-row > [class*="span-"] > .w-col { height: 100%; }
+.w-col > .w-card:last-child, .w-col > .procedure_task:last-child { flex: 1 1 auto; }
 /* 详情页栅格里的 hb-row：整行占 24 栏 */
 .item-grid > .w-row { grid-column: span 24; }
 .mk-callout {

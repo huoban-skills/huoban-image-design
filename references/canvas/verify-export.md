@@ -15,6 +15,9 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 - `scale-limit`：表格行数、单指标个数、看板列数、透视表张数、浮层卡数超出出图约束（几何问题在无 Chrome 时只能靠约束规避）；是设计判断，确有理由可保留并在验收表第 8 条写明。
 - `orphan-span`：`.span-N` 列外面没有 `w-row` 行容器，列会退化成通栏竖叠；并排的组件写进同一个 `<hb-row spans=…>`，不要自己包 span 列。
 - `todo-stacked`：待办、我处理的、我发起的各占通栏竖着叠；并排写进一个 `<hb-row spans="8|8|8">`（或 8|16）。
+- `card-stretched`：并排里某栏只有一张矮卡，会被拉到与邻栏等高、卡里空一大块；用 `<hb-col>` 在这栏再叠一个组件，或换更高的组件。
+- `mobile-in-pc`：PC 图里出现手机组件（订单卡、手机工作台、会话流），样式只在 hb-phone 里生效，会散成裸文字；PC 浮层改用 PC 组件。
+- `empty-state`：画面里出现「没有找到任务／暂无数据」空态；营销图每块都要有内容。
 - `column-short`：同一行里短栏比长栏矮 100px 以上（按 base.css 实测行高估算，不用 Chrome）；单张卡会被拉到等高不算，栏里是单指标行或多张卡才报。修法同 `column-uneven`。
 - `empty-gap`（要 `--render`）只看布局层——组件之间、组件到画布边缘不许有大片空白；组件内部留白由数据量决定，属产品原样。
 - `column-uneven`（要 `--render`）：同一行两栏底部落差超过 24px；修法是给短的那栏补数据行或调 `hb-row spans`，不用固定高度硬撑。

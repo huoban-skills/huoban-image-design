@@ -487,6 +487,8 @@ def nice_max(m):
     top = math.ceil(m / step) * step
     if top / m < 1.15:
         top += step
+    if m <= 100 < top:
+        top = 100          # 覆盖率、及时率这类 0～100 的数，轴顶不画到 110
     return top
 
 
@@ -1673,6 +1675,7 @@ def m_wpage(a, body):
             if len(c) > 1:
                 chips = '<span class="chips">' + "".join(f'<span class="chip{" on" if on else ""}">{esc(n)}</span>' for n, on in star_items("|".join(c[1:]))) + "</span>"
             sub_html = f'<div class="wsub"><div class="wsh">{esc(c[0])}{chips}</div><div class="wempty"><i></i>没有找到任务</div></div>'
+            warn("hb-wpage 的 sub: 会渲染成「没有找到任务」空态：营销图不放空态，任务列表用 hb-ptasks 另起一屏，或去掉 sub:")
         else:
             raise ExpandError(f"<hb-wpage> 行要以 #（横幅）/ sc:（快捷方式）/ tabs:（页签）/ sub:（任务子区）开头：{ln}")
     if tabs_html or sub_html:
@@ -1715,7 +1718,11 @@ def m_chat(a, body):
 
 
 def m_conn(a, body):
-    steps = [f'<div class="step"><b>{esc(c[0])}</b>{esc(c[1]) if len(c) > 1 else ""}</div>' for c in map(cells, lines(body))]
+    rows = [cells(ln) for ln in lines(body)]
+    for c in rows:
+        if len(c) > 1 and len(c[1]) > 18:
+            warn(f"hb-conn 说明「{c[1]}」超过 18 字：中缝只有 216px 宽，会绕成三四行贴到手机上，精简成一句")
+    steps = [f'<div class="step"><b>{esc(c[0])}</b>{esc(c[1]) if len(c) > 1 else ""}</div>' for c in rows]
     arrow = f'<div class="bigarr">{ico("arrow-right")}</div>'
     return '<div class="conn">' + arrow.join(steps) + "</div>"
 
@@ -1759,7 +1766,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "workbench": dict(
         cn="工作台",
-        allowed={"hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-tabcard",
+        allowed={"hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-col", "hb-tabcard",
                  "hb-pivot", "hb-filters", "hb-float", "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar",
                  "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map",
                  "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal"},
@@ -1800,7 +1807,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "dashboard": dict(
         cn="数据看板",
-        allowed={"hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
+        allowed={"hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-col", "hb-bar", "hb-line", "hb-donut",
                  "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map", "hb-pivot", "hb-tabcard",
                  "hb-float", "hb-multistats", "hb-list", "hb-progress", "hb-subtotal"},
         required=["hb-nav", "hb-banner"],
@@ -1843,7 +1850,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
 </hb-page>"""),
     "detail": dict(
         cn="自定义详情页",
-        allowed={"hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-tabcard", "hb-flow",
+        allowed={"hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-col", "hb-tabcard", "hb-flow",
                  "hb-stats", "hb-pivot", "hb-grid", "hb-float", "hb-multistats", "hb-list", "hb-progress",
                  "hb-subtotal", "hb-stream", "hb-comment"},
         required=["hb-itembar", "hb-hcard", "hb-fields", "hb-tabcard"],
@@ -2000,6 +2007,17 @@ def m_float(a, body):
             f'style="--float-top:{top}px;--float-w:{w}px">{title}{body.strip()}</div>')
 
 
+def m_col(a, body):
+    parts = [p for p in _top_level(a.get("_raw", body))]
+    items = [expand(raw) if name else raw for name, raw in parts]
+    names = [n for n, _ in parts if n]
+    if len(names) < 2:
+        raise ExpandError("<hb-col> 是给一栏里竖叠 2～3 个组件用的；只有 1 个组件就直接放进 hb-row 那一段")
+    if len(names) > 3:
+        warn(f"hb-col 里竖叠了 {len(names)} 个组件：一栏最多叠 3 个，多了这栏会比邻栏高出一截")
+    return '<div class="w-col">' + "".join(items) + "</div>"
+
+
 def m_row(a, body):
     parts = [p for p in _top_level(a.get("_raw", body))]
     spans = [s.strip() for s in str(a.get("spans", "")).split("|") if s.strip()]
@@ -2091,14 +2109,21 @@ def m_page(a, body):
     if _tail:
         first_screen = first_screen[:len(first_screen) - _tail]   # 页面末尾的图表不算首屏
     for n, raw in parts:
-        if n in ("hb-row", "hb-tabcard"):
+        if n in ("hb-row", "hb-tabcard", "hb-col"):
             inner = TAG_RE.match(raw).group(3) or ""
             for m in TAG_RE.finditer(inner):
                 deep.append(m.group(1))
                 if n == "hb-row":
                     first_screen.append(m.group(1))
-                if m.group(1) in ("hb-row", "hb-tabcard"):
-                    deep += [x.group(1) for x in TAG_RE.finditer(TAG_RE.match(m.group(0)).group(3) or "")]
+                if m.group(1) in ("hb-row", "hb-tabcard", "hb-col"):
+                    sub = TAG_RE.match(m.group(0)).group(3) or ""
+                    deep += [x.group(1) for x in TAG_RE.finditer(sub)]
+                    if n == "hb-row" and m.group(1) == "hb-col":
+                        first_screen += [x.group(1) for x in TAG_RE.finditer(sub)]
+    if kind != "mobile":
+        bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn))\b", a.get("_raw", body))
+        if bad:
+            raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里；PC 页和 PC 浮层里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
     _check_slots(kind, spec, names, deep, first_screen)
     floats, main_parts, nav_html = [], [], ""
     for name, raw in parts:
@@ -2181,6 +2206,7 @@ def render_page(kind):
 MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
+    "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组、多项统计、进度条）别单独占一栏被拉高"),
     "hb-float": (m_float, "营销浮层：属性 side=right|left、top、w、title；体内放底层没有的组件（bare 模式）"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-duo": (m_duo, "hb-screens 的旧名"),
@@ -2251,7 +2277,7 @@ COMMON = """通用写法
 - 没有对应宏的组件：`python3 scripts/registry.py --list 页面类型` 里「宏」一列是 — 的那些，按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
 
 GROUPS = [
-    ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-float", "hb-screens"]),
+    ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-col", "hb-float", "hb-screens"]),
     ("产品壳（PC）", ["hb-shell", "hb-nav"]),
     ("列表页", ["hb-views", "hb-tools", "hb-grid", "hb-kanban", "hb-cards"]),
     ("自定义页面组件（工作台 / 数据看板）", ["hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-shortcuts", "hb-tasks",
@@ -2266,7 +2292,25 @@ GROUPS = [
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
-"hb-row": """24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放组件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
+"hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
+并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
+例：
+<hb-row spans="8|16">
+<hb-col>
+<hb-shortcuts title="快捷方式">
+新建巡检计划 | check-s
+飞行检查派单 | warn
+</hb-shortcuts>
+<hb-multistats title="待办">
+待我审核的整改 | 12 | orange
+超期未整改 | 3 | red
+</hb-multistats>
+</hb-col>
+<hb-tasks title="待我审核的整改">
+…
+</hb-tasks>
+</hb-row>""",
+"hb-row": """24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放组件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个；一段里要叠两个组件就包一层 hb-col。
 例：
 <hb-row spans="16|8">
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
@@ -2710,7 +2754,7 @@ def expand(text):
         if name not in MACROS:
             raise ExpandError(f"不认识的宏 <{name}>。可用：{'、'.join(MACROS)}（python3 scripts/expand.py --list 看说明）")
         attrs = attrs_of(raw_attrs)
-        if name in ("hb-page", "hb-row"):
+        if name in ("hb-page", "hb-row", "hb-col"):
             attrs["_raw"] = body
             return MACROS[name][0](attrs, body)
         if "<hb-" in body:

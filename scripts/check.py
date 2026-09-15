@@ -156,7 +156,9 @@ def est_col(seg, col_w):
     for cls, inner in top_divs(seg):
         if "w-row" in cls.split():
             h = est_row(inner, col_w)
-        elif "w-card" in cls.split():
+        elif "w-col" in cls.split():
+            h = est_col(inner, col_w)
+        elif {"w-card", "procedure_task"} & set(cls.split()):
             h = est_card(cls, inner, col_w)
         elif _span_of(cls) is not None:
             h = est_col(inner, col_w)
@@ -176,7 +178,7 @@ def est_row(inner, row_w):
         sp = _span_of(cls)
         if sp is not None:
             h = est_col(kin, (row_w - ROW_GAP * (len(kids) - 1)) * sp / 24)
-        elif "w-card" in cls.split():
+        elif {"w-card", "procedure_task"} & set(cls.split()):
             h = est_card(cls, kin, row_w / max(len(kids), 1))
         else:
             h = None
@@ -306,9 +308,11 @@ def check(path, render=False, allow_local=False):
                     if h is None:
                         return
                     kk = top_divs(kin)
-                    stretch = len(kk) == 1 and "w-card" in kk[0][0].split()   # 单张卡会被 base.css 拉到等高
+                    stretch = len(kk) == 1 and bool({"w-card", "procedure_task"} & set(kk[0][0].split()))   # 单张卡会被 base.css 拉到等高
                     hs.append((h, k, stretch))
                 short, tall = min(hs), max(hs)
+                if tall[0] - short[0] > 150 and short[2]:
+                    add("Medium", "card-stretched", f"并排里 .{short[1]} 只有一张矮卡（内容约 {int(short[0])}px），会被拉到和 .{tall[1]}（约 {int(tall[0])}px）等高，卡里空一大块：用 <hb-col> 在这一栏再叠一个组件（如按钮组＋多项统计），或换更高的组件")
                 if tall[0] - short[0] > 100 and not short[2]:
                     add("Medium", "column-short", f"并排不等高（按实测行高估算）：.{short[1]} 约 {int(short[0])}px，.{tall[1]} 约 {int(tall[0])}px，差约 {int(tall[0] - short[0])}px；给短栏补 1～2 张图表、数值字段组或待办列表，或改成单栏，不用固定高度硬撑")
         if "page" in toks or "item-page-canvas" in toks:
@@ -324,6 +328,10 @@ def check(path, render=False, allow_local=False):
                     run = 0
 
     walk_divs(body, "", _struct)
+    if re.search(r'class="(ocard|m-workbench|m-chat|rec-card|obar)\b', body) and 'class="phone' not in body:
+        add("High", "mobile-in-pc", "PC 图里出现了手机组件（订单卡、手机工作台、会话流等），样式只在 hb-phone 里生效，会散成一堆裸文字：PC 页和 PC 浮层改用 hb-fields、hb-list、hb-multistats 这类 PC 组件")
+    if 'class="wempty"' in body or "暂无数据" in body:
+        add("Medium", "empty-state", "画面里有「没有找到任务／暂无数据」空态：营销图每个区域都要有内容，给它几行数据或去掉这块")
 
     # ── Medium：规模上限（本 skill 出图约束） ────────────────────────
     for m in re.finditer(r'<div class="[^"]*\bview-grid\b[^"]*">.*?</table>', body, re.S):

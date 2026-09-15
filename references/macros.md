@@ -25,11 +25,35 @@
 24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个
 
 ```
-24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放组件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个。
+24 栅格一行。属性 spans="16|8"（各段跨度，加起来必须 24；不写则等分）。体内并排放组件宏（hb-shortcuts、hb-tasks、hb-bar、hb-donut、hb-pivot、hb-tabcard…），最多 4 个；一段里要叠两个组件就包一层 hb-col。
 例：
 <hb-row spans="16|8">
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
+</hb-row>
+```
+
+### hb-col
+hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组、多项统计、进度条）别单独占一栏被拉高
+
+```
+一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
+并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
+例：
+<hb-row spans="8|16">
+<hb-col>
+<hb-shortcuts title="快捷方式">
+新建巡检计划 | check-s
+飞行检查派单 | warn
+</hb-shortcuts>
+<hb-multistats title="待办">
+待我审核的整改 | 12 | orange
+超期未整改 | 3 | red
+</hb-multistats>
+</hb-col>
+<hb-tasks title="待我审核的整改">
+…
+</hb-tasks>
 </hb-row>
 ```
 
