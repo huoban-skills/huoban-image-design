@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""回归：把 tests/frags/*.frag.html 逐个拼装，与 tests/golden/ 的基线做规范化 DOM 比对；
+"""回归：把回归集里 frags/*.frag.html 逐个拼装，与 golden/ 的基线做规范化 DOM 比对；
+回归集不在 skill 里，默认在 skill 同级目录 huoban-image-design-tests/，可用环境变量 HB_TESTS_DIR 指定；
 末尾再比对 expand.py --doc all 的输出与 references/macros.md 是否一致。
 
 用法：
@@ -10,13 +11,15 @@
 """
 import difflib
 import re
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 SKILL = Path(__file__).resolve().parent.parent
-FRAGS = SKILL / "tests" / "frags"
-GOLD = SKILL / "tests" / "golden"
+TESTS = Path(os.environ.get("HB_TESTS_DIR", SKILL.parent / "huoban-image-design-tests"))
+FRAGS = TESTS / "frags"
+GOLD = TESTS / "golden"
 SKIN = "navy-gold"
 
 
@@ -39,7 +42,7 @@ def build(frag, out):
 def main():
     update = "--update" in sys.argv
     GOLD.mkdir(parents=True, exist_ok=True)
-    tmp = SKILL / "tests" / "_out"
+    tmp = TESTS / "_out"
     tmp.mkdir(exist_ok=True)
     bad = 0
     for frag in sorted(FRAGS.glob("*.frag.html")):
