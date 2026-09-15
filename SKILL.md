@@ -1,6 +1,6 @@
 ---
 name: huoban-image-design
-description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实产品组件。当用户要画伙伴云界面示意图/mockup（列表页、详情页、表单、工作台、看板、大屏、手机端），给报告/方案配系统图，或 huoban-solution-report 给出图需求单时，必须使用本 skill。不用于：海报/朋友圈营销图、流程图（hb-flowchart）、ER 图（hb-er-draw）、网站（hb-website-creator）。
+description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实产品组件。当用户要画伙伴云界面示意图/mockup（列表页、详情页、表单、工作台、数据看板、大屏、手机端），给报告/方案配系统图，或 huoban-solution-report 给出图需求单时，必须使用本 skill。不用于：海报/朋友圈营销图、流程图（hb-flowchart）、ER 图（hb-er-draw）、网站（hb-website-creator）。
 ---
 
 # 伙伴云系统界面示意图
@@ -14,19 +14,19 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 页面类型路由（唯一真相源）
 
-先判页面类型，在下表找到对应行，取它的骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles 与 visual-color；多张营销配图另读 anti-sameness。
+先判页面类型，在下表找到对应行，取它的骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles、visual-color 与 anti-sameness。
 
 | 用户说的 | `<hb-page kind>` | 必读页面原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
-| 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视用 extract_templates.py 提模板放在视图位 |
+| 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视放在视图位 |
 | 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗随视口减 48 宽减 60 高，字段区一到四列等分 |
-| 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；弹窗详情仅明确要求时用 c3 模板手写 |
+| 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；记录详情弹窗仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组与待办 → 页签 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端（上面任一页面的手机版） | mobile | 对应页面篇＋c4 注释 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
 
-要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 visual-color 与 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
+要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
 
 ## 执行流程
 
@@ -37,7 +37,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 ### 1. 追问并确认需求单（闸门）
 
 - 按 [references/intake.md](references/intake.md) 追问，只问决定、事实自己定，每条消息发出即停，等用户答完再发下一条：
-  1. 定盘子：画布、配色，加定不下来的清单维度（主角、讲哪些事、颗粒度）。
+  1. 定盘子：画布、配色（皮肤按 [references/skin/routing.md](references/skin/routing.md) 选），加定不下来的清单维度（主角、讲哪些事、颗粒度）。
   2. 需求单初稿单独一条，只让用户增删图，不带题、不问"确认吗"。
   3. 逐图决定，每轮 3 张图、一题一个编号、推荐带理由；有依赖的题推到下一轮，问完为止。
   4. 发终稿需求单，问"按这份做吗"。
@@ -54,7 +54,7 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 ```
 
 - 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏。
-- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float top="…" w="…">`，体内放 bare 模式的宏。
+- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float top="…" w="…">`，体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
 - 外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 - 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
@@ -77,8 +77,8 @@ python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style pag
 
 - 脚本按固定顺序拼皮肤、base.css、icons.svg、内容、fit.js；`canvas="product"` 自动全屏。
 - 展开失败会指出第几行、缺什么、可用什么，照提示改片段重跑。
-- "提示："开头的是规模与顺序建议，不阻断。
-- 改过公共资产后重跑即重拼。
+- build.py 输出里以"提示："开头的行是规模与顺序建议，不中断拼装。
+- 改过皮肤、base.css 这类公共资产后，重跑上面的 build.py 就重新拼装。
 - 完成标准：拼装成功，输出文件存在。
 
 ### 4. 对照判据
@@ -94,8 +94,7 @@ python3 scripts/check.py "源文件/图名.html" --render    # 有 Chrome 时加
 python3 scripts/check.py "源文件/图名.html" --acceptance # 起草十条人工验收表
 ```
 
-- Blocker 必须清零。
-- High 逐条处理；本图样式里的新类默认 High，确属一次性布局加 `--allow-local`。
+- Blocker 必须清零，High 逐条处理；各规则的判断细节见 [references/canvas/verify-export.md](references/canvas/verify-export.md)。
 - 按 [references/canvas/verify-export.md](references/canvas/verify-export.md) 的人工验收表逐图回报十条结论。
 - 完成标准：十条全过；有一条没过不交付。
 
@@ -110,6 +109,7 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 ```
 
 - 导出细节与沙箱降级见 [references/canvas/export.md](references/canvas/export.md)。
+- 完成标准：文件落在落点表对应目录；回复正文每张图一行交付说明，注明皮肤与仿写项。
 
 ## 输出物模板
 

@@ -96,17 +96,6 @@ def main():
             head = "" if "本图布局" in raw else "/* ── 本图布局 ── */\n"
             extra = head + raw
 
-    # 大屏装饰底图：内容里出现 class="… bg-xxx …" 时把 assets/screens/bg-xxx.svg 以 data URI 注入 --screen-photo
-    # （大屏默认底色＋网格纹理＋顶部光带都在 base.css 里，底图是可选的一层）
-    import base64
-    for name in sorted(set(re.findall(r'class="[^"]*\bbg-([a-z0-9-]+)\b', content))):
-        svg_path = ASSETS / "screens" / f"bg-{name}.svg"
-        if not svg_path.exists():
-            avail = "、".join(sorted(p.stem[3:] for p in (ASSETS / "screens").glob("bg-*.svg")))
-            sys.stderr.write(f"大屏背景 bg-{name} 不存在，可用：{avail}\n")
-            return 1
-        uri = "data:image/svg+xml;base64," + base64.b64encode(svg_path.read_bytes()).decode()
-        extra += f"\n.screen.bg-{name} {{ --screen-photo: url({uri}); }}"
 
     # 客户图片：<img src="本地路径"> 内嵌为 data URI（相对内容文件目录或当前目录），保证单文件可再导出
     import mimetypes

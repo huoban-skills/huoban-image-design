@@ -115,6 +115,11 @@ def list_(page):
         nm = f"｜{e['name']}" if e.get("name") and e["name"] != e["cn"] else ""
         print(f"{e['id']:<22} {tk:<20} {e['cn']}{nm:<18} 宏 {mc:<18} {st}")
     print(f"共 {len(rows)} 项")
+    if page:
+        inner = [e for e in reg["entries"] if e["kind"] == "component" and not any(a.startswith("page:") for a in e.get("allowed_in", []))
+                 and {"row", "float", "tabs"} & set(e.get("allowed_in", []))]
+        if inner:
+            print("另有只放在容器里（hb-row／浮层／页签内）的组件：" + "、".join(f"{e['cn']}（{e['id']}）" for e in inner))
 
 
 def find(kw):

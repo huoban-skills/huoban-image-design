@@ -988,7 +988,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .fg-c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .fg-c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fg-c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.fg-field { padding: 6px; min-width: 0; }
+.fg-field { padding: 6px 6px 7px; min-width: 0; }   /* 标签 24 ＋ 值框 32 ＋ 上 6 下 7 ＝ 实测行高 69 */
 .fg-field.full { grid-column: 1 / -1; }
 .fg-label { height: 24px; padding: 4px 8px; font-size: 14px; line-height: 16px; color: var(--ink-65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fg-value {

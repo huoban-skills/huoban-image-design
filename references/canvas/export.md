@@ -18,7 +18,7 @@ curl -sL -o /tmp/chs.zip "https://registry.npmmirror.com/-/binary/chrome-for-tes
 unzip -q -o /tmp/chs.zip -d ~ && chmod +x ~/chrome-headless-shell-linux64/chrome-headless-shell
 ```
 
-  路径必须带完整 `/-/binary/chrome-for-testing/`，裸域名会 302 限速；googleapis 源国内明显限速只作兜底。运行时报 dbus 错误属正常。
+  路径必须带完整 `/-/binary/chrome-for-testing/`，裸域名会 302 限速。运行时报 dbus 错误属正常。
 
 ## SVG（嵌报告）
 

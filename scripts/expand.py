@@ -1894,7 +1894,7 @@ WZ-JS-0106 | 茅台飞天 53° 500ml | 酒品:red | 36 | 周敏
         cn="数据大屏",
         allowed={"hb-screen"},
         required=["hb-screen"],
-        order=["hb-cover", "hb-screen"],
+        order=["hb-screen"],
         doc=("只放一个 hb-screen，不套产品壳、不放浮层。体内按官方骨架排：左列 hb-scol（6 栏：指标框 ×2 → 面积图 → 饼图）"
              "｜中间 hb-svisual（12 栏，跨整个主体高度）｜右列 hb-scol（6 栏：进度条 → 对比图），底部两张 hb-scard 各 12 栏。"
              "标题行与分隔条由 hb-screen 产出。大屏不缩放：24 栅格、行高 20h−20、间距 20 与其他页面一致。"),
@@ -1985,7 +1985,6 @@ WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
 </hb-screens>
 </hb-page>"""),
 }
-PAGE_SLOTS["analysis"] = PAGE_SLOTS["dashboard"]
 
 SHELL_ATTRS = ("ws", "logo", "page", "nav", "me", "theme", "bottom")
 
@@ -2102,7 +2101,7 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
 def m_page(a, body):
     kind = a.get("kind")
     if kind not in PAGE_SLOTS:
-        raise ExpandError(f"<hb-page kind> 只能是 {'/'.join(k for k in PAGE_SLOTS if k != 'analysis')}（analysis 同 dashboard）")
+        raise ExpandError(f"<hb-page kind> 只能是 {'/'.join(PAGE_SLOTS)}")
     spec = PAGE_SLOTS[kind]
     canvas = a.get("canvas", "marketing")
     if canvas not in ("marketing", "product"):
@@ -2173,7 +2172,7 @@ def m_page(a, body):
         rest = "".join(h for n, h in main_parts if n not in ("hb-views", "hb-tools"))
         inner = f'{views}<div class="view-box">{tools}{rest}</div>'
         body_html = shell(inner)
-    elif kind in ("workbench", "dashboard", "analysis"):
+    elif kind in ("workbench", "dashboard"):
         level = a.get("level", "flat")
         if level not in ("flat", "card"):
             raise ExpandError('<hb-page level> 只能是 flat（白底描边，默认）或 card（浅底白卡）')
@@ -2195,7 +2194,7 @@ def m_page(a, body):
         body_html = "".join(h for _, h in main_parts)
         screens = max([int(m) for _, h in main_parts for m in re.findall(r'data-screens="(\d)"', h)] or [1])
         stage_style = {1: "width:520px", 2: "width:1100px", 3: "width:1640px"}[screens]
-    if kind in ("list", "workbench", "dashboard", "analysis") and cut:
+    if kind in ("list", "workbench", "dashboard") and cut:
         body_html = body_html.replace('<div class="window ', f'<div class="window cut" style="height:{cut}px" ', 1)
     st = f' style="{stage_style}"' if stage_style else ""
     return f'<div class="{" ".join(stage_cls)}" data-kind="{kind}"{st}>{body_html}{"".join(floats)}</div>'
@@ -2210,7 +2209,7 @@ def render_page(kind):
               "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"]) if n != "hb-duo"),
               "hb-page 通用属性：canvas=marketing|product（默认 marketing）、ws/page/nav/me/theme/logo/bottom（产品壳，同 hb-shell）、level=flat|card（页面底色，默认 flat）、cut=高度px（窗口截到主要内容为止，默认按内容撑高）",
               "", "最小示例：", spec["example"], "",
-              "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(n for n in spec["allowed"] if n != "hb-float")) + " hb-row hb-float"]
+              "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(n for n in spec["allowed"] if n != "hb-duo"))]
     return "\n".join(lines_)
 
 
@@ -2418,7 +2417,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 出库审批 · CK-20260824-0037 | 1.4 小时前 | 陈晓东 扫码创建 · 待仓库主管审批
 </hb-tasks>""",
 "hb-bar": """属性 title、labels（横轴，| 分）、max（不给自动取整）、ticks（默认 4）、h（配合本图补充样式改 .chart .wc-bd 高度时同步给）。
-每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card w-chart 卡，bare 只出 svg＋图例，plain 去掉卡片外壳只留 40 高标题行（产品 common 样式）。
+每行 系列名 | 值,值,… | 颜色；系列值用逗号分隔，不写千分位。颜色缺省：第一系列主色，第二系列主色 45% 透明，再往后状态色；显式给颜色用状态色。图例自动生成。默认 w-card chart 卡，bare 只出 svg＋图例，plain 去掉卡片外壳只留 40 高标题行（产品 common 样式）。
 例：
 <hb-bar title="近 6 个月出入库趋势" labels="3 月|4 月|5 月|6 月|7 月|8 月">
 出库 | 135,165,115,185,212,217
@@ -2557,7 +2556,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 陈晓东 | 昨天 17:06 | 第二批发货时间已与客户确认
 </hb-comment>
 <hb-comment title="评论" span="8"></hb-comment>""",
-"hb-donut": """每行 名称 | 值 | 颜色（值可带千分位；颜色缺省按 red/blue/purple/teal/green/orange 轮转）；center="标签|值" 出中心文字；百分比自动算，图例画在右侧。默认 w-card w-chart 卡，bare 只出 svg，plain 去掉卡片外壳只留标题行。
+"hb-donut": """每行 名称 | 值 | 颜色（值可带千分位；颜色缺省按 red/blue/purple/teal/green/orange 轮转）；center="标签|值" 出中心文字；百分比自动算，图例画在右侧。默认 w-card chart 卡，bare 只出 svg，plain 去掉卡片外壳只留标题行。
 例：
 <hb-donut title="各存放点库存占比" center="在库总量|4,386">
 城建大厦酒窖 | 1,842

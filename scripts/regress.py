@@ -40,7 +40,10 @@ def build(frag, out):
 
 
 def main():
-    update = "--update" in sys.argv
+    args = [a for a in sys.argv[1:]]
+    if "--help" in args or "-h" in args or any(a not in ("--update",) for a in args):
+        print(__doc__.strip() if __doc__ else "用法：python3 scripts/regress.py [--update]"); return 0 if ("--help" in args or "-h" in args) else 2
+    update = "--update" in args
     GOLD.mkdir(parents=True, exist_ok=True)
     tmp = TESTS / "_out"
     tmp.mkdir(exist_ok=True)

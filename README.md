@@ -14,7 +14,7 @@
 
 ## 用法
 
-直接说要画什么即可，skill 会先问出图需求（用途、要讲清哪几件事和主角、配色），拟需求单并逐图补细节，确认后写骨架片段、拼装、检查、验收、交付。
+直接说要画什么即可。skill 只问决定、事实自己定：先定画布和配色，发需求单初稿让你增删图，再逐图问决定（推荐带理由，回"按推荐"整轮采纳），终稿确认后写骨架片段、拼装、检查、验收、交付。
 
 ```
 画一张排产工作台的界面示意图
@@ -32,17 +32,17 @@
         assets/c3-page-detail.html 详情页、弹窗、工作台/看板组件   │ 与 data-measured（实测注释）
         assets/c4-mobile.html      手机端 H5                    │
         assets/c5-screen.html      数据大屏                     ┘
-骨架样式 assets/base.css            尺寸布局，无颜色
+骨架样式 assets/base.css            尺寸布局；只有黑白和大屏主题色，其余颜色走皮肤
 皮肤    assets/skins/*.css         纯色彩 token，8 套
 版式    assets/layout-gallery.html 各页面版式线框示意（人看，浏览器打开），与页面原则的版式表同步
-宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 60 个组件宏；模型只填内容，外壳与栅格由脚本产出
+宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 60 余个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
 配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；`--render` 有 Chrome 时加渲染检查；`--acceptance` 起草验收表）、`export.py`（PNG／SVG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
 
 ## 皮肤
 
-8 套：报告同名皮肤（与 huoban-solution-report 同名同气质）＋功能皮肤（产品原生蓝、科技暗黑）。选型在 `references/skin/routing.md`，清单以 `assets/skins/` 为准；客户有品牌色时按 `references/skin/custom-skin.md` 现造。
+报告同名皮肤（与 huoban-solution-report 同名同气质）＋功能皮肤（产品原生蓝、科技暗黑）＋客户定制皮肤。清单与选型都在 `references/skin/routing.md`；客户有品牌色时按 `references/skin/custom-skin.md` 现造。
 
 ## 三条硬约束
 
@@ -56,9 +56,9 @@
 
 ## 文档
 
-- `references/principles/` — 五类页面各一篇原则（列表、表单、详情页、工作台、看板/大屏）＋组件选取＋通用原则；索引在其 README
+- `references/principles/` — 六类页面各一篇原则（列表、表单、详情页、工作台、数据看板、数据大屏）＋组件辞典＋通用原则；索引在其 README
 - `references/canvas/` — 画布规范（营销/产品设计）、检查与验收、导出
 - `references/skin/` — 皮肤选型与制作
 - `references/macros.md` — 宏语法全文（由 `expand.py --doc all` 生成，出图时按需 `--page`／`--doc` 取，不整读）
-- 回归集在 skill 同级目录 `huoban-image-design-tests/`（片段与基线），`scripts/regress.py` 读它，不随 skill 交付
+- 回归集在 skill 同级目录 `huoban-image-design-tests/`（片段与基线），`scripts/regress.py` 读它（可用环境变量 `HB_TESTS_DIR` 指到别处），不随 skill 交付
 - `CHANGELOG/` — 版本记录

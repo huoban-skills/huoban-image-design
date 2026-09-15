@@ -39,7 +39,7 @@ PERSON_PATTERNS = [re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)")
 PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报", "周会", "周期", "周边", "周转", "金额", "马上", "于今")
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
-SCALE = {"grid_rows": (6, 14), "stats_per_row": (3, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
+SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
 
 
 def load_known_classes():
@@ -132,11 +132,11 @@ def est_card(cls, inner, col_w):
         rows = max(len(re.findall(r"<tr\b", inner)) - 1, 0)
         return head + 32 + 35 * rows + (40 if "til-foot" in inner else 0)
     if "chart_table" in c:
-        return head + 35 * len(re.findall(r"<tr\b", inner)) + 14
+        return head + 34 + 33 * max(len(re.findall(r"<tr\b", inner)) - 1, 0) + 14
     if "chart" in c:
         return head + 240 + 28
     if "progress_bar" in c:
-        return head + 40 * inner.count('class="pg-row') + 10
+        return head + 40 * inner.count('class="pg-row') + 20
     if "button" in c and "shortcuts" in c:
         n = inner.count('class="sc"')
         per_row = max(1, int((col_w - 28 + 20) // 182))
@@ -413,7 +413,15 @@ def acceptance(path):
     text = Path(path).read_text(encoding="utf-8")
     _, body = split_doc(text)
     reg = json.loads((ASSETS / "registry.json").read_text(encoding="utf-8"))
-    cn = {e["id"].split()[0]: e["cn"] for e in reg["entries"] if e["kind"] == "component"}
+    _k = re.search(r'data-kind="(\w+)"', body)
+    _pk = f"page:{_k.group(1)}" if _k else ""
+    cn = {}
+    for e in reg["entries"]:                 # 同 id 多条（如大屏表格列表）按页面类型取名
+        if e["kind"] != "component":
+            continue
+        _id = e["id"].split()[0]
+        if _id not in cn or _pk in e.get("allowed_in", []):
+            cn[_id] = e["cn"]
     used = sorted({c for m in re.finditer(r'class="([^"]+)"', body) for c in m.group(1).split() if c in cn})
     rows = len(re.findall(r"<tr(?![^>]*class=\"group\")", body)) - body.count("<table>")
     stats = len(re.findall(r'class="w-card chart_single', body))

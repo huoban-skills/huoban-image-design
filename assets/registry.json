@@ -1187,6 +1187,7 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
+        "page:detail",
         "row",
         "float"
       ],
@@ -1213,6 +1214,7 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
+        "page:detail",
         "row",
         "float"
       ],
@@ -1359,6 +1361,7 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
+        "page:detail",
         "row",
         "float",
         "tabs",
@@ -2699,7 +2702,6 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
-        "page:detail",
         "row"
       ],
       "note": "2026-09-14 实测：柱次色＋线主色，左轴对柱、右轴对线；宏 hb-biaxial"
@@ -2723,7 +2725,6 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
-        "page:detail",
         "row"
       ],
       "note": "2026-09-14 实测（项目管理 v2.0「Chart」页）：卡片壳，单色系由深到浅；宏 hb-funnel"
@@ -2747,7 +2748,6 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
-        "page:detail",
         "row"
       ],
       "note": "2026-09-14 实测（项目管理 v2.0「Chart」页）：卡片壳，两个数值轴、点单色；宏 hb-scatter"
@@ -2771,7 +2771,6 @@
       "allowed_in": [
         "page:workbench",
         "page:dashboard",
-        "page:detail",
         "row"
       ],
       "note": "2026-09-14 实测：官方是 ECharts 内置中国地图；本 skill 不画国界，用网点阵标记点或客户提供的地图图片；宏 hb-map"

@@ -22,7 +22,7 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 - `column-short`：同一行里短栏比长栏矮 100px 以上（按 base.css 实测行高估算，不用 Chrome）；单张卡会被拉到等高不算，栏里是单指标行或多张卡才报。修法同 `column-uneven`。
 - `empty-gap`（要 `--render`）只看布局层——组件之间、组件到画布边缘不许有大片空白；组件内部留白由数据量决定，属产品原样。
 - `column-uneven`（要 `--render`）：同一行两栏底部落差超过 24px；修法是给短的那栏补数据行或调 `hb-row spans`，不用固定高度硬撑。
-- 没有 Chrome 时会打印"渲染检查未执行"，空隙、裁切、浮层出界、并排不齐四项靠 hb-page 的自动撑高与规模约束兜底。
+- 没有 Chrome 时 check.py 打印"渲染检查未执行"。空隙、裁切、浮层出界、并排不齐四项改由 hb-page 的自动撑高和规模上限约束控制，不做渲染验证。
 
 ## B. 人工验收表
 
