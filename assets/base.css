@@ -82,6 +82,16 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .float-anchor > .mk-float {                   /* 浮层顶端与这块组件的上沿齐平 */
   position: absolute; top: 0; right: -200px; left: auto; width: var(--float-w, 356px); margin: 0;
 }
+.stage.auto.has-float .view-box,
+.stage.auto.has-float .page,
+.stage.auto.has-float .item-grid { overflow: visible; }   /* 浮层挂在里面的组件上，不被容器裁掉 */
+.stage.auto .float-anchor > .mk-float .float-title {      /* 标题浮在底图上，给底色免得和内容糊在一起 */
+  display: inline-block; background: var(--card-bg); padding: 2px 10px; border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+/* 挂在组件上的浮层压着底图，靠投影和描边和底图分开 */
+.stage.auto .float-anchor > .mk-float .w-card,
+.stage.auto .float-anchor > .mk-float .comp { box-shadow: 0 12px 32px rgba(0, 0, 0, .16); }
 .stage.auto.has-float .window,
 .stage.auto.has-float .item-page { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
 .stage.auto .mk-float {
