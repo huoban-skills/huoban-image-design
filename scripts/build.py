@@ -6,7 +6,7 @@
         --skin dawn-blue \
         --content /tmp/stage.html \
         --extra-style /tmp/page.css \
-        --output "源文件/图名.html" \
+        --output "{客户或项目名}/01-图名.html" \
         [--fullbleed] [--title "图名"]
 
 - --skin：皮肤名（assets/skins/ 下的文件名，不带 .css）或一个 css 文件路径（自定义皮肤）。

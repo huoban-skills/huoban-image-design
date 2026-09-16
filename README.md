@@ -21,7 +21,7 @@
 给这个方案配一张订单列表页的图，营销版
 ```
 
-交付物落在当前工作目录 `源文件/图名.html`；要图片时 `python3 scripts/export.py 图.html --png`（要 Chrome）或 `--svg`（不要）。
+交付物落在 `{客户或项目名}/01-图名.html`；要图片时 `python3 scripts/export.py 图.html --png`（要 Chrome）或 `--svg`（不要）。
 
 ## 架构
 

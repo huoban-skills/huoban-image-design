@@ -9,7 +9,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 - 目标：产出"长得像伙伴云产品"的界面示意图，用骨架宏拼装真实产品实测组件，不自由发挥。
 - 输入：用户的出图需求，或 huoban-solution-report 给出的图需求单。
-- 输出：单文件 HTML（`源文件/图名.html`，离线可开、自适应）；PNG／SVG 只在用户或报告明确要时另出。
+- 输出：单文件 HTML（`{客户或项目名}/图名.html`，离线可开、自适应）；PNG／SVG 只在用户或报告明确要时另出。
 - 边界：只画伙伴云产品界面；海报、流程图、ER 图、网站不在本 skill。
 
 ## 页面类型路由（唯一真相源）
@@ -67,8 +67,8 @@ python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘�
 ### 3. 拼装
 
 ```bash
-python3 scripts/build.py --skin dawn-blue --content stage.html --output "源文件/图名.html" --title "图名"
-python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style page.css --output "源文件/图名.html" --title "图名"   # 手写外壳时
+python3 scripts/build.py --skin dawn-blue --content stage.html --output "味捷餐饮巡店督导方案图/01-督导工作台.html" --title "督导工作台"
+python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style page.css --output "{客户或项目名}/图名.html" --title "图名"   # 手写外壳时
 ```
 
 - 脚本按固定顺序拼皮肤、base.css、icons.svg、内容、fit.js；`canvas="product"` 自动全屏。
@@ -85,9 +85,9 @@ python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style pag
 ### 5. 检查与验收
 
 ```bash
-python3 scripts/check.py "源文件/图名.html"             # 静态：色值、组件与 token 存在性、结构禁令、规模上限
-python3 scripts/check.py "源文件/图名.html" --render    # 有 Chrome 时加渲染检查；没有会明说"渲染检查未执行"
-python3 scripts/check.py "源文件/图名.html" --acceptance # 起草十条人工验收表
+python3 scripts/check.py "{客户或项目名}/图名.html"             # 静态：色值、组件与 token 存在性、结构禁令、规模上限
+python3 scripts/check.py "{客户或项目名}/图名.html" --render    # 有 Chrome 时加渲染检查；没有会明说"渲染检查未执行"
+python3 scripts/check.py "{客户或项目名}/图名.html" --acceptance # 起草十条人工验收表
 ```
 
 - Blocker 必须清零，High 逐条处理；各规则的判断细节见 [references/canvas/verify-export.md](references/canvas/verify-export.md)。
@@ -96,16 +96,17 @@ python3 scripts/check.py "源文件/图名.html" --acceptance # 起草十条人�
 
 ### 6. 交付
 
-- 默认交付 `源文件/图名.html`，回复正文附交付说明（模板见下）。
+- 一批图放同一个文件夹，文件夹名用客户名或项目名（材料里的原话，如「味捷餐饮巡店督导方案图」）；图名前加两位序号，按讲述顺序排。
+- 默认交付 `{客户或项目名}/图名.html`，回复正文附交付说明（模板见下）。
 - 用户或报告明确要 PNG／SVG 时：
 
 ```bash
-python3 scripts/export.py "源文件/图名.html" --png     # 2x PNG；找不到 Chrome 会给手动命令，不下载
-python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量，不需要 Chrome
+python3 scripts/export.py "{客户或项目名}/图名.html" --png     # 2x PNG；找不到 Chrome 会给手动命令，不下载
+python3 scripts/export.py "{客户或项目名}/图名.html" --svg     # 嵌报告用矢量，不需要 Chrome
 ```
 
 - 导出细节与沙箱降级见 [references/canvas/export.md](references/canvas/export.md)。
-- 完成标准：文件落在落点表对应目录；回复正文每张图一行交付说明，注明皮肤与仿写项。
+- 完成标准：这批图都在同一个客户或项目文件夹里，没有散落在上一级；回复正文每张图一行交付说明，注明皮肤与仿写项。
 
 ## 输出物模板
 
@@ -122,8 +123,8 @@ python3 scripts/export.py "源文件/图名.html" --svg     # 嵌报告用矢量
 
 | 场景 | HTML（默认交付） | PNG／SVG（可选） |
 | --- | --- | --- |
-| 独立出图 | 当前工作目录 `源文件/图名.html` | 当前工作目录 `图名@2x.png`／`图名.svg` |
-| 报告配图 | 报告项目 `figures/源文件/` | 报告项目 `figures/` |
+| 独立出图 | `{客户或项目名}/01-图名.html` | 同一文件夹 `01-图名@2x.png`／`01-图名.svg` |
+| 报告配图 | 报告项目 `figures/{客户或项目名}/` | 报告项目 `figures/` |
 
 片段与探针中间产物放 scratchpad，不留在交付目录。
 
