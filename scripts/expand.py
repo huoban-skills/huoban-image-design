@@ -2031,6 +2031,9 @@ def _top_level(raw):
 
 def m_float(a, body):
     at = a.get("at")
+    align = a.get("align", "top")
+    if align not in ("top", "center", "bottom"):
+        raise ExpandError('<hb-float align> 只能是 top（默认，和这块上沿齐平）、center（贴这块中部）、bottom（和这块下沿齐平）')
     if at is not None and str(at) not in [str(i) for i in range(1, 21)]:
         raise ExpandError('<hb-float at> 写第几块组件（1 起），比如 at="4"；不写就挂在倒数第二块')
     if a.get("side", "right") != "right":
@@ -2044,7 +2047,8 @@ def m_float(a, body):
         warn(f"浮层里放了 {n_cards} 个组件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
     title = f'<div class="float-title">{esc(a["title"])}</div>' if a.get("title") else ""
     if at is not None or "top" not in a:
-        return (f'<div class="mk-float" data-at="{at or ""}" '
+        cls = "mk-float" if align == "top" else f"mk-float at-{align}"
+        return (f'<div class="{cls}" data-at="{at or ""}" '
                 f'style="--float-w:{w}px">{title}{body.strip()}</div>')
     return (f'<div class="mk-float" '
             f'style="--float-top:{top}px;--float-w:{w}px">{title}{body.strip()}</div>')
@@ -2261,7 +2265,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（只从右侧探出）：属性 at（挂在第几块组件，默认倒数第二块）、w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
+    "hb-float": (m_float, "营销浮层（只从右侧探出）：属性 at（挂在第几块组件，默认倒数第二块）、align=top/center/bottom、w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -2368,7 +2372,7 @@ DOCS = {
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层，从右侧探出，右边缘探出画布 200。属性 at（挂在第几块顶层组件上，浮层顶端与那块的上沿齐平；默认倒数第二块，落在偏右下）、w（宽 300～480，默认 356）、title；top（距画布顶 px）只在 at 定不出位置时用。
+"hb-float": """营销浮层，从右侧探出，右边缘探出画布 200。属性 at（挂在第几块顶层组件上；默认倒数第二块，落在偏右下）、align=top（默认，和那块上沿齐平）/center（贴那块中部）/bottom（和那块下沿齐平，位置最低）、w（宽 300～480，默认 356）、title；top（距画布顶 px）只在 at 定不出位置时用。
 浮层必须压在底图上，不能整块飘在画布外：宽 300 起，压住底图至少 100；盖住底图的面积不超过四分之一（check.py `float-cover`）。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
 <hb-float at="4" w="392" title="华北区整改超期门店">

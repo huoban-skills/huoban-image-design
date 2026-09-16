@@ -83,6 +83,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .float-anchor > .mk-float {                   /* 浮层顶端与这块组件的上沿齐平 */
   position: absolute; top: 0; right: -200px; left: auto; width: var(--float-w, 356px); margin: 0;
 }
+.stage.auto .float-anchor > .mk-float.at-center { top: 50%; transform: translateY(-50%); }
+.stage.auto .float-anchor > .mk-float.at-bottom { top: auto; bottom: 0; }
 .stage.auto.has-float .view-box,
 .stage.auto.has-float .page,
 .stage.auto.has-float .item-page,
