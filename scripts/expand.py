@@ -1881,7 +1881,7 @@ CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
         required=["hb-itembar", "hb-hcard", "hb-fields", "hb-tabcard"],
         order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-list", "hb-tabcard",
                "hb-flow", "hb-stream", "hb-comment", "hb-float"],
-        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必；单栏通栏，双栏 hb-row spans=13|11 左字段右分析区，主从 hb-row spans=8|16 或 16|8 主栏标签页放子表、从栏字段组或流程执行记录，主栏叠两个标签页用 hb-col）→ 标签页（必）→ 流程执行记录、动态、评论。"
+        doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必；单栏通栏，双栏 hb-row spans=13|11 主栏字段、侧栏数字，或 16|8 主栏标签页放字段与明细、侧栏放流程与动态）→ 标签页（必）→ 流程执行记录、动态、评论。"
             "页头卡片、字段组必有：一条记录先说清是哪条、有哪些字段，页签内的字段组也算。图表宏只能放在 hb-row 或 hb-tabcard 体内，不在顶层。"
             "不套产品壳；浮层只能右探出（side=\"left\" 会报错）。",
         example="""<hb-page kind="detail">
