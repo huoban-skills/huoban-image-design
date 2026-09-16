@@ -1556,7 +1556,7 @@ def m_mtool(a, body):
         if on:
             cls.append("on")
         out.append(f'<span{" class=\"" + " ".join(cls) + "\"" if cls else ""}>{ico(icon, tag="<hb-mtool> ")}{esc(label)}</span>')
-    wrap = "apptab" if mode == "app" else ("m-tool obar" if mode == "obar" else "m-tool")
+    wrap = "apptab" if mode == "app" else "m-tool"
     return f'<div class="{wrap}">' + "".join(out) + "</div>"
 
 

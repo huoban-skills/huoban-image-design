@@ -111,6 +111,15 @@ def est_card(cls, inner, col_w):
     """按 base.css 实测行高估算一张组件卡的高度；估不了返回 None。"""
     c = cls.split()
     head = 40 if re.match(r'\s*<div class="(wc-hd|ws-hd)', inner) else 0
+    if "header_card" in c:
+        return 180
+    if {"item-steps", "item-tiles"} & set(c):
+        return 40
+    if "rich" in c and "title" in c:
+        return 120 if "card" in c else (100 if "bg-solid" in c else 80)
+    if "grid" in c and "w-card" not in c:
+        rows = max(len(re.findall(r"<tr\b", inner)) - 1, 0)
+        return 32 + 35 * rows + (40 if "til-foot" in inner or "pager" in inner else 0)
     if "chart_single" in c:
         return 80 if "strip" in c else 120
     if "multi_stats" in c:
@@ -158,7 +167,7 @@ def est_col(seg, col_w):
             h = est_row(inner, col_w)
         elif "w-col" in cls.split():
             h = est_col(inner, col_w)
-        elif {"w-card", "procedure_task"} & set(cls.split()):
+        elif {"w-card", "procedure_task", "grid", "rich"} & set(cls.split()):
             h = est_card(cls, inner, col_w)
         elif _span_of(cls) is not None:
             h = est_col(inner, col_w)
@@ -178,7 +187,7 @@ def est_row(inner, row_w):
         sp = _span_of(cls)
         if sp is not None:
             h = est_col(kin, (row_w - ROW_GAP * (len(kids) - 1)) * sp / 24)
-        elif {"w-card", "procedure_task"} & set(cls.split()):
+        elif {"w-card", "procedure_task", "grid", "rich"} & set(cls.split()):
             h = est_card(cls, kin, row_w / max(len(kids), 1))
         else:
             h = None
@@ -195,6 +204,19 @@ def walk_divs(seg, parent_cls, fn, col_w=PAGE_W):
         fn(cls, inner, parent_cls, kids, col_w)
         sp = _span_of(cls)
         walk_divs(inner, cls, fn, (col_w - ROW_GAP * (len(kids) - 1)) * sp / 24 if sp else col_w)
+
+
+def _inner_of(body, pat):
+    """取第一个 class 匹配 pat 的 div 的内容（配平闭合标签）；找不到返回 None。"""
+    m = re.search(pat, body)
+    if not m:
+        return None
+    depth, i = 0, m.start()
+    for t in re.finditer(r"<div\b[^>]*>|</div>", body[i:]):
+        depth += 1 if t.group(0) != "</div>" else -1
+        if depth == 0:
+            return body[i + m.end() - m.start():i + t.start()]
+    return None
 
 
 def check(path, render=False, allow_local=False):
@@ -332,7 +354,7 @@ def check(path, render=False, allow_local=False):
         left_css = re.search(r"\.mk-float[^{]*\{[^}]*\bleft\s*:\s*0", tail)
         if "float-left" in body or re.search(r'class="mk-float[^"]*\bleft\b', body) or left_css:
             add("High", "float-left", "浮层放在了左侧：左边是导航（详情页是页头与字段），会被盖住；浮层只从右侧探出，用 <hb-float> 默认位置")
-    if re.search(r'class="(ocard|m-workbench|m-chat|rec-card|obar)\b', body) and 'class="phone' not in body:
+    if re.search(r'class="(ocard|m-workbench|m-chat|rec-card|m-tool)\b', body) and 'class="phone' not in body:
         add("High", "mobile-in-pc", "PC 图里出现了手机组件（订单卡、手机工作台、会话流等），样式只在 hb-phone 里生效，会散成一堆裸文字：PC 页和 PC 浮层改用 hb-fields、hb-list、hb-multistats 这类 PC 组件")
     if 'class="wempty"' in body or "暂无数据" in body:
         add("Medium", "empty-state", "画面里有「没有找到任务／暂无数据」空态：营销图每个区域都要有内容，给它几行数据或去掉这块")

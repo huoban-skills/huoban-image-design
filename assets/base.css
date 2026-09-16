@@ -77,7 +77,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .item-page { height: auto; }
 .stage.auto .item-page-scroll { overflow: visible; }
 .stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
-.stage.auto.has-float .window { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
+.stage.auto.has-float .window,
+.stage.auto.has-float .item-page { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
 .stage.auto .mk-float {
   position: relative; z-index: 3; grid-area: 1 / 1 / 2 / 3; justify-self: end; align-self: start;
   width: var(--float-w, 356px); margin-top: var(--float-top, 96px); margin-bottom: 24px;
