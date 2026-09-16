@@ -98,6 +98,20 @@ def top_divs(seg):
     return out
 
 
+FILL = {                                   # 短栏补什么：按页面类型给候选组件
+    "workbench": "进度条、分类汇总、日历、多项统计，或在这一栏再放一个标签页容器",
+    "dashboard": "分类汇总、进度条、饼图，或再加一张图表",
+    "detail": "单指标、进度条、图表、流程执行记录、动态、评论，或给标签页容器多加一个页签",
+    "list": "在视图区之外另起一块：单指标、进度条、分类汇总",
+    "screen": "大屏指标框、大屏进度条、再加一张图表",
+}
+
+
+def fill_hint(body):
+    m = re.search(r'data-kind="(\w+)"', body)
+    return FILL.get(m.group(1) if m else "", "本页面原则里该位置列出的其他组件")
+
+
 PAGE_W = 1160          # 页面内容区常见宽度，只用于估算按钮组件换行
 ROW_GAP = 20           # .page / .w-row 组件间距
 
@@ -107,8 +121,11 @@ def _span_of(cls):
     return int(m.group(1)) if m else None
 
 
+UNEST = []             # 本次检查里估不出高度的组件类名
+
+
 def est_card(cls, inner, col_w):
-    """按 base.css 实测行高估算一张组件卡的高度；估不了返回 None。"""
+    """按 base.css 实测行高估算一张组件卡的高度；估不了返回 None 并记下类名。"""
     c = cls.split()
     head = 40 if re.match(r'\s*<div class="(wc-hd|ws-hd)', inner) else 0
     if "header_card" in c:
@@ -130,13 +147,29 @@ def est_card(cls, inner, col_w):
         return head + 80 * inner.count('class="proc"') + 40 * inner.count('class="proc-empty"') + 10
     if "procedure_task" in c:
         return head + 80 * inner.count('class="task"') + 10
+    if "w-stream" in c:                                    # 实测：条目 40，多一行 +16，条间 16
+        items = re.findall(r'<div class="fd-item"', inner)
+        lines = [len(re.findall(r"<div>", x)) or 1 for x in re.split(r'<div class="fd-item"', inner)[1:]]
+        return head + 40 + sum(40 + 16 * (n - 1) for n in lines) + 16 * max(len(items) - 1, 0)
+    if "w-comment" in c:                                   # 实测：发布条 68；空态整块 170
+        if 'class="empty"' in inner:
+            return head + 68 + 170
+        lines = [len(re.findall(r"<div>", x)) or 1 for x in re.split(r'<div class="fd-item"', inner)[1:]]
+        return head + 68 + 40 + sum(40 + 16 * (n - 1) for n in lines) + 16 * max(len(lines) - 1, 0)
+    if "process" in c:                                     # 流程执行记录的头：消息体 52 ＋ 撤销行 41
+        return 52 + (41 if "flow-msg-actions" in inner else 0)
+    if "flowbox-timeline" in c:                            # 节点 89，带链接 128，节点间 12，上下内边距 32
+        nodes = re.split(r'<div class="flowbox"', inner)[1:]
+        return 32 + sum(128 if "flowbox-links" in x else 89 for x in nodes) + 12 * max(len(nodes) - 1, 0)
+    if "flow-foot" in c:
+        return 40
     if "w-field-group" in c:
         m = re.search(r"fg-grid fg-c(\d+)", inner)
         cols = int(m.group(1)) if m else 2
         fields = len(re.findall(r'class="fg-field"', inner))
         full = len(re.findall(r'class="fg-field full"', inner))
         groups = len(re.findall(r'class="fg-group', inner))
-        return head + 40 * groups + -(-fields // cols) * 69 + full * 110
+        return head + 40 * groups + -(-fields // cols) * 69 + full * 110 + (32 if fields else 0)
     if "table_item_list" in c:
         rows = max(len(re.findall(r"<tr\b", inner)) - 1, 0)
         return head + 32 + 35 * rows + (40 if "til-foot" in inner else 0)
@@ -153,9 +186,11 @@ def est_card(cls, inner, col_w):
     if "tabs" in c:
         m = re.search(r'<div class="(wt-body|page-tabs-body)">', inner)
         if not m:
+            UNEST.append(cls)
             return None
         body = est_col(inner[m.end():], col_w)
         return None if body is None else 44 + body
+    UNEST.append(cls)
     return None
 
 
@@ -167,7 +202,7 @@ def est_col(seg, col_w):
             h = est_row(inner, col_w)
         elif "w-col" in cls.split():
             h = est_col(inner, col_w)
-        elif {"w-card", "procedure_task", "grid", "rich"} & set(cls.split()):
+        elif {"w-card", "procedure_task", "grid", "rich", "process", "flowbox-timeline", "flow-foot"} & set(cls.split()):
             h = est_card(cls, inner, col_w)
         elif _span_of(cls) is not None:
             h = est_col(inner, col_w)
@@ -187,7 +222,7 @@ def est_row(inner, row_w):
         sp = _span_of(cls)
         if sp is not None:
             h = est_col(kin, (row_w - ROW_GAP * (len(kids) - 1)) * sp / 24)
-        elif {"w-card", "procedure_task", "grid", "rich"} & set(cls.split()):
+        elif {"w-card", "procedure_task", "grid", "rich", "process", "flowbox-timeline", "flow-foot"} & set(cls.split()):
             h = est_card(cls, kin, row_w / max(len(kids), 1))
         else:
             h = None
@@ -260,6 +295,7 @@ def page_height(body):
 def check(path, render=False, allow_local=False):
     text = Path(path).read_text(encoding="utf-8")
     styles, body = split_doc(text)
+    UNEST.clear()
     findings = []
 
     def add(level, rule, msg, line=None):
@@ -366,15 +402,17 @@ def check(path, render=False, allow_local=False):
                 for k, kin in cols:
                     h = est_col(kin, (col_w - ROW_GAP * (len(cols) - 1)) * _span_of(k) / 24)
                     if h is None:
+                        if UNEST:
+                            add("Nit", "height-unknown", f"这一行的等高没检：.{UNEST[-1].split()[-1]} 没有实测高度，估不出这栏多高；肉眼确认两栏底边齐不齐")
                         return
                     kk = top_divs(kin)
                     stretch = len(kk) == 1 and bool({"w-card", "procedure_task"} & set(kk[0][0].split()))   # 单张卡会被 base.css 拉到等高
                     hs.append((h, k, stretch))
                 short, tall = min(hs), max(hs)
                 if tall[0] - short[0] > 150 and short[2]:
-                    add("Medium", "card-stretched", f"并排里 .{short[1]} 只有一张矮卡（内容约 {int(short[0])}px），会被拉到和 .{tall[1]}（约 {int(tall[0])}px）等高，卡里空一大块：用 <hb-col> 在这一栏再叠一个组件（如按钮组件＋多项统计），或换更高的组件")
+                    add("Medium", "card-stretched", f"并排里 .{short[1]} 只有一张矮卡（内容约 {int(short[0])}px），会被拉到和 .{tall[1]}（约 {int(tall[0])}px）等高，卡里空一大块：只补这一栏，用 <hb-col> 再叠一个组件（{fill_hint(body)}），不要给长栏删内容")
                 if tall[0] - short[0] > 100 and not short[2]:
-                    add("Medium", "column-short", f"并排不等高（按实测行高估算）：.{short[1]} 约 {int(short[0])}px，.{tall[1]} 约 {int(tall[0])}px，差约 {int(tall[0] - short[0])}px；给短栏补 1～2 张图表、数值字段组或待办列表，或改成单栏，不用固定高度硬撑")
+                    add("Medium", "column-short", f"并排不等高（按实测行高估算）：.{short[1]} 约 {int(short[0])}px，.{tall[1]} 约 {int(tall[0])}px，差约 {int(tall[0] - short[0])}px；只补短的那一栏，先补组件（{fill_hint(body)}），差 100px 以内才靠加数据行补；不要给长栏删内容，也不用固定高度硬撑")
         if "page" in toks or "item-page-canvas" in toks:
             run = 0
             for k, _ in top_divs(inner):
@@ -408,6 +446,22 @@ def check(path, render=False, allow_local=False):
         lo, hi = SCALE["stats_per_row"]
         if n and (n < lo or n > hi):
             add("Medium", "scale-limit", f"单指标一行 {n} 个：常态 {lo}～{hi} 个（4 或 6 能在 24 栅格等分）", line_of(body, m.start()))
+    no_float = body
+    fm = re.search(r'<div class="mk-float', no_float)
+    while fm:                                              # 浮层里的表本来就短，不算
+        inner = _inner_of(no_float[fm.start():], r'<div class="mk-float[^"]*"[^>]*>')
+        if inner is None:
+            break
+        no_float = no_float[:fm.start()] + " " * (len(inner) + 40) + no_float[fm.start() + len(inner) + 40:]
+        fm = re.search(r'<div class="mk-float', no_float)
+    for m in re.finditer(r'<div class="w-card table_item_list[^"]*">.*?</table>', no_float, re.S):
+        rows = max(len(re.findall(r"<tr\b", m.group(0))) - 1, 0)
+        if 0 < rows < 4:
+            add("Medium", "short-content", f"表格列表只有 {rows} 行，卡里会空一截：先在这一栏补一个别的组件（{fill_hint(body)}），别把这张表灌成一大堆数据；确实该长就补到 6 行以上（列表页视图是 6～14 行）", line_of(body, m.start()))
+    for m in re.finditer(r'<div class="w-card chart_table[^"]*">.*?</table>', no_float, re.S):
+        rows = max(len(re.findall(r"<tr\b", m.group(0))) - 1, 0)
+        if 0 < rows < 3:
+            add("Medium", "short-content", f"透视表只有 {rows} 行：维度太少就不用透视表，换单指标或多项统计；或者在这一栏补一个别的组件（{fill_hint(body)}）", line_of(body, m.start()))
     n_cols = len(re.findall(r'class="kanban-group', body))
     if n_cols and not SCALE["kanban_cols"][0] <= n_cols <= SCALE["kanban_cols"][1]:
         add("Medium", "scale-limit", f"看板 {n_cols} 列：常态 3～5 列")
