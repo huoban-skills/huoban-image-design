@@ -77,6 +77,11 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .item-page { height: auto; }
 .stage.auto .item-page-scroll { overflow: visible; }
 .stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
+.stage.auto.has-float .window { overflow: visible; }      /* 挂在组件上的浮层要探出窗口右缘 */
+.float-anchor { position: relative; }
+.stage.auto .float-anchor > .mk-float {                   /* 浮层顶端与这块组件的上沿齐平 */
+  position: absolute; top: 0; right: -200px; left: auto; width: var(--float-w, 356px); margin: 0;
+}
 .stage.auto.has-float .window,
 .stage.auto.has-float .item-page { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
 .stage.auto .mk-float {

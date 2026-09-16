@@ -219,6 +219,44 @@ def _inner_of(body, pat):
     return None
 
 
+def _inner_of(body, pat):
+    """取第一个 class 匹配 pat 的 div 的内容（配平闭合标签）；找不到返回 None。"""
+    m = re.search(pat, body)
+    if not m:
+        return None
+    depth, i = 0, m.start()
+    for t in re.finditer(r"<div\b[^>]*>|</div>", body[i:]):
+        depth += 1 if t.group(0) != "</div>" else -1
+        if depth == 0:
+            return body[i + m.end() - m.start():i + t.start()]
+    return None
+
+
+def page_height(body):
+    """按实测行高估算底图高度；估不出返回 None。"""
+    inner = _inner_of(body, r'<div class="page(?: [^"]*)?">')
+    if inner is None:
+        inner = _inner_of(body, r'<div class="item-grid(?: [^"]*)?">')
+    if inner is None:
+        return None
+    total, n = 0, 0
+    for cls, seg in top_divs(inner):
+        k = set(cls.split())
+        if "float-anchor" in k:
+            seg = re.sub(r'<div class="mk-float.*', "", seg, flags=re.S)
+        if "w-row" in k:
+            h = est_row(seg, PAGE_W)
+        elif _span_of(cls.replace("float-anchor", "").strip()) is not None:
+            h = est_col(seg, PAGE_W)
+        else:
+            h = est_card(cls, seg, PAGE_W)
+        if h is None:
+            return None
+        total += h
+        n += 1
+    return total + ROW_GAP * (n - 1) if n else None
+
+
 def check(path, render=False, allow_local=False):
     text = Path(path).read_text(encoding="utf-8")
     styles, body = split_doc(text)
@@ -389,6 +427,16 @@ def check(path, render=False, allow_local=False):
         n = len(re.findall(r'class="w-card', body[m.end():m.end() + 8000]))
         if n > SCALE["float_cards"][1]:
             add("Medium", "scale-limit", f"浮层里 {n} 张组件卡：浮层只强调一两个底层没有的东西", line_of(body, m.start()))
+
+    for m in re.finditer(r'<div class="mk-float[^"]*"[^>]*style="([^"]*)"', body):
+        w = re.search(r"--float-w:(\d+)px", m.group(1))
+        inner = _inner_of(body, r'<div class="mk-float[^"]*"[^>]*>')
+        page_h, fh = page_height(body), (est_col(inner, 392) if inner else None)
+        if not (w and page_h and fh):
+            continue
+        covered = max(0, int(w.group(1)) - 200) * min(fh, page_h)
+        if covered > 0.25 * 1440 * page_h:
+            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (1440 * page_h):.0%}：最多四分之一，少放一行或把宽度收到 400 以内", line_of(body, m.start()))
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):

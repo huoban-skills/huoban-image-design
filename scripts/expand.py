@@ -2021,14 +2021,22 @@ def _top_level(raw):
 
 
 def m_float(a, body):
+    at = a.get("at")
+    if at is not None and str(at) not in [str(i) for i in range(1, 21)]:
+        raise ExpandError('<hb-float at> 写第几块组件（1 起），比如 at="4"；不写就挂在倒数第二块')
     if a.get("side", "right") != "right":
         raise ExpandError('<hb-float> 只从右侧探出：PC 页面左边是导航（详情页左边是页头与字段），浮层放左会盖住它们；去掉 side 属性')
     top = str(a.get("top", "96")).rstrip("px")
     w = str(a.get("w", "356")).rstrip("px")
+    if not w.isdigit() or not 300 <= int(w) <= 480:
+        raise ExpandError(f'<hb-float w="{w}"> 宽度写 300～480：浮层右探出画布 200，宽 300 才压住底图 100（默认 356）')
     n_cards = len(re.findall(r'class="w-card', body))
     if n_cards > 2:
         warn(f"浮层里放了 {n_cards} 个组件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
     title = f'<div class="float-title">{esc(a["title"])}</div>' if a.get("title") else ""
+    if at is not None or "top" not in a:
+        return (f'<div class="mk-float" data-at="{at or ""}" '
+                f'style="--float-w:{w}px">{title}{body.strip()}</div>')
     return (f'<div class="mk-float" '
             f'style="--float-top:{top}px;--float-w:{w}px">{title}{body.strip()}</div>')
 
@@ -2164,8 +2172,25 @@ def m_page(a, body):
             floats.append(html_)
         else:
             main_parts.append((name, html_))
+    anchored = [h for h in floats if 'data-at="' in h]
+    floats = [h for h in floats if 'data-at="' not in h]
+    if anchored:
+        blocks = [i for i, (n, _) in enumerate(main_parts) if n != "hb-itembar"]
+        if not blocks:
+            raise ExpandError("<hb-float at> 要挂在页面组件上，但这张图除了浮层没有别的组件")
+        for h in anchored:
+            at = re.search(r'data-at="(\d*)"', h).group(1)
+            idx = int(at) - 1 if at else max(0, len(blocks) - 2)
+            if idx >= len(blocks):
+                raise ExpandError(f'<hb-float at="{at}"> 这张图只有 {len(blocks)} 块组件，at 最大写 {len(blocks)}')
+            j = blocks[idx]
+            n, bh = main_parts[j]
+            bh = re.sub(r'^(\s*<div class=")', r"\1float-anchor ", bh, count=1)
+            if "float-anchor" not in bh:
+                raise ExpandError(f"<hb-float at> 挂不到第 {idx + 1} 块（{n}）上：换一块，或改用 top 自己定位置")
+            main_parts[j] = (n, bh[:bh.rstrip().rfind("</div>")] + h + "</div>")
     stage_cls = ["stage", "auto"]
-    if floats:
+    if floats or anchored:
         stage_cls.append("has-float")
     if canvas == "product":
         stage_cls.append("product")
@@ -2229,7 +2254,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（只从右侧探出）：属性 top、w、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
+    "hb-float": (m_float, "营销浮层（只从右侧探出）：属性 at（挂在第几块组件，默认倒数第二块）、w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -2336,9 +2361,10 @@ DOCS = {
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层，从右侧探出。属性 top（距画布顶 px，默认 96）、w（宽 px，默认 356）、title。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
+"hb-float": """营销浮层，从右侧探出，右边缘探出画布 200。属性 at（挂在第几块顶层组件上，浮层顶端与那块的上沿齐平；默认倒数第二块，落在偏右下）、w（宽 300～480，默认 356）、title；top（距画布顶 px）只在 at 定不出位置时用。
+浮层必须压在底图上，不能整块飘在画布外：宽 300 起，压住底图至少 100；盖住底图的面积不超过四分之一（check.py `float-cover`）。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
-<hb-float top="220" w="392" title="华北区整改超期门店">
+<hb-float at="4" w="392" title="华北区整改超期门店">
 <hb-list title="整改超期门店" nock noidx count="3">
 门店 | 督导 | 超期:tag | 状态:tag
 味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
