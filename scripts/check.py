@@ -39,7 +39,7 @@ PERSON_PATTERNS = [re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)")
 PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报", "周会", "周期", "周边", "周转", "金额", "马上", "于今")
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
-SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5), "float_cards": (0, 2), "pivot_per_page": (0, 2)}
+SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5), "float_cards": (0, 2)}
 
 
 def load_known_classes():
@@ -474,9 +474,6 @@ def check(path, render=False, allow_local=False):
             vals += [v for v in tds if v and v not in ("—", "-", "–")]
         if vals and sum(1 for v in vals if _num.match(v)) / len(vals) < 0.6:
             add("High", "pivot-as-list", "透视表里装的是一条条记录（大部分格子是文字）：透视表是维度 × 指标的统计，做数据分析用；记录列表改 hb-list（表格列表）", line_of(body, m.start()))
-    n_pivot = len(re.findall(r'class="w-card chart_table', body))
-    if n_pivot > SCALE["pivot_per_page"][1]:
-        add("Medium", "scale-limit", f"透视表 {n_pivot} 张：默认 ≤2 张，多了先并成一张多维透视")
     for m in re.finditer(r'<div class="mk-float[^"]*"[^>]*>', body):
         n = len(re.findall(r'class="w-card', body[m.end():m.end() + 8000]))
         if n > SCALE["float_cards"][1]:

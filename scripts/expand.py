@@ -1843,7 +1843,7 @@ CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
         order=["hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
                "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map", "hb-multistats",
                "hb-progress", "hb-subtotal", "hb-pivot", "hb-list", "hb-float"],
-        doc="产品壳 → 横幅（必，一行高）→ 筛选（可选）→ 单指标一行（看板必有）→ 图表行（hb-row 16+8 或 12+12）→ 透视表/明细（底部，≤2 张）。",
+        doc="产品壳 → 横幅（必，一行高）→ 筛选（可选）→ 单指标一行（看板必有）→ 图表行（hb-row 16+8 或 12+12）→ 透视表/明细（底部：一张通栏，两张 hb-row 12+12，再多往下接）。",
         example="""<hb-page kind="dashboard" ws="云图贸易" page="库存分析" me="周">
 <hb-nav>
 * 库存分析 | chart-s
@@ -2125,8 +2125,6 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
         warn("出现了两组单指标：单指标只放一行，多出来的并成多项统计或改进度条/透视表")
     if c.get("hb-banner", 0) > 1 and kind != "dashboard":
         warn("横幅出现了两次：只有看板中段可以再放一个做段落标题")
-    if c.get("hb-pivot", 0) > 2:
-        warn(f"透视表 {c['hb-pivot']} 张：默认 ≤2 张，多了先并成一张多维透视")
 
 
 def m_page(a, body):

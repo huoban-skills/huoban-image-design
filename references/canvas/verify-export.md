@@ -12,7 +12,7 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 
 - `local-class`（High）：本图样式里定义了 base.css 没有的类，这是自造组件的常见入口；确属一次性布局微调加 `--allow-local` 降为 Nit，多张图都要用就沉淀进 base.css。
 - `unknown-token`：`var(--xx)` 在皮肤和 base.css 里都没定义，换肤时会失效；报错带候选名。
-- `scale-limit`：表格行数、单指标个数、看板列数、透视表张数、浮层卡数超出出图约束（几何问题在无 Chrome 时只能靠约束规避）；是设计判断，确有理由可保留并在验收表第 8 条写明。
+- `scale-limit`：表格行数、单指标个数、看板列数、浮层卡数超出出图约束（几何问题在无 Chrome 时只能靠约束规避）；是设计判断，确有理由可保留并在验收表第 8 条写明。
 - `banner-person-name`（High）：横幅里写了具体人名或问候语；横幅写角色或业务域。
 - `stage-no-height`（High）：手写外壳的 `.stage` 没写死高度，导出会算错画布。
 - `orphan-span`（Blocker）：`.span-N` 列外面没有 `w-row` 行容器，列会退化成通栏竖叠；并排的组件写进同一个 `<hb-row spans=…>`，不要自己包 span 列。
