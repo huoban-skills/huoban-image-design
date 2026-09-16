@@ -511,7 +511,7 @@ def check(path, render=False, allow_local=False):
                 if e["kind"] == "clipped":
                     add("High", "content-clipped", f"cut 窗口内容比窗口高 {e['over']}px，底部被裁：调 cut 值或减内容")
                 else:
-                    add("High", "float-out", f"浮层探出画布 {e['over']}px：换一块 at 挂靠，或减少浮层内容")
+                    add("High", "float-out", f"浮层探出画布 {e['over']}px：减少浮层内容，或把宽度收小")
             findings[:] = [f for f in findings if f["rule"] != "column-short"]
             for u in r.get("uneven", []):
                 add("Medium", "column-uneven", f"并排底部不齐：.{u['short']} 高 {u['shortH']}，.{u['tall']} 高 {u['tallH']}，差 {u['diff']}px；给短栏补数据行或调 spans")

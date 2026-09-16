@@ -58,13 +58,13 @@ hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统
 ```
 
 ### hb-float
-营销浮层（只从右侧探出）：属性 at（挂在第几块组件，默认倒数第二块）、align=top/center/bottom、w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏
+营销浮层（固定在底图右下角）：属性 w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏
 
 ```
-营销浮层，从右侧探出，右边缘探出画布 200。属性 at（挂在第几块顶层组件上；默认倒数第二块，落在偏右下）、align=top（默认，和那块上沿齐平）/center（贴那块中部）/bottom（和那块下沿齐平，位置最低）、w（宽 300～480，默认 356）、title；top（距画布顶 px）只在 at 定不出位置时用。
+营销浮层，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 300～480，默认 356）、title。
 浮层必须压在底图上，不能整块飘在画布外：宽 300 起，压住底图至少 100；盖住底图的面积不超过四分之一（check.py `float-cover`）。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
 例：
-<hb-float at="4" w="392" title="华北区整改超期门店">
+<hb-float w="392" title="华北区整改超期门店">
 <hb-list title="整改超期门店" nock noidx count="3">
 门店 | 督导 | 超期:tag | 状态:tag
 味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
