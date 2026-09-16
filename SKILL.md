@@ -14,7 +14,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 页面类型路由（唯一真相源）
 
-先判页面类型，在下表找到对应行，取它的骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles、visual-color 与 anti-sameness。
+先判页面类型，在下表找到对应行，取它的骨架 kind 和必读页面原则。所有图都读 references/principles/ 的 visual-four-principles 与 anti-sameness。
 
 | 用户说的 | `<hb-page kind>` | 必读页面原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
@@ -36,7 +36,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ### 1. 追问并确认需求单（闸门）
 
-- 按 [references/intake.md](references/intake.md) 追问，依次发四种消息：定盘子 → 需求单初稿 → 逐图决定（可多轮）→ 终稿；每条发出即停，等用户答完再发下一条。配色按 [references/skin/routing.md](references/skin/routing.md) 推荐。
+- 按 [references/intake.md](references/intake.md) 追问；皮肤按 [references/skin/routing.md](references/skin/routing.md) 选。
 - 完成标准：题库问空、终稿"决定与默认"列没有"待问"、用户对终稿回了确认。**初稿被认可不算确认；三条不齐，不进入步骤 2。**
 
 ### 2. 写骨架片段
@@ -50,7 +50,7 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 ```
 
 - 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏。
-- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组件、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float top="…" w="…">`，体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
+- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组件、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float at="…" w="…">`（at 是挂在第几块组件上，不写就挂倒数第二块），体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
 - 外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 - 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 

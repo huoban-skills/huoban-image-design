@@ -490,7 +490,7 @@ def check(path, render=False, allow_local=False):
             continue
         covered = max(0, int(w.group(1)) - 200) * min(fh, page_h)
         if covered > 0.25 * 1440 * page_h:
-            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (1440 * page_h):.0%}：最多四分之一，少放一行或把宽度收到 400 以内", line_of(body, m.start()))
+            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (1440 * page_h):.0%}：最多四分之一，少放一行或把宽度收小（300～480 里取小值）", line_of(body, m.start()))
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -514,7 +514,7 @@ def check(path, render=False, allow_local=False):
                 if e["kind"] == "clipped":
                     add("High", "content-clipped", f"cut 窗口内容比窗口高 {e['over']}px，底部被裁：调 cut 值或减内容")
                 else:
-                    add("High", "float-out", f"浮层探出画布 {e['over']}px：调 hb-float 的 top 或减少浮层内容")
+                    add("High", "float-out", f"浮层探出画布 {e['over']}px：换一块 at 挂靠，或减少浮层内容")
             findings[:] = [f for f in findings if f["rule"] != "column-short"]
             for u in r.get("uneven", []):
                 add("Medium", "column-uneven", f"并排底部不齐：.{u['short']} 高 {u['shortH']}，.{u['tall']} 高 {u['tallH']}，差 {u['diff']}px；给短栏补数据行或调 spans")

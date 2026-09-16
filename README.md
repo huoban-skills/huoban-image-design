@@ -56,7 +56,7 @@
 
 ## 文档
 
-- `references/principles/` — 六类页面各一篇原则（列表、表单、详情页、工作台、数据看板、数据大屏）＋组件辞典＋通用原则，读哪篇由 SKILL.md 的页面类型路由表定
+- `references/principles/` — 六类页面各一篇原则（列表、表单、详情页、工作台、数据看板、数据大屏）＋组件辞典＋视觉四原则与色彩＋防重复原则，读哪篇由 SKILL.md 的页面类型路由表定
 - `references/canvas/` — 画布规范（营销/产品设计）、检查与验收、导出
 - `references/skin/` — 皮肤选型与制作
 - `references/macros.md` — 宏语法全文（由 `expand.py --doc all` 生成，出图时按需 `--page`／`--doc` 取，不整读）
