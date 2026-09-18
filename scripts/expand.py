@@ -750,7 +750,8 @@ def m_biaxial(a, body):
 
 
 def m_funnel(a, body):
-    """漏斗图（chart_funnel）：自上而下逐级收窄的梯形，右侧标转化率；单色系由深到浅（2026-09-14 实测）。"""
+    """漏斗图（chart_funnel）：自上而下逐级收窄的梯形，右侧标原值与转化率；单色系由深到浅（2026-09-14 实测）。
+    用网页元素画：梯形宽度按比例，文字按实际字号显示，放进窄栏也不跟着缩小。"""
     rows = []
     for ln in lines(body):
         c = cells(ln)
@@ -760,24 +761,19 @@ def m_funnel(a, body):
     if len(rows) < 2:
         raise ExpandError("<hb-funnel> 至少两段：漏斗讲的是一级级掉下来的转化")
     top = rows[0]["val"] or 1
-    W, H = int(a.get("w", 560)), int(a.get("h", 240))
-    L, T, B, R = 16, 14, 14, 150
-    pw, ph = W - L - R, H - T - B
-    seg = ph / len(rows)
-    inner = []
+    out = []
     for i, r in enumerate(rows):
-        w0 = pw * max(r["val"] / top, 0.12)
+        w0 = 100 * max(r["val"] / top, 0.3)                  # 最窄留三成，阶段名放得下
         nxt = rows[i + 1]["val"] if i + 1 < len(rows) else r["val"]
-        w1 = pw * max(nxt / top, 0.12) if i + 1 < len(rows) else w0
-        cx = L + pw / 2
-        y0, y1 = T + seg * i, T + seg * (i + 1) - 4
-        op = max(0.3, 1 - i * 0.18)
-        inner.append(f'<polygon points="{cx - w0 / 2:.1f},{y0:.1f} {cx + w0 / 2:.1f},{y0:.1f} '
-                     f'{cx + w1 / 2:.1f},{y1:.1f} {cx - w1 / 2:.1f},{y1:.1f}" fill="var(--primary)" opacity="{op:.2f}"/>')
-        inner.append(f'<text x="{cx:.1f}" y="{(y0 + y1) / 2 + 4:.1f}" font-size="12" fill="#fff" text-anchor="middle">{esc(r["name"])}</text>')
-        rate = f"　{100 * r['val'] / top:.0f}%" if i else ""
-        inner.append(f'<text x="{W - R + 12}" y="{(y0 + y1) / 2 + 4:.1f}" font-size="12" fill="var(--ink-65)">{esc(r["raw"])}{rate}</text>')
-    return chart_card(a, inner, "", "hb-funnel", par="xMidYMid meet")
+        w1 = 100 * max(nxt / top, 0.3) if i + 1 < len(rows) else w0 * 0.9
+        op = max(0.55, 1 - i * 0.11)
+        rate = f'<i>{100 * r["val"] / top:.0f}%</i>' if i else ""
+        out.append(f'<div class="fn-row"><div class="fn-bar" style="--w0:{w0:.1f}%;--w1:{w1:.1f}%;--op:{op:.2f}">'
+                   f'<span>{esc(r["name"])}</span></div><div class="fn-val">{esc(r["raw"])}{rate}</div></div>')
+    body_html = '<div class="fn">' + "".join(out) + "</div>"
+    if "bare" in a:
+        return body_html
+    return chart_shell(a, "hb-funnel", f'<div class="wc-bd">{body_html}</div>')
 
 
 def m_scatter(a, body):
@@ -2516,7 +2512,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 出库量 | 135,165,115,185,212,217 | bar
 周转天数 | 48,45,51,43,40,42 | line
 </hb-biaxial>""",
-"hb-funnel": """漏斗图（官方 chart_funnel）。属性 title、span、plain、bare、w、h。每行「阶段名 | 值」，至少两段，自上而下逐级收窄；右侧标原值与对首段的转化率，颜色是主色由深到浅。
+"hb-funnel": """漏斗图（官方 chart_funnel）。属性 title、span、plain、bare。每行「阶段名 | 值」，至少两段，自上而下逐级收窄；右侧标原值与对首段的转化率，颜色是主色由深到浅。
 讲一条链路一级级掉下来的量才用它（线索→商机→报价→签约）；并列的几类量用 hb-bar 或 hb-hbar。
 例：
 <hb-funnel title="销售漏斗">

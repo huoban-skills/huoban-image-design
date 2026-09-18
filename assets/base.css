@@ -680,6 +680,17 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* 图表组件 */
 .chart .wc-bd { height: 240px; display: flex; align-items: center; justify-content: center; }
 .chart .wc-bd svg { width: 100%; height: 100%; }
+/* 漏斗图用网页元素画：梯形按比例裁出，文字按实际字号，放进窄栏不缩小 */
+.chart .wc-bd .fn { width: 100%; max-width: 640px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 8px 16px; }
+.fn-row { flex: 1; max-height: 44px; display: flex; align-items: stretch; gap: 12px; }
+.fn-bar { flex: 1; position: relative; }
+.fn-bar::before {
+  content: ""; position: absolute; inset: 0; background: var(--primary); opacity: var(--op, 1);
+  clip-path: polygon(calc(50% - var(--w0) / 2) 0, calc(50% + var(--w0) / 2) 0, calc(50% + var(--w1) / 2) 100%, calc(50% - var(--w1) / 2) 100%);
+}
+.fn-bar span { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; white-space: nowrap; }
+.fn-val { width: 88px; flex: none; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-85); white-space: nowrap; }
+.fn-val i { font-style: normal; color: var(--ink-45); }
 .legend { display: flex; justify-content: center; align-items: center; gap: 18px; padding: 6px 12px 14px; font-size: 13px; color: var(--ink-65); }
 .legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 .legend .sw-1 { background: var(--c-green); }
