@@ -1911,14 +1911,14 @@
       "file": "c3-page-detail.html",
       "name": "选项字段-平铺样式",
       "group": "自定义详情页",
-      "macro": "hb-steps",
+      "macro": "hb-fields",
       "grid": null,
       "variants": [],
       "measured": "measured",
       "allowed_in": [
-        "page:detail"
+        "field_group"
       ],
-      "note": "字段的展示样式（is_tile=1），不是 status_bar 组件；用 <hb-steps pill>"
+      "note": "字段的展示样式（is_tile=1），只能放在字段组里，不是独立组件；hb-fields 里写 tiles 类型"
     },
     {
       "kind": "component",

@@ -39,6 +39,8 @@ PERSON_PATTERNS = [re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)")
 PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报", "周会", "周期", "周边", "周转", "金额", "马上", "于今")
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
+SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
+SLIDE_MAX_H = 760      # 演示尺寸窗口高度上限：放进 PPT 时不要太高
 FLOAT_ZOOM = 0.8        # 画面浮层里的内容缩到 0.8 倍显示（base.css .float-screen）
 SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5)}
 
@@ -169,8 +171,9 @@ def est_card(cls, inner, col_w):
         cols = int(m.group(1)) if m else 2
         fields = len(re.findall(r'class="fg-field"', inner))
         full = len(re.findall(r'class="fg-field full"', inner))
+        tile_rows = len(re.findall(r'class="fg-field span-all"', inner))
         groups = len(re.findall(r'class="fg-group', inner))
-        return head + 40 * groups + -(-fields // cols) * 69 + full * 110 + (32 if fields else 0)
+        return head + 40 * groups + -(-fields // cols) * 69 + tile_rows * 69 + full * 110 + (32 if fields or tile_rows else 0)
     if "table_item_list" in c:
         rows = max(len(re.findall(r"<tr\b", inner)) - 1, 0)
         return head + 32 + 35 * rows + (40 if "til-foot" in inner else 0)
@@ -480,14 +483,16 @@ def check(path, render=False, allow_local=False):
         w = re.search(r"--float-w:(\d+)px", m.group(1))
         inner = _inner_of(body, r'<div class="float-screen">')
         fw = int(w.group(1)) if w else 640
-        raw = est_col(inner, fw / FLOAT_ZOOM) if inner else None
+        zoom = 1 if SLIDE_RE.search(body) else FLOAT_ZOOM     # 演示尺寸下浮层内容不缩小
+        raw = est_col(inner, fw / zoom) if inner else None
         page_h = page_height(body)
-        fh = raw * FLOAT_ZOOM + 12 if raw else None           # 画面按 0.8 倍显示，外框上下内边距 6
+        fh = raw * zoom + 12 if raw else None                 # 外框上下内边距 6
         if not (w and page_h and fh):
             continue
         covered = max(0, int(w.group(1)) - 200) * min(fh, page_h)
-        if covered > 0.25 * 1440 * page_h:
-            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (1440 * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～960 里取小值）", line_of(body, m.start()))
+        win_w = 1200 if SLIDE_RE.search(body) else 1440
+        if covered > 0.25 * win_w * page_h:
+            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～960 里取小值）", line_of(body, m.start()))
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -513,6 +518,9 @@ def check(path, render=False, allow_local=False):
                 else:
                     add("High", "float-out", f"浮层探出画布 {e['over']}px：减少浮层内容，或把宽度收小")
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown")]
+            sh = (r.get("stage") or {}).get("h")
+            if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
+                add("Medium", "slide-height", f"演示尺寸画面高 {sh}px（实测），放进 PPT 显得太高：控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行表格")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):

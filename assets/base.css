@@ -94,6 +94,13 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 
 .stage.auto.product .window { border-radius: 0; border: 0; }
+/* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。窗口 1200 宽，浮层内容不缩小，详情页边距收窄 */
+.stage.auto.slide { width: 1200px; }
+.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1200px; }
+.stage.auto.slide.has-float { width: 1400px; grid-template-columns: 1200px 200px; }
+.stage.auto.slide.has-float .window, .stage.auto.slide.has-float .item-page { width: 1200px; }
+.stage.auto.slide .item-page-canvas { padding: 32px 48px; }
+.stage.auto.slide .float-screen > * { zoom: 1; }
 /* ── 栅格换算（2026-09-14 实测，三个工作区的自定义页面与详情页都成立）──
    自定义页面与详情页都是 24 列、列间距 20、行间距 20。配置里的 w×h 换成像素：
      像素高 = 20 × h − 20        （h=3→40、7→120、16→300、27→520、44→860、55→1080）
@@ -995,7 +1002,8 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .fg-c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fg-c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .fg-field { padding: 6px 6px 7px; min-width: 0; }   /* 标签 24 ＋ 值框 32 ＋ 上 6 下 7 ＝ 实测行高 69 */
-.fg-field.full { grid-column: 1 / -1; }
+.fg-field.full, .fg-field.span-all { grid-column: 1 / -1; }
+.fg-value.item-tiles { height: 32px; padding: 0 8px; border-radius: 6px; }   /* 平铺选项放在字段值框里，框高照常 32 */
 .fg-label { height: 24px; padding: 4px 8px; font-size: 14px; line-height: 16px; color: var(--ink-65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fg-value {
   height: 32px; padding: 5px 8px; border-radius: 6px; background: var(--field-bg);

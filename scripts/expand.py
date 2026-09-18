@@ -913,14 +913,7 @@ def m_steps(a, body):
         raise ExpandError("<hb-steps> 要用 * 标出当前步骤")
     span = a.get("span", "24")
     if "pill" in a:
-        # 选项字段平铺形态（2026-09-14 实测）：全圆角胶囊 20 高，选中填该选项自身颜色，其余透明底
-        out = []
-        for i, it in enumerate(items):
-            name, color = split_color(it[1:].strip() if it.startswith("*") else it)
-            cls = "tile" + (" on" if i == cur else "")
-            style = f' style="--pg:{ctok(color)}"' if i == cur and color else ""
-            out.append(f'<span class="{cls}"{style}>{esc(name)}</span>')
-        return f'<div class="item-tiles span-{span}">' + "".join(out) + "</div>"
+        raise ExpandError('选项字段平铺是字段的展示样式，只能放在字段组里，不能单独成一块：在 <hb-fields> 里写一行「房源状态 | 草稿 / *待上架审批:orange / 已上架 | tiles」')
     out = []
     for i, it in enumerate(items):
         name = split_color(it[1:].strip() if it.startswith("*") else it)[0]
@@ -1016,7 +1009,7 @@ def span_wrap(a, html_):
     return f'<div class="span-{a["span"]}">{html_}</div>' if "span" in a else html_
 
 
-FIELD_TYPES = ("text", "tag", "tags", "user", "multi", "file", "image")
+FIELD_TYPES = ("text", "tag", "tags", "user", "multi", "file", "image", "tiles")
 FULL_ROW_TYPES = ("multi", "file", "image")
 MS_COLORS = ["orange", "green", "red", "yellow", "purple", "blue"]
 PG_COLORS = ["blue", "green", "yellow", "purple", "orange", "teal"]
@@ -1041,6 +1034,19 @@ def m_fields(a, body):
         typ = c[2].strip() if len(c) > 2 and c[2].strip() else "text"
         if typ not in FIELD_TYPES:
             raise ExpandError(f"<hb-fields> 字段类型「{typ}」不认识，可用：{'、'.join(FIELD_TYPES)}")
+        if typ == "tiles":      # 选项字段平铺（is_tile，2026-09-14 实测）：胶囊 20 高，选中填该选项自身颜色，其余透明底
+            opts = [o.strip() for o in c[1].split("/") if o.strip()]
+            cur = next((i for i, o in enumerate(opts) if o.startswith("*")), None)
+            if cur is None or len(opts) < 2:
+                raise ExpandError(f"<hb-fields> tiles 字段写成「选项 / *当前选项:颜色 / 选项」，用 * 标出当前值：{ln}")
+            tiles = []
+            for i, o in enumerate(opts):
+                name, color = split_color(o[1:].strip() if o.startswith("*") else o)
+                style = f' style="--pg:{ctok(color)}"' if i == cur and color else ""
+                tiles.append(f'<span class="tile{" on" if i == cur else ""}"{style}>{esc(name)}</span>')
+            out.append(f'<div class="fg-field span-all"><div class="fg-label">{esc(c[0])}</div>'
+                       f'<div class="fg-value item-tiles">{"".join(tiles)}</div></div>')
+            continue
         full = typ in FULL_ROW_TYPES
         val = render_val(c[1], "text" if full else typ, "hb-fields")
         out.append(f'<div class="fg-field{" full" if full else ""}"><div class="fg-label">{esc(c[0])}</div>'
@@ -2048,8 +2054,8 @@ def m_float(a, body):
     if a.get("side", "right") != "right":
         raise ExpandError('<hb-float> 只从右侧探出：PC 页面左边是导航（详情页左边是页头与字段），浮层放左会盖住它们；去掉 side 属性')
     w = str(a.get("w", "640")).rstrip("px")
-    if not w.isdigit() or not 480 <= int(w) <= 960:
-        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～960（默认 640）：浮层是一块小画面，右缘探出画布 200')
+    if not w.isdigit() or not 400 <= int(w) <= 960:
+        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～960（默认 640；演示尺寸 400～640）：浮层是一块小画面，右缘探出画布 200')
     if "title" in a:
         raise ExpandError('<hb-float> 不带浮层标题：去掉 title 属性，要说明的话写在体内组件卡片自己的 title 上')
     n_cards = len(re.findall(r'class="w-card', body))
@@ -2144,6 +2150,11 @@ def m_page(a, body):
     canvas = a.get("canvas", "marketing")
     if canvas not in ("marketing", "product"):
         raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
+    size = a.get("size", "full")
+    if size not in ("full", "slide"):
+        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1200 宽、只画讲点那几块）')
+    if size == "slide" and (canvas != "marketing" or kind in ("screen", "mobile")):
+        raise ExpandError('<hb-page size="slide"> 只用在营销类的电脑端页面：大屏、手机端和产品设计类画布不用演示尺寸')
     parts = _top_level(a.get("_raw", body))
     names = [n for n, _ in parts if n]
     deep = list(names)          # 「必有」用：容器体内的宏也算出现过
@@ -2172,6 +2183,9 @@ def m_page(a, body):
         bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn))\b", a.get("_raw", body))
         if bad:
             raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里；PC 页和 PC 浮层里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
+    if size == "slide":        # 演示尺寸只画讲点那几块：必有项只留外壳类，内容组件按讲点挑
+        spec = dict(spec, required=[r for r in spec["required"] if r in ("hb-nav", "hb-banner", "hb-itembar", "hb-hcard", "hb-views", "hb-tools")],
+                    first_screen_ban=set())
     _check_slots(kind, spec, names, deep, first_screen)
     floats, main_parts, nav_html = [], [], ""
     for name, raw in parts:
@@ -2195,6 +2209,20 @@ def m_page(a, body):
         stage_cls.append("has-float")
     if canvas == "product":
         stage_cls.append("product")
+    if size == "slide":
+        stage_cls.append("slide")
+        tops = [n for n, _ in main_parts if n not in ("hb-nav", "hb-itembar", "hb-banner", "hb-views", "hb-tools", "hb-hcard", "hb-steps")]
+        if len(tops) > 5:
+            warn(f"演示尺寸下放了 {len(tops)} 块组件：一页只放讲点那三到五块，多了字会挤小")
+        for h in floats:
+            fw = re.search(r"--float-w:(\d+)px", h)
+            if fw and not 400 <= int(fw.group(1)) <= 640:
+                raise ExpandError(f'演示尺寸下 <hb-float w> 写 400～640（现在 {fw.group(1)}）：窗口只有 1200 宽')
+    else:
+        for h in floats:
+            fw = re.search(r"--float-w:(\d+)px", h)
+            if fw and int(fw.group(1)) < 480:
+                raise ExpandError(f'<hb-float w="{fw.group(1)}"> 宽度写 480～960（默认 640）；400 起只在演示尺寸 size="slide" 下可用')
     stage_style = ""
     cut = str(a.get("cut", "")).rstrip("px")
 
@@ -2290,7 +2318,7 @@ MACROS = {
     "hb-hcard": (m_hcard, "详情页页头卡片：属性 title、sub；体内每行「字段名 | 值 | 类型」，类型 user/tag/tags 可选"),
     "hb-tabcard": (m_tabcard, "标签页：属性 tabs=*页签|页签、span；pill 出工作台胶囊式（一律居中）；体内放已展开的内容"),
     "hb-flow": (m_flow, "流程执行记录时间线：属性 name、by；每行「节点名 | 状态:颜色 | 日期 | 耗时 | 链接」"),
-    "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤；默认箭头式（status_bar），pill 出选项字段平铺胶囊"),
+    "hb-steps": (m_steps, "状态条：步骤 | *当前 | 步骤，箭头式（status_bar）；选项字段平铺写进 hb-fields 的 tiles 字段"),
     "hb-kanban": (m_kanban, "看板视图：# 分组:颜色 | 数量 开列，其后每行「标题 | 字段=值; 字段=值」"),
     "hb-cards": (m_cards, "卡片视图：标题 | 字段=值; 字段=值 | 操作:图标:颜色"),
     "hb-screen": (m_screen, "数据大屏画布：属性 title、sub、logo、date、week、time、theme=cyan|blue|gold|red|light；体内放 hb-scol/hb-scard/hb-svisual"),
@@ -2337,6 +2365,7 @@ GROUPS = [
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、画面高 760 以内，只画讲点那三到五块，必有组件只留外壳类，浮层宽 400～640 且不缩小；只用于营销类电脑端页面）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
@@ -2524,7 +2553,8 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 </hb-hbar>""",
 "hb-fields": """字段组（官方 field_group，详情页最常用的组件）。属性 title、cols=1～4（每行字段数，默认 2）、span、icon、tint。
 体内：# 分组名 开一组（分组标题行 40 高，三种浅色底轮转）；其余每行 字段名 | 值 | 类型。
-类型：缺省文本；user 人员（多人用 / 分）、tag 彩色选项、tags 多选项（/ 分）；multi 多行文本、file 附件、image 图片是不定高类型，自动独占一行。
+类型：缺省文本；user 人员（多人用 / 分）、tag 彩色选项、tags 多选项（/ 分）；multi 多行文本、file 附件、image 图片是不定高类型，自动独占一行；
+tiles 选项字段平铺，值写「选项 / *当前:颜色 / 选项」，独占一行、行高照常 69，放在分组的首行或末行，免得上一行空半格。选项字段平铺只能这样写在字段组里，不能单独成一块。
 字段行 69 高＝标签 24 ＋ 值框 32 ＋ 上下内距（2026-09-14 实测）。
 例：
 <hb-fields title="订单详情" cols="2" tint="blue">
@@ -2647,12 +2677,11 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 仓库主管审批 | 周敏 执行中 | 8月24日 09:40 | 1.4小时 | 催办
 启动事件 | 陈晓东 扫码创建了「CK-20260824-0037 领用出库单」 | 8月24日 09:12
 </hb-flow>""",
-"hb-steps": """状态条，* 标当前步骤；属性 span（默认 24）、pill。两种形态实测下来是两个不同的东西：
-- 默认＝官方 status_bar 组件：箭头式分段，整条 40 高、白卡圆角 9；段间重叠 10px 咬合，已过段主色 25% 底＋ink-45 字，当前段主色实底白字，未到段透明底＋ink-85 字。
-- pill＝选项字段的平铺展示（is_tile）：全圆角胶囊、20 高、固定宽，选中段填该选项自身颜色（当前项写 *名称:颜色 指定），其余透明底。
+"hb-steps": """状态条（官方 status_bar），* 标当前步骤；属性 span（默认 24）。
+箭头式分段，整条 40 高、白卡圆角 9；段间重叠 10px 咬合，已过段主色 25% 底＋ink-45 字，当前段主色实底白字，未到段透明底＋ink-85 字。
+选项字段平铺（全圆角胶囊）不是组件，是字段的展示样式：写在 <hb-fields> 里，类型 tiles，单独用 pill 会报错。
 例：
-<hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>
-<hb-steps pill>待派工 | 已派工 | *生产中:orange | 已完工</hb-steps>""",
+<hb-steps>提交申请 | *仓库主管审批 | 行政总监审批 | 已出库</hb-steps>""",
 "hb-screen": """数据大屏画布（不套产品壳）。属性 title 页面名（必填）、sub 副题、logo 左上企业名、date/week/time 右上日期星期时间、
 theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色）；背景由主题自带的网格纹理和顶部光带产出。
 大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
