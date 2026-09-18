@@ -1775,7 +1775,7 @@ WZ-JS-0118 | 五粮液 52° 500ml | 酒品:red | 22 | 周敏
 WZ-CY-0389 | 正山小种 特级 | 茶叶:green | 96 | 陈晓东
 WZ-LH-0233 | 商务伴手礼 B 款 | 礼盒:purple | 18 | 李文彬
 </hb-grid>
-<hb-float w="356">…浮层内容（底层没有的组件）…</hb-float>
+<hb-float w="640" title="另一屏画面">…用 hb-row／hb-col 排一块小画面…</hb-float>
 </hb-page>"""),
     "workbench": dict(
         cn="工作台",
@@ -2034,15 +2034,12 @@ def m_float(a, body):
         raise ExpandError('<hb-float> 位置固定在整张底图的右下角，没有位置属性：去掉 pos／at／align／top')
     if a.get("side", "right") != "right":
         raise ExpandError('<hb-float> 只从右侧探出：PC 页面左边是导航（详情页左边是页头与字段），浮层放左会盖住它们；去掉 side 属性')
-    w = str(a.get("w", "356")).rstrip("px")
-    if not w.isdigit() or not 300 <= int(w) <= 480:
-        raise ExpandError(f'<hb-float w="{w}"> 宽度写 300～480：浮层右探出画布 200，宽 300 才压住底图 100（默认 356）')
-    n_cards = len(re.findall(r'class="w-card', body))
-    if n_cards > 2:
-        warn(f"浮层里放了 {n_cards} 个组件卡：浮层只强调一两个底层没有的东西，多了就成了第二张图")
+    w = str(a.get("w", "640")).rstrip("px")
+    if not w.isdigit() or not 480 <= int(w) <= 960:
+        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～960（默认 640）：浮层是一块小画面，右缘探出画布 200')
     title = f'<div class="float-title">{esc(a["title"])}</div>' if a.get("title") else ""
-    return (f'<div class="mk-float" '
-            f'style="--float-w:{w}px">{title}{body.strip()}</div>')
+    return (f'<div class="mk-float" style="--float-w:{w}px">{title}'
+            f'<div class="float-screen">{body.strip()}</div></div>')
 
 
 def m_col(a, body):
@@ -2171,6 +2168,8 @@ def m_page(a, body):
         if name == "hb-float":
             if canvas == "product":
                 raise ExpandError("产品设计类画布不放浮层：去掉 <hb-float>，或改 canvas=\"marketing\"")
+            if floats:
+                raise ExpandError("一张图只放一个浮层：两个浮层都贴在右下角会叠在一起；要讲两件事就拆成两张图")
             floats.append(html_)
         else:
             main_parts.append((name, html_))
@@ -2239,7 +2238,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（固定在底图右下角）：属性 w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏"),
+    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～960、title；体内用 hb-row／hb-col 排一块小画面，只放 PC 组件"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -2346,16 +2345,24 @@ DOCS = {
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 300～480，默认 356）、title。
-浮层必须压在底图上，不能整块飘在画布外：宽 300 起，压住底图至少 100；盖住底图的面积不超过四分之一（check.py `float-cover`）。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
+"hb-float": """营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～960，默认 640）、title。
+浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，外面自动套圆角窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。只放 PC 组件；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容。
 例：
-<hb-float w="392" title="华北区整改超期门店">
-<hb-list title="整改超期门店" nock noidx count="3">
-门店 | 督导 | 超期:tag | 状态:tag
-味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
-味小捷·天津和平路店 | 刘洋 | 4 天:red | 待跟进
-味捷·石家庄万象城店 | 张伟 | 2 天:orange | 已催办:green
+<hb-float w="640" title="华北区巡检看板">
+<hb-row spans="12|12">
+<hb-list title="整改超期门店" nock noidx count="9">
+门店 | 督导 | 超期:tag
+味捷·北京朝阳大悦城店 | 张伟 | 6 天:red
+味小捷·天津和平路店 | 刘洋 | 4 天:red
+味捷·石家庄万象城店 | 张伟 | 2 天:orange
+味捷·北京西单店 | 陈立 | 3 天:orange
+味捷·廊坊万达店 | 刘洋 | 1 天:orange
+味小捷·保定万博店 | 陈立 | 1 天:orange
 </hb-list>
+<hb-line title="近 6 月整改完成率" labels="4月|5月|6月|7月|8月|9月">
+完成率 | 72,78,81,76,85,88 | blue
+</hb-line>
+</hb-row>
 </hb-float>""",
 "hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微会话那一屏用 hb-chat 写在第一个 hb-phone 里。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。

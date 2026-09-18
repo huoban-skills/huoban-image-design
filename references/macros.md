@@ -58,19 +58,27 @@ hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统
 ```
 
 ### hb-float
-营销浮层（固定在底图右下角）：属性 w=300～480、title；体内放底层没有的 PC 组件（hb-list / hb-fields / hb-multistats…），不放手机宏
+营销浮层（一张图一个，固定在底图右下角）：属性 w=480～960、title；体内用 hb-row／hb-col 排一块小画面，只放 PC 组件
 
 ```
-营销浮层，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 300～480，默认 356）、title。
-浮层必须压在底图上，不能整块飘在画布外：宽 300 起，压住底图至少 100；盖住底图的面积不超过四分之一（check.py `float-cover`）。体内放底层没有的东西，且只能是 PC 组件：hb-list、hb-fields、hb-multistats、hb-stats、hb-grid bare，或 extract_templates.py 提的表单编辑页模板；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容；最多两张卡。
+营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～960，默认 640）、title。
+浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，外面自动套圆角窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。只放 PC 组件；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容。
 例：
-<hb-float w="392" title="华北区整改超期门店">
-<hb-list title="整改超期门店" nock noidx count="3">
-门店 | 督导 | 超期:tag | 状态:tag
-味捷·北京朝阳大悦城店 | 张伟 | 6 天:red | 待跟进
-味小捷·天津和平路店 | 刘洋 | 4 天:red | 待跟进
-味捷·石家庄万象城店 | 张伟 | 2 天:orange | 已催办:green
+<hb-float w="640" title="华北区巡检看板">
+<hb-row spans="12|12">
+<hb-list title="整改超期门店" nock noidx count="9">
+门店 | 督导 | 超期:tag
+味捷·北京朝阳大悦城店 | 张伟 | 6 天:red
+味小捷·天津和平路店 | 刘洋 | 4 天:red
+味捷·石家庄万象城店 | 张伟 | 2 天:orange
+味捷·北京西单店 | 陈立 | 3 天:orange
+味捷·廊坊万达店 | 刘洋 | 1 天:orange
+味小捷·保定万博店 | 陈立 | 1 天:orange
 </hb-list>
+<hb-line title="近 6 月整改完成率" labels="4月|5月|6月|7月|8月|9月">
+完成率 | 72,78,81,76,85,88 | blue
+</hb-line>
+</hb-row>
 </hb-float>
 ```
 

@@ -77,11 +77,13 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .item-page { height: auto; }
 .stage.auto .item-page-scroll { overflow: visible; }
 .stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
-/* 浮层比页面窄，里面的表按卡片宽度等分列宽，长文字省略号，不撑出卡片 */
-.mk-float .grid table { table-layout: fixed; }
-.mk-float .grid th, .mk-float .grid td { overflow: hidden; text-overflow: ellipsis; }
-/* 浮层压着底图，靠投影和底图分开 */
-.stage.auto .mk-float .w-card, .stage.auto .mk-float .comp { box-shadow: 0 12px 32px rgba(0, 0, 0, .16); }
+/* 画面浮层：一块小画面，套圆角窗口框，内容缩到 0.8 倍，一看就是另一屏 */
+.stage.auto .float-screen {
+  background: var(--page-bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
+}
+.stage.auto .float-screen > * { zoom: .8; }
+.stage.auto .float-screen > * + * { margin-top: 16px; }
 .stage.auto.has-float .window,
 .stage.auto.has-float .item-page { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
 .stage.auto .mk-float {                                   /* 浮层固定在底图右下角，右缘探出 200 */
@@ -1091,7 +1093,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .cm-send svg { width: 12px; height: 12px; }
 
 /* ── 浮层通用（营销类第二画布） ── */
-.mk-float .comp, .mk-float .w-card {
+.mk-float > .comp, .mk-float > .w-card {                  /* 1.x 手写外壳的浮层卡片 */
   background: var(--card-bg); border-radius: 12px; border: 1px solid var(--line);
   box-shadow: none; overflow: hidden; margin-bottom: 18px;
 }

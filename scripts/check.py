@@ -39,7 +39,8 @@ PERSON_PATTERNS = [re.compile(_NAME + r"的?(?:工作台|看板|首页|主页)")
 PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "财报", "战报", "周会", "周期", "周边", "周转", "金额", "马上", "于今")
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
-SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5), "float_cards": (0, 2)}
+FLOAT_ZOOM = 0.8        # 画面浮层里的内容缩到 0.8 倍显示（base.css .float-screen）
+SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5)}
 
 
 def load_known_classes():
@@ -474,20 +475,19 @@ def check(path, render=False, allow_local=False):
             vals += [v for v in tds if v and v not in ("—", "-", "–")]
         if vals and sum(1 for v in vals if _num.match(v)) / len(vals) < 0.6:
             add("High", "pivot-as-list", "透视表里装的是一条条记录（大部分格子是文字）：透视表是维度 × 指标的统计，做数据分析用；记录列表改 hb-list（表格列表）", line_of(body, m.start()))
-    for m in re.finditer(r'<div class="mk-float[^"]*"[^>]*>', body):
-        n = len(re.findall(r'class="w-card', body[m.end():m.end() + 8000]))
-        if n > SCALE["float_cards"][1]:
-            add("Medium", "scale-limit", f"浮层里 {n} 张组件卡：浮层只强调一两个底层没有的东西", line_of(body, m.start()))
 
     for m in re.finditer(r'<div class="mk-float[^"]*"[^>]*style="([^"]*)"', body):
         w = re.search(r"--float-w:(\d+)px", m.group(1))
-        inner = _inner_of(body, r'<div class="mk-float[^"]*"[^>]*>')
-        page_h, fh = page_height(body), (est_col(inner, 392) if inner else None)
+        inner = _inner_of(body, r'<div class="float-screen">')
+        fw = int(w.group(1)) if w else 640
+        raw = est_col(inner, fw / FLOAT_ZOOM) if inner else None
+        page_h = page_height(body)
+        fh = raw * FLOAT_ZOOM + 32 if raw else None           # 画面按 0.8 倍显示，外框上下内边距 16
         if not (w and page_h and fh):
             continue
         covered = max(0, int(w.group(1)) - 200) * min(fh, page_h)
         if covered > 0.25 * 1440 * page_h:
-            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (1440 * page_h):.0%}：最多四分之一，少放一行或把宽度收小（300～480 里取小值）", line_of(body, m.start()))
+            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (1440 * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～960 里取小值）", line_of(body, m.start()))
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
