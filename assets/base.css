@@ -80,12 +80,12 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto:not(.product) .item-page { border: 1px solid #D9DCE3; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); }
 .stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
 /* 画面浮层：一块小画面，套圆角窗口框，内容缩到 0.8 倍，一看就是另一屏 */
-.stage.auto .float-screen {
-  background: var(--page-bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
+.stage.auto .float-screen {                               /* 窗口框只留一道细边：6 像素内边距 */
+  background: var(--page-bg); border: 1px solid var(--line); border-radius: 10px; padding: 6px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .16);
 }
 .stage.auto .float-screen > * { zoom: .8; }
-.stage.auto .float-screen > * + * { margin-top: 16px; }
+.stage.auto .float-screen > * + * { margin-top: 8px; }
 .stage.auto.has-float .window,
 .stage.auto.has-float .item-page { grid-area: 1 / 1 / 2 / 2; width: 1440px; margin: 0; }
 .stage.auto .mk-float {                                   /* 浮层固定在底图右下角，右缘探出 200 */

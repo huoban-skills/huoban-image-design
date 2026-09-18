@@ -482,7 +482,7 @@ def check(path, render=False, allow_local=False):
         fw = int(w.group(1)) if w else 640
         raw = est_col(inner, fw / FLOAT_ZOOM) if inner else None
         page_h = page_height(body)
-        fh = raw * FLOAT_ZOOM + 32 if raw else None           # 画面按 0.8 倍显示，外框上下内边距 16
+        fh = raw * FLOAT_ZOOM + 12 if raw else None           # 画面按 0.8 倍显示，外框上下内边距 6
         if not (w and page_h and fh):
             continue
         covered = max(0, int(w.group(1)) - 200) * min(fh, page_h)

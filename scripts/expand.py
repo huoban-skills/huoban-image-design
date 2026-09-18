@@ -1775,7 +1775,20 @@ WZ-JS-0118 | 五粮液 52° 500ml | 酒品:red | 22 | 周敏
 WZ-CY-0389 | 正山小种 特级 | 茶叶:green | 96 | 陈晓东
 WZ-LH-0233 | 商务伴手礼 B 款 | 礼盒:purple | 18 | 李文彬
 </hb-grid>
-<hb-float w="640">…用 hb-row／hb-col 排一块小画面…</hb-float>
+<hb-float w="640">
+<hb-row spans="12|12">
+<hb-subtotal title="各品类在库">
+酒品 | 1,842
+茶叶 | 1,204
+礼盒 | 486
+</hb-subtotal>
+<hb-donut title="库存构成" center="在库|3,532">
+酒品 | 1842 | red
+茶叶 | 1204 | green
+礼盒 | 486 | purple
+</hb-donut>
+</hb-row>
+</hb-float>
 </hb-page>"""),
     "workbench": dict(
         cn="工作台",
@@ -2039,6 +2052,9 @@ def m_float(a, body):
         raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～960（默认 640）：浮层是一块小画面，右缘探出画布 200')
     if "title" in a:
         raise ExpandError('<hb-float> 不带浮层标题：去掉 title 属性，要说明的话写在体内组件卡片自己的 title 上')
+    n_cards = len(re.findall(r'class="w-card', body))
+    if n_cards < 2:
+        raise ExpandError(f'<hb-float> 里只有 {n_cards} 块组件：浮层是一块小画面，至少放两块，用 <hb-row>／<hb-col> 排，比如明细表配一张汇总图；推荐三四块排两行')
     return (f'<div class="mk-float" style="--float-w:{w}px">'
             f'<div class="float-screen">{body.strip()}</div></div>')
 
@@ -2239,7 +2255,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～960（无标题）；体内用 hb-row／hb-col 排一块小画面，只放 PC 组件"),
+    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～960（无标题）；体内用 hb-row／hb-col 排一块小画面，至少两块 PC 组件"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -2347,7 +2363,7 @@ DOCS = {
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
 "hb-float": """营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～960，默认 640）；不带浮层标题，要说明的话写在体内组件卡片的 title 上。
-浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，外面自动套圆角窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。只放 PC 组件；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容。
+浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，至少两块组件，推荐三四块排两行；外面自动套一道细窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。只放 PC 组件；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容。
 例：
 <hb-float w="640">
 <hb-row spans="12|12">
