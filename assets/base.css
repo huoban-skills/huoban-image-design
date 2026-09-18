@@ -76,6 +76,8 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .window.cut .main { overflow: hidden; }
 .stage.auto .item-page { height: auto; }
 .stage.auto .item-page-scroll { overflow: visible; }
+/* 营销图里的自定义详情页没有产品壳，浅灰页底会和画布背景融成一片：加灰色外框把页面框出来（全屏产品图不加） */
+.stage.auto:not(.product) .item-page { border: 1px solid #D9DCE3; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); }
 .stage.auto.has-float { display: grid; grid-template-columns: 1440px 200px; }
 /* 画面浮层：一块小画面，套圆角窗口框，内容缩到 0.8 倍，一看就是另一屏 */
 .stage.auto .float-screen {
@@ -91,11 +93,6 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
   width: var(--float-w, 356px); margin: 0 0 32px;
 }
 
-.stage.auto .float-title { font-size: 13px; font-weight: 500; color: var(--ink-45); margin-bottom: 8px; }
-.stage.auto .mk-float .float-title {                      /* 标题浮在底图上，给底色免得和内容糊在一起 */
-  display: inline-block; background: var(--card-bg); padding: 2px 10px; border-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
-}
 .stage.auto.product .window { border-radius: 0; border: 0; }
 /* ── 栅格换算（2026-09-14 实测，三个工作区的自定义页面与详情页都成立）──
    自定义页面与详情页都是 24 列、列间距 20、行间距 20。配置里的 w×h 换成像素：
@@ -1149,6 +1146,9 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone.h-fix { height: 812px; }
 .duo { display: flex; align-items: center; justify-content: center; }
 .duo .phone { height: 812px; margin: 0; }   /* 清掉单屏的 margin auto，否则在 flex 行里会把两屏推开 */
+/* 手机图用收紧的投影：窗口级大投影（模糊 90、下移 40）会超出画布被导出窗口切掉，
+   在透明 PNG 里留下一块半透明灰色矩形，贴到彩色背景上就是"手机后面一层灰底" */
+.stage[data-kind="mobile"] .phone { box-shadow: 0 14px 32px -16px rgba(28, 37, 48, .22); }
 
 /* 双屏之间的中缝流程说明 */
 .conn { width: 216px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 0 8px; text-align: center; }
