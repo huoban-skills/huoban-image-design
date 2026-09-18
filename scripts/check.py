@@ -489,7 +489,7 @@ def check(path, render=False, allow_local=False):
         fh = raw * zoom + 12 if raw else None                 # 外框上下内边距 6
         if not (w and page_h and fh):
             continue
-        covered = max(0, int(w.group(1)) - 200) * min(fh, page_h)
+        covered = max(0, int(w.group(1)) - 200) * min(fh, page_h / 2)   # 浮层顶端在底图半高，只压下半截
         win_w = 1200 if SLIDE_RE.search(body) else 1440
         if covered > 0.25 * win_w * page_h:
             add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～960 里取小值）", line_of(body, m.start()))
@@ -518,7 +518,7 @@ def check(path, render=False, allow_local=False):
                 else:
                     add("High", "float-out", f"浮层探出画布 {e['over']}px：减少浮层内容，或把宽度收小")
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown")]
-            sh = (r.get("stage") or {}).get("h")
+            sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
                 add("Medium", "slide-height", f"演示尺寸画面高 {sh}px（实测），放进 PPT 显得太高：控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行表格")
             if r.get("floatCover", 0) > 0.25:

@@ -58,6 +58,8 @@ PROBE = r"""
   var st = document.querySelector('.stage');
   document.querySelectorAll('.stage').forEach(function (s) { s.style.zoom = 1; });
   var out = { stage: st ? { w: Math.round(st.scrollWidth), h: Math.round(st.scrollHeight) } : null, gaps: [], extra: [], uneven: [] };
+  var wb = document.querySelector('.stage .window, .stage .item-page');
+  if (wb) out.winH = Math.round(wb.getBoundingClientRect().height);
   var BOTTOM = 48, RIGHT = 120;
   var SKIP = /\b(stage|window|mk-float|shell-side|tree|win-body|main|mk-callout|hscroll|kanban-group|kanban-columns|w-card|comp|widget|kanban-item|record-card|field|f-value|modal|grid|page-header|item-page|item-page-scroll|item-page-canvas|screen|screen-grid|duo|phone|conn|procedure_task|button|tabs|chart_table|chart)\b/;
   document.querySelectorAll('*').forEach(function (e) {

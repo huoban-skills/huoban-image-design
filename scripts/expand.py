@@ -2217,8 +2217,8 @@ def m_page(a, body):
     else:
         for h in floats:
             fw = re.search(r"--float-w:(\d+)px", h)
-            if fw and int(fw.group(1)) < 480:
-                raise ExpandError(f'<hb-float w="{fw.group(1)}"> 宽度写 480～960（默认 640）；400 起只在演示尺寸 size="slide" 下可用')
+            if fw and not 480 <= int(fw.group(1)) <= 920:
+                raise ExpandError(f'<hb-float w="{fw.group(1)}"> 宽度写 480～920（默认 640）：浮层左边不能越过底图中线；400 起只在演示尺寸 size="slide" 下可用')
     stage_style = ""
     cut = str(a.get("cut", "")).rstrip("px")
 
@@ -2259,6 +2259,9 @@ def m_page(a, body):
     if kind in ("list", "workbench", "dashboard") and cut:
         body_html = body_html.replace('<div class="window ', f'<div class="window cut" style="height:{cut}px" ', 1)
     st = f' style="{stage_style}"' if stage_style else ""
+    if floats:                 # 浮层和底图装进同一个定位框：浮层按底图尺寸落在右下象限
+        body_html = f'<div class="stage-body">{body_html}{"".join(floats)}</div>'
+        floats = []
     return f'<div class="{" ".join(stage_cls)}" data-kind="{kind}"{st}>{body_html}{"".join(floats)}</div>'
 
 
@@ -2279,7 +2282,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～960（无标题）；体内用 hb-row／hb-col 排一块小画面，至少两块 PC 组件"),
+    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～920（无标题）；体内用 hb-row／hb-col 排一块小画面，至少两块 PC 组件"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
