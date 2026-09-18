@@ -86,12 +86,12 @@ python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style pag
 ### 5. 检查与验收
 
 ```bash
-python3 scripts/check.py "{客户或项目名}/图名.html"             # 静态：色值、组件与 token 存在性、结构禁令、规模上限
-python3 scripts/check.py "{客户或项目名}/图名.html" --render    # 有 Chrome 时加渲染检查；没有会明说"渲染检查未执行"
+python3 scripts/check.py "{客户或项目名}/图名.html"             # 静态检查；有浏览器时自动加渲染检查，没有会明说"渲染检查未执行"
 python3 scripts/check.py "{客户或项目名}/图名.html" --acceptance # 起草十条人工验收表
 ```
 
 - Blocker 必须清零，High 逐条处理；各规则的判断细节见 [references/canvas/verify-export.md](references/canvas/verify-export.md)。
+- 不逐张导 PNG 看图：渲染检查已经用实测数字查了空隙、裁切、并排不齐和浮层遮挡。只在这批图第一次用某种版式，或要确认刚改的问题改对了时，导一张看。
 - 按 [references/canvas/verify-export.md](references/canvas/verify-export.md) 的人工验收表逐图回报十条结论。
 - 完成标准：十条全过；有一条没过不交付。
 

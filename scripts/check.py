@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""界面示意图产出物检查。纯标准库；渲染类检查只在显式 --render 且本机有 Chrome 时执行。
+"""界面示意图产出物检查。纯标准库；本机找得到 Chrome（含 Playwright 装的 Chromium）就自动加渲染检查。
 
 用法：
-    python3 scripts/check.py 图.html               # 静态检查（沙箱可用）
-    python3 scripts/check.py 图.html --render      # 加渲染检查（空隙、裁切、浮层出界、并排不齐；要 Chrome，找不到就明说）
+    python3 scripts/check.py 图.html               # 静态检查；有浏览器时自动加渲染检查（空隙、裁切、浮层出界与遮挡、并排不齐）
+    python3 scripts/check.py 图.html --no-render   # 只做静态检查
     python3 scripts/check.py 图.html --json
     python3 scripts/check.py 图.html --allow-local # 本图补充样式里定义的新类降为 Nit（默认 High）
     python3 scripts/check.py 图.html --acceptance  # 起草十条人工验收表，机器能答的先填
 
 检查的是"该由机器判定、肉眼容易漏"的项：色值有没有写死、有没有用不存在的组件类或 token、
-规模是否超出出图约束、几条踩过坑的结构禁令、列丢了行容器、待办竖叠、并排不等高（按实测行高静态估算）。对齐与观感仍要看渲染，见 references/canvas/verify-export.md。
+规模是否超出出图约束、几条踩过坑的结构禁令、列丢了行容器、待办竖叠、并排不等高（按实测行高静态估算）。有浏览器时空隙、并排不齐、浮层遮挡改用实测值。
 
 退出码：有 Blocker 返回 1，其余返回 0。
 """
@@ -499,12 +499,12 @@ def check(path, render=False, allow_local=False):
                     add("High", "banner-person-name", f'横幅写成具体某个人「{hit.group()}」：工作台服务的是角色（律师、库管、店长），改成「库管工作台」这类角色名', line_of(body, bm.start()))
                     break
 
-    # ── 渲染检查（显式 --render 且有 Chrome）────────────────────────
+    # ── 渲染检查（有浏览器就做，--no-render 关掉）───────────────────
     if render:
         import export
         r = export.probe(path)
         if r is None:
-            note = "渲染检查未执行：未找到 Chrome（empty-gap / content-clipped / float-out / column-uneven 四项未检）"
+            note = "渲染检查未执行：没找到 Chrome 或 Playwright 的 Chromium（空隙、裁切、浮层出界、并排不齐按静态估算）"
         else:
             note = None
             for e in r.get("extra", []):
@@ -512,7 +512,9 @@ def check(path, render=False, allow_local=False):
                     add("High", "content-clipped", f"cut 窗口内容比窗口高 {e['over']}px，底部被裁：调 cut 值或减内容")
                 else:
                     add("High", "float-out", f"浮层探出画布 {e['over']}px：减少浮层内容，或把宽度收小")
-            findings[:] = [f for f in findings if f["rule"] != "column-short"]
+            findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown")]
+            if r.get("floatCover", 0) > 0.25:
+                add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):
                 add("Medium", "column-uneven", f"并排底部不齐：.{u['short']} 高 {u['shortH']}，.{u['tall']} 高 {u['tallH']}，差 {u['diff']}px；给短栏补数据行或调 spans")
             for g in r.get("gaps", []):
@@ -524,7 +526,7 @@ def check(path, render=False, allow_local=False):
                 x, y, w, h = g["box"]
                 add("Medium", "empty-gap", f".{g['cls']} {'，'.join(part)}（{w}×{h}，位置 x{x} y{y}）：补内容或收高度")
     else:
-        note = "渲染检查未执行：未加 --render（空隙、裁切、浮层出界、并排不齐四项未检）"
+        note = "渲染检查未执行：加了 --no-render（空隙、裁切、浮层出界、并排不齐按静态估算）"
 
     for f in findings:
         f.pop("key", None)
@@ -563,7 +565,7 @@ def acceptance(path):
              f"7 浮层没挡关键内容 {'待填' if floats else '通过：无浮层'}",
              f"8 信息密度够 机检：表格行 {max(rows, 0)}、单指标 {stats}；对照 check.py 的 scale-limit 后填",
              "9 数据像真的 待填（编号不连号、金额带零头、日期不等距、有非理想态）",
-             "10 整体观感 待填：有 Chrome 时 `export.py --png` 后目检；无 Chrome 时写「未渲染目检，静态与规模检查已过」"]
+             "10 整体观感 待填：渲染检查没报空隙、裁切、并排不齐、浮层遮挡就写通过；这批图第一次用某种版式，或要确认刚改的问题改对了，才导一张 PNG 看"]
     return "\n".join(lines)
 
 
@@ -577,7 +579,7 @@ def main():
     if "--acceptance" in sys.argv:
         print(acceptance(args[0]))
         return 0
-    findings, note = check(args[0], render="--render" in sys.argv, allow_local="--allow-local" in sys.argv)
+    findings, note = check(args[0], render="--no-render" not in sys.argv, allow_local="--allow-local" in sys.argv)
     if "--json" in sys.argv:
         print(json.dumps({"findings": findings, "render": note}, ensure_ascii=False, indent=2))
     else:
@@ -594,7 +596,7 @@ def main():
                 print(f"[{f['level']}] {f['rule']}{loc}\n    {f['msg']}")
         if note:
             print(f"\n{note}")
-        print("对齐与观感仍要看渲染：references/canvas/verify-export.md 的人工验收表")
+        print("观感按 references/canvas/verify-export.md 的人工验收表逐条过")
     return 1 if any(f["level"] == "Blocker" for f in findings) else 0
 
 

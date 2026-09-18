@@ -10,7 +10,7 @@ python3 scripts/export.py "{客户或项目名}/图名.html" --png --out figures
 ```
 
 - 脚本自己量画布高度（渲染探针），营销类透明底、`1704×(高+96)`，产品设计类边到边 `1640×高`，都是 2 倍图。
-- Chrome 探测顺序：`CHROME_BIN` → macOS 本机 Chrome → `~/chrome-headless-shell-linux64/` → PATH 里的 chrome-headless-shell / google-chrome / chromium。找不到就退出码 2 并打印手动命令，**不自动下载**；沙箱里没有 Chrome 就交 HTML。
+- Chrome 探测顺序：`CHROME_BIN` → macOS 本机 Chrome → `~/chrome-headless-shell-linux64/` → Playwright 装的 Chromium（`PLAYWRIGHT_BROWSERS_PATH` 或默认缓存目录）→ PATH 里的 chrome-headless-shell / google-chrome / chromium。找不到就退出码 2 并打印手动命令，**不自动下载**；沙箱里没有 Chrome 就交 HTML。
 - 手动获取（Linux 可联网时，约 120MB，版本固定 152.0.7977.54）：
 
 ```bash

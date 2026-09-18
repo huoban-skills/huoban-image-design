@@ -3,8 +3,8 @@
 ## A. 机检
 
 ```bash
-python3 scripts/check.py 图.html               # 静态（沙箱可用）
-python3 scripts/check.py 图.html --render      # 有 Chrome 时加渲染检查
+python3 scripts/check.py 图.html               # 静态检查；有浏览器时自动加渲染检查
+python3 scripts/check.py 图.html --no-render   # 只做静态检查
 python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 ```
 
@@ -26,9 +26,9 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 - `mobile-in-pc`：PC 图里出现手机组件（订单卡、手机工作台、会话流），样式只在 hb-phone 里生效，会散成裸文字；PC 浮层改用 PC 组件。
 - `empty-state`：画面里出现「没有找到任务／暂无数据」空态；营销图每块都要有内容。
 - `column-short`：同一行里短栏比长栏矮 100px 以上（按 base.css 实测行高估算，不用 Chrome）；单张卡会被拉到等高不算，栏里是单指标行或多张卡才报。只补短的那一栏，先补组件、差 100px 以内才加数据行，不给长栏删内容。
-- `empty-gap`（要 `--render`）只看布局层——组件之间、组件到画布边缘不许有大片空白；组件内部留白由数据量决定，属产品原样。
-- `column-uneven`（要 `--render`）：同一行两栏底部落差超过 24px；修法是给短的那栏补数据行或调 `hb-row spans`，不用固定高度硬撑。
-- 没有 Chrome 时 check.py 打印"渲染检查未执行"。空隙、裁切、浮层出界、并排不齐四项改由 hb-page 的自动撑高和规模上限约束控制，不做渲染验证。
+- `empty-gap`（渲染检查）只看布局层——组件之间、组件到画布边缘不许有大片空白；组件内部留白由数据量决定，属产品原样。
+- `column-uneven`（渲染检查）：同一行两栏底部落差超过 24px；修法是给短的那栏补数据行或调 `hb-row spans`，不用固定高度硬撑。
+- 浏览器认 Chrome，也认 Playwright 装的 Chromium。有浏览器时 `column-short`、`float-cover`、`height-unknown` 这几条静态估算换成实测：并排不齐报 `column-uneven`，浮层遮挡按实测面积报。没有浏览器时打印"渲染检查未执行"，这几项按静态估算。
 
 ## B. 人工验收表
 
@@ -45,7 +45,7 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 | 7 | 浮层没挡关键内容 | 浮层在右下角，不压住这张图本来要讲的那个字段或那一行 |
 | 8 | 信息密度够 | 列表有足够行数、看板指标成组、页签内容填实；scale-limit 有保留的写明理由 |
 | 9 | 数据像真的 | 编号有规则且不连号、金额有零头、日期不等距、同一人重复出现、状态分布不均匀 |
-| 10 | 整体观感 | 有 Chrome：`export.py --png` 后目检高度贴合、无溢出、无大片空白、字号层级正常。没有 Chrome：写「未渲染目检，静态与规模检查已过」 |
+| 10 | 整体观感 | 渲染检查没报空隙、裁切、并排不齐、浮层遮挡就算过；这批图第一次用某种版式，或要确认刚改的问题改对了，导一张 PNG 看。没有浏览器时写「未渲染，静态与规模检查已过」 |
 
 交付前按这个格式逐图回报，一图一段：
 

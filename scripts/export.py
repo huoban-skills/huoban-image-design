@@ -8,10 +8,11 @@
     python3 scripts/export.py 图.html --probe               # 渲染探针 JSON（空隙、裁切、浮层出界、并排不齐）
 
 默认交付物是 HTML，本脚本只在用户或报告明确要 PNG/SVG 时用。
-Chrome 探测顺序：CHROME_BIN → macOS 本机 Chrome → ~/chrome-headless-shell-linux64 → PATH 里的 chrome-headless-shell/google-chrome/chromium。
+Chrome 探测顺序：CHROME_BIN → macOS 本机 Chrome → ~/chrome-headless-shell-linux64 → Playwright 装的 Chromium → PATH 里的 chrome-headless-shell/google-chrome/chromium。
 不自动下载；沙箱里没有 Chrome 就跳过 PNG，交 HTML。
 """
 import argparse
+import glob
 import json
 import os
 import re
@@ -37,6 +38,13 @@ def find_chrome():
     for c in cands:
         if c and os.path.exists(c):
             return c
+    pw = os.environ.get("PLAYWRIGHT_BROWSERS_PATH") or os.path.expanduser(
+        "~/Library/Caches/ms-playwright" if sys.platform == "darwin" else "~/.cache/ms-playwright")
+    for pat in ("chromium_headless_shell-*/chrome-*/headless_shell", "chromium-*/chrome-linux*/chrome",
+                "chromium-*/chrome-mac*/Chromium.app/Contents/MacOS/Chromium"):
+        hits = sorted(glob.glob(os.path.join(pw, pat)))
+        if hits:
+            return hits[-1]
     for name in ("chrome-headless-shell", "google-chrome", "chromium", "chromium-browser"):
         p = shutil.which(name)
         if p:
@@ -102,6 +110,13 @@ PROBE = r"""
       var fr = fl.getBoundingClientRect();
       if (fr.bottom > sr.bottom + 2) out.extra.push({ kind: 'float-out', over: Math.round(fr.bottom - sr.bottom) });
       if (fr.top < sr.top - 2) out.extra.push({ kind: 'float-out', over: Math.round(sr.top - fr.top) });
+      var base = st.querySelector('.window, .item-page');
+      if (base) {
+        var br = base.getBoundingClientRect();
+        var ox = Math.max(0, Math.min(br.right, fr.right) - Math.max(br.left, fr.left));
+        var oy = Math.max(0, Math.min(br.bottom, fr.bottom) - Math.max(br.top, fr.top));
+        out.floatCover = Math.round(ox * oy / (br.width * br.height) * 100) / 100;
+      }
     });
   }
   document.title = 'PROBE' + JSON.stringify(out);
