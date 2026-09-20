@@ -489,7 +489,7 @@ def check(path, render=False, allow_local=False):
         fh = raw * zoom + 12 if raw else None                 # 外框上下内边距 6
         if not (w and page_h and fh):
             continue
-        covered = max(0, int(w.group(1)) - 200) * min(fh, page_h / 2)   # 浮层顶端在底图半高，只压下半截
+        covered = max(0, int(w.group(1)) - 200) * min(fh / 2, page_h / 2)   # 浮层最多一半压在底图上，且不高过底图半高
         win_w = 1200 if SLIDE_RE.search(body) else 1440
         if covered > 0.25 * win_w * page_h:
             add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～920 里取小值）", line_of(body, m.start()))

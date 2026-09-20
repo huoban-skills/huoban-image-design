@@ -715,6 +715,16 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .chart_table th { height: 34px; font-weight: 400; color: var(--ink-65); border: 1px solid rgba(0,0,0,.08); padding: 0 12px; text-align: left; }
 .chart_table td { height: 33px; border: 1px solid rgba(0,0,0,.08); padding: 0 12px; }
 .chart_table .dim { background: var(--tag-bg); }
+/* 单元格底色（值::颜色）：整格铺该色的浅色底，进度表、达成表标高低用 */
+.chart_table td.cell-red { background: color-mix(in srgb, var(--c-red) 16%, transparent); }
+.chart_table td.cell-orange { background: color-mix(in srgb, var(--c-orange) 16%, transparent); }
+.chart_table td.cell-yellow { background: color-mix(in srgb, var(--c-yellow) 16%, transparent); }
+.chart_table td.cell-green { background: color-mix(in srgb, var(--c-green) 16%, transparent); }
+.chart_table td.cell-teal { background: color-mix(in srgb, var(--c-teal) 16%, transparent); }
+.chart_table td.cell-blue { background: color-mix(in srgb, var(--c-blue) 16%, transparent); }
+.chart_table td.cell-purple { background: color-mix(in srgb, var(--c-purple) 16%, transparent); }
+.chart_table td.cell-gray { background: color-mix(in srgb, var(--ink-25) 16%, transparent); }
+.chart_table td[rowspan] { vertical-align: middle; }
 .databar { display: inline-block; background: color-mix(in srgb, var(--c-red) 70%, transparent); padding: 1px 4px; border-radius: 2px; }
 
 /* 内容组件通用壳与快捷表单（c3 内容组件） */

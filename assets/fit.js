@@ -6,6 +6,10 @@
   function grow(s) {                       // 浮层是绝对定位：量出它探出底图多少，画布底部留出这段
     var body = s.querySelector('.stage-body'), f = s.querySelector('.stage-body > .mk-float');
     if (!body || !f) return;
+    // 浮层最多一半压在底图上：默认顶在底图半高；浮层矮、压得多时往下挪，多出来的探出底边
+    f.style.top = '';
+    var bh = body.offsetHeight, fh = f.offsetHeight;
+    f.style.top = Math.round(Math.max(bh / 2 + 16, bh - fh / 2)) + 'px';
     var over = f.getBoundingClientRect().bottom - body.getBoundingClientRect().bottom;
     s.style.paddingBottom = Math.max(24, Math.ceil(over + 24)) + 'px';
   }

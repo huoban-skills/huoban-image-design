@@ -363,19 +363,52 @@ def m_pivot(a, body):
         raise ExpandError("<hb-pivot> 是透视表，做维度 × 指标的统计，列里不放人员、状态标签、操作这类记录字段；一条条记录（编号、门店、负责人、日期、状态）用 hb-list（表格列表）")
     _num = re.compile(r"^[+\-−]?[\d,]+(?:\.\d+)?\s*(?:%|万|亿|元|件|天|次|家|个|人|条|单|台|kg|k)?$")
     _cells = [v.split(":")[0].strip() for ln in ls[1:] for v in cells(ln)[1:]]
-    _cells = [v for v in _cells if v and v not in ("—", "-", "–")]
+    _cells = [v for v in _cells if v and v not in ("—", "-", "–", "^", "<")]
     if _cells and sum(1 for v in _cells if _num.match(v)) / len(_cells) < 0.6:
         raise ExpandError("<hb-pivot> 里大部分格子是文字，这是记录列表不是透视表：透视表首列是维度（区域／产品／月份），其余列都是数字；一条条记录用 hb-list（表格列表）")
     ths = "".join(f"<th>{esc(c['name'])}</th>" for c in header)
-    rows = []
+    # 先排成格子矩阵：^ 并入上方单元格，< 并入左侧单元格；值::颜色 给整格铺浅色底
+    grid = []
     for i, ln in enumerate(ls[1:], 1):
         vals = cells(ln)
         if len(vals) != len(header):
             raise ExpandError(f"<hb-pivot> 第 {i} 行有 {len(vals)} 列，表头是 {len(header)} 列：{ln}")
+        row = []
+        for j, v in enumerate(vals):
+            v = v.strip()
+            if v == "^":
+                k = len(grid) - 1
+                while k >= 0 and grid[k][j] is None:
+                    k -= 1
+                if k < 0:
+                    raise ExpandError(f"<hb-pivot> 第 {i} 行第 {j + 1} 格写了 ^，但上面没有可以并入的单元格")
+                grid[k][j]["rs"] += 1
+                row.append(None)
+            elif v == "<":
+                k = j - 1
+                while k >= 0 and row[k] is None:
+                    k -= 1
+                if k < 0:
+                    raise ExpandError(f"<hb-pivot> 第 {i} 行第 {j + 1} 格写了 <，但左边没有可以并入的单元格")
+                row[k]["cs"] += 1
+                row.append(None)
+            else:
+                bg = None
+                if "::" in v:
+                    v, bg = [x.strip() for x in v.rsplit("::", 1)]
+                    if bg not in COLORS:
+                        raise ExpandError(f"<hb-pivot> 单元格底色「{bg}」不认识，可用：{'、'.join(sorted(COLORS))}")
+                row.append({"v": v, "rs": 1, "cs": 1, "bg": bg})
+        grid.append(row)
+    rows = []
+    for row in grid:
         tds = []
-        for j, (col, v) in enumerate(zip(header, vals)):
-            cls = ' class="dim"' if j == 0 and "dim" in a else ""
-            tds.append(f"<td{cls}>{render_val(v, col['type'], 'hb-pivot')}</td>")
+        for j, (col, c) in enumerate(zip(header, row)):
+            if c is None:
+                continue
+            cls = [x for x in ("dim" if j == 0 and "dim" in a else "", f"cell-{c['bg']}" if c["bg"] else "") if x]
+            attrs = (f' class="{" ".join(cls)}"' if cls else "") + (f' rowspan="{c["rs"]}"' if c["rs"] > 1 else "") + (f' colspan="{c["cs"]}"' if c["cs"] > 1 else "")
+            tds.append(f"<td{attrs}>{render_val(c['v'], col['type'], 'hb-pivot')}</td>")
         rows.append("<tr>" + "".join(tds) + "</tr>")
     table = f"<table><tr>{ths}</tr>{''.join(rows)}</table>"
     if "bare" in a:
@@ -2632,11 +2665,17 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 城建大厦酒窖 | 1,842
 北京办公室 | 1,097
 </hb-donut>""",
-"hb-pivot": """透视表（官方 chart_table），做数据分析用：首列是维度（区域、产品、月份、人员），其余列是该维度下的数字指标，值可带 :red 做成标签。它不是记录列表，编号、门店、负责人、日期、状态这种一条条的记录用 hb-list（表格列表）；列里带 :user/:tag、或大部分格子是文字时会报错。属性 title、icon、tint（yellow/blue/teal 标题栏底色）、dim（首列维度灰底）、bare 只出 <table>。
+"hb-pivot": """透视表（官方 chart_table），做数据分析用：首列是维度（区域、产品、月份、人员），其余列是该维度下的数字指标，值可带 :red 做成标签。合并单元格：格子写 ^ 并入上方、写 < 并入左侧（同一维度连着几行时，首列只写一次，下面几行写 ^）。单元格底色：值::颜色 给整格铺浅色底，如 85%::green、延期::red，进度表、达成表用它标高低。它不是记录列表，编号、门店、负责人、日期、状态这种一条条的记录用 hb-list（表格列表）；列里带 :user/:tag、或大部分格子是文字时会报错。属性 title、icon、tint（yellow/blue/teal 标题栏底色）、dim（首列维度灰底）、bare 只出 <table>。
 例：
 <hb-pivot title="分存放点库存统计" dim>
 存放点 | 品种数 | 在库数量
 城建大厦酒窖 | 486 | 1,842
+</hb-pivot>
+<hb-pivot title="各工序周进度" dim>
+工序 | 小组 | 计划 | 完成 | 达成率
+折弯 | 樊组 | 420 | 398 | 95%::green
+^ | 红组 | 380 | 266 | 70%::orange
+焊接 | 森组 | 300 | 171 | 57%::red
 </hb-pivot>""",
 "hb-itembar": """记录功能区（自定义详情页默认自带，56 高）。属性 title 记录主标题（必填）、nosys 不出右侧系统操作。
 体内快捷按钮用 | 分开：名:solid（主色实底）、名:line（线框）、再接 :dis 置灰或 :green/:orange/:teal 实底色。
