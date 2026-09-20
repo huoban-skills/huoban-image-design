@@ -28,10 +28,10 @@ python3 scripts/export.py "{客户或项目名}/图名.html" --svg     # 同目�
 
 把 `<style>`＋图标雪碧图＋`.stage` 包进 `<svg><foreignObject>`；脚本已处理三个必修点：内嵌 `<svg` 补 xmlns、`<br>` 转 `<br/>`、foreignObject 前垫不透明白底（留透明像素手机端 PDF 会渲成灰块）。没有 Chrome 时高度按 1000 估算，打开若有裁切改 `<svg height>`。
 
-## 渲染探针（check.py --render 用）
+## 渲染探针（check.py 的渲染检查用）
 
 ```bash
 python3 scripts/export.py "{客户或项目名}/图名.html" --probe   # JSON：画布尺寸、空隙、裁切、浮层出界、并排不齐
 ```
 
-`check.py --render` 内部调它；没有 Chrome 时 check.py 会明说"渲染检查未执行"，静态检查照常给结论。
+`check.py` 找到浏览器就自动调它，`--no-render` 关；没有 Chrome 时 check.py 会明说"渲染检查未执行"，静态检查照常给结论。

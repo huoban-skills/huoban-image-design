@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""可选导出：PNG（要 Chrome）、SVG（不要 Chrome）、渲染探针（给 check.py --render 用）。
+"""可选导出：PNG（要 Chrome）、SVG（不要 Chrome）、渲染探针（给 check.py 的渲染检查用）。
 
 用法：
     python3 scripts/export.py 图.html --png                 # 出 图@2x.png（同目录）；找不到 Chrome 退出码 2 并给手动命令
@@ -65,6 +65,7 @@ PROBE = r"""
   document.querySelectorAll('*').forEach(function (e) {
     var cls = typeof e.className === 'string' ? e.className : '';
     if (e === document.body || e === document.documentElement || SKIP.test(cls) || !e.children.length) return;
+    if (e.closest('.phone')) return;         // 手机屏固定 812 高，内容短时下方留白是真实样子，不算空隙
     var s = getComputedStyle(e);
     if (s.display === 'none' || s.position === 'absolute') return;
     var r = e.getBoundingClientRect();

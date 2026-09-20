@@ -492,7 +492,7 @@ def check(path, render=False, allow_local=False):
         covered = max(0, int(w.group(1)) - 200) * min(fh, page_h / 2)   # 浮层顶端在底图半高，只压下半截
         win_w = 1200 if SLIDE_RE.search(body) else 1440
         if covered > 0.25 * win_w * page_h:
-            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～960 里取小值）", line_of(body, m.start()))
+            add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～920 里取小值）", line_of(body, m.start()))
 
     if SLIDE_RE.search(body) and not any(x["rule"] == "slide-height" for x in findings):
         ph = page_height(body)

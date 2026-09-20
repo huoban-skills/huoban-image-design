@@ -38,7 +38,7 @@
 宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 60 余个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
-配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；`--render` 有 Chrome 时加渲染检查；`--acceptance` 起草验收表）、`export.py`（PNG／SVG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
+配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；有浏览器时自动加渲染检查，`--no-render` 关；`--acceptance` 起草验收表）、`export.py`（PNG／SVG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
 
 ## 皮肤
 
