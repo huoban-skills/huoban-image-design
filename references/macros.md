@@ -18,7 +18,7 @@
 
 ```
 整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、画面高 800 以内（长宽比不低于 1.5，图太高会被 PPT 按高度缩小、字看不清），只画这一页讲点对应的几块，必有组件只留外壳类，浮层宽 400～640 且不缩小；只用于营销类电脑端页面。不卡内容数量，只看画面高度，超了由 check.py `slide-height` 报 High；看板视图各列均分宽度）。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、窗口高 900 以内，整张图含浮层探出部分宽高比不低于 1.3（推荐 1.3–1.6，低于 1.25 报 High）；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，不删骨架组件；浮层宽 400～640 且不缩小；只用于营销类电脑端页面。由 check.py `slide-height`、`slide-ratio`、`slide-thin` 检查；看板视图各列均分宽度）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。
 ```
 

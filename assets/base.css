@@ -104,6 +104,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto.slide .float-screen > * { zoom: 1; }
 .stage.auto.slide .kanban-columns { gap: 16px; }          /* 演示尺寸：看板各列均分宽度，全部列都露出来 */
 .stage.auto.slide .kanban-group { flex: 1; width: auto; min-width: 0; }
+.stage.auto.slide .kanban-item { width: auto; }              /* 卡片跟着列宽走，不用常规尺寸的固定宽度，否则会压到下一列 */
 .stage.auto.slide .kanban-item b, .stage.auto.slide .kanban-item dd { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* ── 栅格换算（2026-09-14 实测，三个工作区的自定义页面与详情页都成立）──
    自定义页面与详情页都是 24 列、列间距 20、行间距 20。配置里的 w×h 换成像素：

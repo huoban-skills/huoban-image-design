@@ -2181,7 +2181,7 @@ def m_page(a, body):
         raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
     size = a.get("size", "full")
     if size not in ("full", "slide"):
-        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1200 宽、只画讲点那几块）')
+        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1200 宽、高 900 以内，底图按完整一页画）')
     if size == "slide" and (canvas != "marketing" or kind in ("screen", "mobile")):
         raise ExpandError('<hb-page size="slide"> 只用在营销类的电脑端页面：大屏、手机端和产品设计类画布不用演示尺寸')
     parts = _top_level(a.get("_raw", body))
@@ -2212,9 +2212,7 @@ def m_page(a, body):
         bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn))\b", a.get("_raw", body))
         if bad:
             raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里；PC 页和 PC 浮层里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
-    if size == "slide":        # 演示尺寸只画讲点那几块：必有项只留外壳类，内容组件按讲点挑
-        spec = dict(spec, required=[r for r in spec["required"] if r in ("hb-nav", "hb-banner", "hb-itembar", "hb-hcard", "hb-views", "hb-tools")],
-                    first_screen_ban=set())
+    # 演示尺寸和整页一样按完整一页画，必有组件不放宽；超高了减行、压图表高度，不删骨架组件
     _check_slots(kind, spec, names, deep, first_screen)
     floats, main_parts, nav_html = [], [], ""
     for name, raw in parts:
@@ -2394,7 +2392,7 @@ GROUPS = [
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、画面高 800 以内（长宽比不低于 1.5，图太高会被 PPT 按高度缩小、字看不清），只画这一页讲点对应的几块，必有组件只留外壳类，浮层宽 400～640 且不缩小；只用于营销类电脑端页面。不卡内容数量，只看画面高度，超了由 check.py `slide-height` 报 High；看板视图各列均分宽度）。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、窗口高 900 以内，整张图含浮层探出部分宽高比不低于 1.3（推荐 1.3–1.6，低于 1.25 报 High）；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，不删骨架组件；浮层宽 400～640 且不缩小；只用于营销类电脑端页面。由 check.py `slide-height`、`slide-ratio`、`slide-thin` 检查；看板视图各列均分宽度）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。

@@ -40,7 +40,9 @@ PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "�
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
 SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
-SLIDE_MAX_H = 800      # 演示尺寸窗口高度上限：1200 宽时长宽比不低于 1.5，再高会被 PPT 按高度缩小
+SLIDE_MAX_H = 900      # 演示尺寸窗口高度上限（1200 宽）
+SLIDE_RATIO_OK = 1.3   # 整张图（含浮层探出部分）宽高比：不低于 1.3，推荐 1.3–1.6
+SLIDE_RATIO_HIGH = 1.25  # 低于这个值才报 High：放进 PPT 会被按高度明显缩小
 FLOAT_ZOOM = 0.8        # 画面浮层里的内容缩到 0.8 倍显示（base.css .float-screen）
 SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5)}
 
@@ -494,6 +496,13 @@ def check(path, render=False, allow_local=False):
         if covered > 0.25 * win_w * page_h:
             add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～920 里取小值）", line_of(body, m.start()))
 
+    # ── High：演示尺寸的数据看板骨架不全（为了压高度删了筛选、图表或明细）──
+    if SLIDE_RE.search(body) and re.search(r'data-kind="dashboard"', body):
+        main = re.split(r'class="[^"]*\bmk-float\b', body)[0]        # 只看底图，浮层里的不算
+        miss = [n for n, pat in (("筛选", r'class="filter"'), ("图表", r'<svg[^>]*class="[^"]*chart|class="[^"]*\bchart\b'),
+                                 ("明细（透视表或表格列表）", r'class="til-|class="pivot|<table')) if not re.search(pat, main)]
+        if miss:
+            add("High", "slide-skeleton", f"演示尺寸的数据看板缺{'、'.join(miss)}：骨架是 横幅 → 筛选 → 单指标 → 图表行 → 明细，不能为了压高度删掉；超高就减明细行数或压图表高度")
     if SLIDE_RE.search(body) and not any(x["rule"] == "slide-height" for x in findings):
         ph = page_height(body)
         est = None
@@ -505,7 +514,7 @@ def check(path, render=False, allow_local=False):
             est = ph + (104 if "item-grid" in body else 76) + 48      # 顶栏或记录功能区 ＋ 页面上下内边距
         if est:
             if est > SLIDE_MAX_H + 60:
-                add("High", "slide-height", f"演示尺寸画面高约 {int(est)}px（估算），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内：少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
+                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_MAX_H}：放进 PPT 会被按高度缩小，字看不清。少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -533,7 +542,16 @@ def check(path, render=False, allow_local=False):
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown", "slide-height")]
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
-                add("High", "slide-height", f"演示尺寸画面高 {sh}px（实测），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内：少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
+                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_MAX_H}：放进 PPT 会被按高度缩小，字看不清。少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
+            st = r.get("stage") or {}
+            if SLIDE_RE.search(body) and st.get("w") and st.get("h"):   # 整张图的宽高比，含浮层向下探出的部分
+                ratio = st["w"] / st["h"]
+                if ratio < SLIDE_RATIO_HIGH:
+                    add("High", "slide-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于 {SLIDE_RATIO_HIGH}：放进 PPT 会被按高度明显缩小。浮层改成左右并排或减行，底图少几行")
+                elif ratio < SLIDE_RATIO_OK:
+                    add("Medium", "slide-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于 {SLIDE_RATIO_OK}：推荐 {SLIDE_RATIO_OK}–1.6，浮层压矮一点或底图少一两行")
+                elif ratio > 1.75 and not re.search(r'kind="mobile"', body):
+                    add("Medium", "slide-thin", f"整张图宽高比 {ratio:.2f}，画面偏扁、内容偏少：窗口高度上限是 {SLIDE_MAX_H}，底图按完整一页画（看板是筛选、指标、一排图表、明细 4–6 行；列表页表格 8–10 行），别为了放浮层把底图削薄")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):
