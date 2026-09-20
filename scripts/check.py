@@ -505,7 +505,7 @@ def check(path, render=False, allow_local=False):
             est = ph + (104 if "item-grid" in body else 76) + 48      # 顶栏或记录功能区 ＋ 页面上下内边距
         if est:
             if est > SLIDE_MAX_H + 60:
-                add("High", "slide-height", f"演示尺寸画面高约 {int(est)}px（估算），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行")
+                add("High", "slide-height", f"演示尺寸画面高约 {int(est)}px（估算），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内：少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -533,7 +533,7 @@ def check(path, render=False, allow_local=False):
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown", "slide-height")]
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
-                add("High", "slide-height", f"演示尺寸画面高 {sh}px（实测），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行")
+                add("High", "slide-height", f"演示尺寸画面高 {sh}px（实测），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内：少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):
