@@ -2364,7 +2364,7 @@ GROUPS = [
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、画面高 760 以内，只画讲点那三到五块，必有组件只留外壳类，浮层宽 400～640 且不缩小；只用于营销类电脑端页面）。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、画面高 800 以内（长宽比不低于 1.5，图太高会被 PPT 按高度缩小、字看不清），只画讲点那三到五块，必有组件只留外壳类，浮层宽 400～640 且不缩小；只用于营销类电脑端页面。不卡内容数量，只看画面高度，超了由 check.py `slide-height` 报 High；看板视图各列均分宽度）。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。

@@ -40,7 +40,7 @@ PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "�
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
 SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
-SLIDE_MAX_H = 760      # 演示尺寸窗口高度上限：放进 PPT 时不要太高
+SLIDE_MAX_H = 800      # 演示尺寸窗口高度上限：1200 宽时长宽比不低于 1.5，再高会被 PPT 按高度缩小
 FLOAT_ZOOM = 0.8        # 画面浮层里的内容缩到 0.8 倍显示（base.css .float-screen）
 SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5)}
 
@@ -494,6 +494,19 @@ def check(path, render=False, allow_local=False):
         if covered > 0.25 * win_w * page_h:
             add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～960 里取小值）", line_of(body, m.start()))
 
+    if SLIDE_RE.search(body) and not any(x["rule"] == "slide-height" for x in findings):
+        ph = page_height(body)
+        est = None
+        cols = re.findall(r'<section class="kanban-group">.*?</section>', body, re.S)
+        if cols:                  # 看板视图：顶栏 56 ＋ 视图页签 52 ＋ 工具栏 70 ＋ 列头 50 ＋ 最高一列的卡片 ＋ 底边 56
+            tallest = max(sum(48 + 39 * card.count("<dt>") + 10 for card in re.findall(r'<article class="kanban-item">.*?</article>', c, re.S)) for c in cols)
+            est = 56 + 52 + 70 + 50 + tallest + 56
+        elif ph:
+            est = ph + (104 if "item-grid" in body else 76) + 48      # 顶栏或记录功能区 ＋ 页面上下内边距
+        if est:
+            if est > SLIDE_MAX_H + 60:
+                add("High", "slide-height", f"演示尺寸画面高约 {int(est)}px（估算），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行")
+
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
         for tm in re.finditer(r"<(h1|p)[^>]*>(.*?)</\1>", bm.group(1), re.S):
@@ -517,10 +530,10 @@ def check(path, render=False, allow_local=False):
                     add("High", "content-clipped", f"cut 窗口内容比窗口高 {e['over']}px，底部被裁：调 cut 值或减内容")
                 else:
                     add("High", "float-out", f"浮层探出画布 {e['over']}px：减少浮层内容，或把宽度收小")
-            findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown")]
+            findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown", "slide-height")]
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
-                add("Medium", "slide-height", f"演示尺寸画面高 {sh}px（实测），放进 PPT 显得太高：控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行表格")
+                add("High", "slide-height", f"演示尺寸画面高 {sh}px（实测），长宽比低于 1.5：放进 PPT 会被按高度缩小，字看不清。控制在 {SLIDE_MAX_H} 以内，删一块组件或少几行")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):

@@ -102,6 +102,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto.slide.has-float .window, .stage.auto.slide.has-float .item-page { width: 1200px; }
 .stage.auto.slide .item-page-canvas { padding: 32px 48px; }
 .stage.auto.slide .float-screen > * { zoom: 1; }
+.stage.auto.slide .kanban-columns { gap: 16px; }          /* 演示尺寸：看板各列均分宽度，全部列都露出来 */
+.stage.auto.slide .kanban-group { flex: 1; width: auto; min-width: 0; }
+.stage.auto.slide .kanban-item b, .stage.auto.slide .kanban-item dd { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* ── 栅格换算（2026-09-14 实测，三个工作区的自定义页面与详情页都成立）──
    自定义页面与详情页都是 24 列、列间距 20、行间距 20。配置里的 w×h 换成像素：
      像素高 = 20 × h − 20        （h=3→40、7→120、16→300、27→520、44→860、55→1080）
