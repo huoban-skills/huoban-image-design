@@ -3108,6 +3108,99 @@
         "*"
       ],
       "note": "原子/工具类，不改名"
+    },
+    {
+      "kind": "component",
+      "id": "p-top",
+      "type_key": null,
+      "cn": "门户顶栏",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "门户顶栏",
+      "group": "手机端",
+      "macro": "hb-ptop",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "p-nav",
+      "type_key": null,
+      "cn": "门户导航条",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "门户导航条",
+      "group": "手机端",
+      "macro": "hb-pnav",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "component",
+      "id": "p-menu",
+      "type_key": null,
+      "cn": "门户分组菜单",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "门户分组菜单",
+      "group": "手机端",
+      "macro": "hb-pmenu",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "p-login",
+      "type_key": null,
+      "cn": "门户登录页",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "门户登录页",
+      "macro": "hb-plogin",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": null
+    },
+    {
+      "kind": "architecture",
+      "id": "p-me",
+      "type_key": null,
+      "cn": "个人中心",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "个人中心",
+      "macro": "hb-pme",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": null
     }
   ]
 }

@@ -1480,7 +1480,8 @@ def m_cards(a, body):
 def m_phone(a, body):
     bar = ""
     if "nobar" not in a:
-        bar = f'<div class="m-topbar"><span class="bk">{ico("prev")}</span><span class="tt">{esc(a.get("title", ""))}</span><span class="dots">···</span></div>'
+        dots = "" if "nodots" in a else "···"
+        bar = f'<div class="m-topbar"><span class="bk">{ico("prev")}</span><span class="tt">{esc(a.get("title", ""))}</span><span class="dots">{dots}</span></div>'
     cls = "phone" + (" h-fix" if "fix" in a else "")
     return f'<div class="{cls}">{bar}{body.strip()}</div>'
 
@@ -1724,6 +1725,100 @@ def m_wpage(a, body):
     if tabs_html or sub_html:
         out.append(f'<div class="wcard">{tabs_html}{sub_html}</div>')
     return f'<div class="m-workbench">{"".join(out)}</div>'
+
+
+# ── 门户（2026-09-21 hb.huobanyun.com 门户实测，安卓 UA 375×812）──
+def m_ptop(a, body):
+    name = a.get("name", "")
+    if not name:
+        raise ExpandError('<hb-ptop> 缺 name（门户名，如 name="伙伴生态合作"）')
+    who = a.get("user", "")
+    if who is True:
+        raise ExpandError('<hb-ptop> 的 user 要写登录人姓名，如 user="周敏"')
+    right = f'<span class="pav">{esc(who[:1])}</span>' if who else f'<span class="pbtn">{esc(a.get("login", "登录"))}</span>'
+    return f'<div class="p-top"><span class="plogo"></span><span class="pname">{esc(name)}</span><span class="sp"></span>{right}</div>'
+
+
+def m_pnav(a, body):
+    items = []
+    for ln in lines(body):
+        items.extend(cells(ln))
+    items = [i for i in items if i]
+    if not items:
+        raise ExpandError("<hb-pnav> 体内写门户一级导航：工作台 | *生态帮助手册 | 物料库:g（* 当前，:g 分组）")
+    out, groups = [], 0
+    for it in items:
+        on = it.startswith("*")
+        it = it[1:].strip() if on else it
+        grp = it.endswith(":g")
+        if grp:
+            it = it[:-2].strip()
+            groups += 1
+        dd = '<span class="dd">▾</span>' if grp else ""
+        cls = ' class="on"' if on else ""
+        out.append(f"<span{cls}>{esc(it)}{dd}</span>")
+    if groups > 1:
+        warn("hb-pnav 里放了多个分组页签（:g）：分组页签排在最后，一条导航里通常只有一个")
+    fill = "fill" in a or (len(items) <= 3 and "scroll" not in a)
+    if not fill:
+        wide = sum(len(i) * 15 + 24 for i in items)
+        if wide > 375:
+            warn("hb-pnav 的页签排不下 375：多出来的会被手机壳切掉，末尾那个分组页签的 ▾ 也跟着没了；一张图里页签放 4 个以内，讲不到的不列")
+    return f'<div class="p-nav{"" if fill else " scroll"}">{"".join(out)}</div>'
+
+
+def m_pmenu(a, body):
+    rows = []
+    for ln in lines(body):
+        n, _, icn = ln.partition(":")
+        rows.append(f'<div class="pmi">{ico(icn.strip() or "grid-s", tag="<hb-pmenu> ")}<span class="pmn">{esc(n.strip())}</span></div>')
+    if not rows:
+        raise ExpandError("<hb-pmenu> 每行一个分组下的页面：名称:图标")
+    if len(rows) > 6:
+        warn(f"hb-pmenu 展开了 {len(rows)} 项：面板从导航条垂下来，超过 6 项会压掉大半屏底图，只画讲得到的几项")
+    return f'<div class="p-menu">{"".join(rows)}</div>'
+
+
+def m_plogin(a, body):
+    name = a.get("name", "")
+    if not name:
+        raise ExpandError('<hb-plogin> 缺 name（门户名，如 name="伙伴生态合作"）')
+    wx = ""
+    if "wechat" in a:
+        label = a["wechat"] if isinstance(a["wechat"], str) else "微信登录"
+        wx = f'<div class="lwx"><i class="wx"></i>{esc(label)}</div>'
+    cls = "p-login" + (" bg" if "bg" in a else "")
+    return (f'<div class="{cls}"><div class="lcard">'
+            f'<div class="lhd"><span class="plogo"></span><span class="lnm">{esc(name)}</span></div>'
+            f'<div class="lin">{esc(a.get("phone", "手机号"))}</div>'
+            f'<div class="lin lcap">{esc(a.get("captcha", "验证码"))}<span class="lcb">{esc(a.get("code", "获取验证码"))}</span></div>'
+            f'<div class="lbtn">{esc(a.get("submit", "登录"))}</div>{wx}'
+            f'<div class="lfoot">Powered by <b>伙伴云</b> ｜ 免责声明 ｜ 投诉</div></div></div>')
+
+
+def m_pme(a, body):
+    who = a.get("who", "")
+    if not who or who is True:
+        raise ExpandError('<hb-pme> 缺 who（当前登录人姓名，如 who="周敏"）')
+    groups, cur = [], []
+    for ln in lines(body):
+        if ln.startswith("--"):
+            if cur:
+                groups.append(cur)
+            cur = []
+            continue
+        c = cells(ln)
+        act = f'<span class="mea">{esc(c[2])}</span>' if len(c) > 2 and c[2] else ""
+        cur.append(f'<div class="merow"><span class="mel">{esc(c[0])}</span><span class="sp"></span>'
+                   f'<span class="mev">{esc(c[1]) if len(c) > 1 else ""}</span>{act}</div>')
+    if cur:
+        groups.append(cur)
+    if not groups:
+        raise ExpandError("<hb-pme> 体内每行「字段名 | 值 | 右侧操作(可选)」，-- 另起一张卡")
+    cards = "".join(f'<div class="megroup">{"".join(g)}</div>' for g in groups)
+    return (f'<div class="p-me"><div class="mecard"><span class="meav">{esc(who[:1])}</span>'
+            f'<span class="menm">{esc(who)}{ico("edit", tag="<hb-pme> ")}</span></div>'
+            f'{cards}<div class="mebtn">{esc(a.get("out", "退出登录"))}</div></div>')
 
 
 def m_chat(a, body):
@@ -2037,7 +2132,7 @@ WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
         allowed={"hb-phone", "hb-screens", "hb-cover"},
         required=[],
         order=["hb-cover", "hb-phone", "hb-screens"],
-        doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。",
+        doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。\n门户页（登录页、门户导航、个人中心）也在这里画：hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav，再放页面内容。",
         example="""<hb-page kind="mobile">
 <hb-screens>
 <hb-phone title="待办">
@@ -2209,7 +2304,7 @@ def m_page(a, body):
         if n in ("hb-row", "hb-tabcard", "hb-col"):
             _walk(raw, n == "hb-row")
     if kind != "mobile":
-        bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn))\b", a.get("_raw", body))
+        bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|ptop|pnav|pmenu|plogin|pme))\b", a.get("_raw", body))
         if bad:
             raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里；PC 页和 PC 浮层里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
     # 演示尺寸和整页一样按完整一页画，必有组件不放宽；超高了减行、压图表高度，不删骨架组件
@@ -2364,6 +2459,11 @@ MACROS = {
     "hb-taskbar": (m_taskbar, "任务办理区：属性 who、sub；体内按钮名 | 按钮名"),
     "hb-ptasks": (m_ptasks, "流程任务列表：属性 tabs、count、dot、app；每行「发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮」"),
     "hb-wpage": (m_wpage, "手机工作台：# 页面名；sc: 名:图标 | …；tabs: *页签 | 页签；sub: 子区名 | 全部 | *待执行 | 已完成"),
+    "hb-ptop": (m_ptop, "门户顶栏：属性 name（门户名）、user（登录人姓名，出头像）、login（未登录时的按钮名）"),
+    "hb-pnav": (m_pnav, "门户导航条：一级页签，* 前缀＝当前，名后缀 :g ＝分组页签；属性 fill、scroll"),
+    "hb-pmenu": (m_pmenu, "门户分组菜单：分组页签展开的面板＋蒙层；每行 名称:图标"),
+    "hb-plogin": (m_plogin, "门户登录页：属性 name、wechat、bg、phone、captcha、code、submit"),
+    "hb-pme": (m_pme, "个人中心：属性 who、out；每行 字段名 | 值 | 右侧操作，-- 另起一张卡"),
     "hb-chat": (m_chat, "企业微信会话：@时间；[标签] 标题 开一条消息；k = v；> 链接；其余为正文"),
     "hb-conn": (m_conn, "屏间中缝说明：每行「步骤标题 | 一句说明」，行间自动加箭头"),
 }
@@ -2388,6 +2488,7 @@ GROUPS = [
     ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
     ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
+    ("手机端 · 门户（2026-09-21 实测）", ["hb-ptop", "hb-pnav", "hb-pmenu", "hb-plogin", "hb-pme"]),
 ]
 
 DOCS = {
@@ -2757,7 +2858,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 例：
 <hb-svisual map span="12" rs="38"/>
 <hb-svisual span="12" rs="38" title="厂区实时状态" img="素材/厂区3D.png"/>""",
-"hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-screens 里必加）、nobar。体内按页面形态放手机端其他宏。
+"hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-screens 里必加）、nobar（不要顶栏，门户页用，顶栏改放 hb-ptop）、nodots（顶栏右侧不出 ···，个人中心这类系统页用）。体内按页面形态放手机端其他宏。
 .stage 宽度由 hb-page 按屏数给（单屏 520、两屏 1100、三屏 1640）。
 例：
 <div class="stage">
@@ -2831,12 +2932,47 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 @昨天 17:06
 ! 本周配货已确认
 8 家门店的配货申请已由库管确认，合计 76 件。""",
+"hb-ptop": """门户顶栏 44，替代 hb-phone 自带的返回顶栏（外层写 <hb-phone nobar>）。属性 name（门户名，必填）、user（登录人姓名，右侧出 24 圆头像）、login（未登录时右侧按钮名，默认「登录」）。自闭合写法。
+未登录出登录按钮，登录后出头像；两者不同时出现。
+例：
+<hb-ptop name="伙伴生态合作" user="周敏"/>
+<hb-ptop name="伙伴生态合作"/>""",
+"hb-pnav": """门户一级导航条 44＋1px 底线，紧跟 hb-ptop。体内一行写完所有页签，* 前缀＝当前页签，名后缀 :g ＝分组页签（带 ▾，排在最后，点开是 hb-pmenu）。
+页签 3 个以内平分整宽；再多就按内容宽从左排、整条横向滚动（右侧渐隐），也可用属性 fill／scroll 指定。选中态只有下方 30×2 主色横条，文字不变色。
+例：
+<hb-pnav>
+工作台 | *生态帮助手册 | 客户管理 | 年费管理 | 物料库:g
+</hb-pnav>""",
+"hb-pmenu": """分组页签展开后的面板，紧跟 hb-pnav：面板从导航条垂下来（导航条下压一条 2px 主色线），面板以下整屏盖 45% 黑蒙层。每行「名称:图标」，图标用表或页面自己的图标。
+只在讲「门户里怎么找到这一页」时画；平时不画展开态。
+例：
+<hb-pnav>*生态帮助手册 | 物料库:g</hb-pnav>
+<hb-pmenu>
+自定义组件:app-s
+产品功能边界:doc
+</hb-pmenu>""",
+"hb-plogin": """门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、bg（铺门户自配的品牌底图；不给就是默认白底）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
+登录按钮画成未填写的浅色态，卡底固定带 Powered by 伙伴云 ｜ 免责声明 ｜ 投诉。
+例：
+<hb-phone nobar fix><hb-plogin name="伙伴生态合作" wechat/></hb-phone>""",
+"hb-pme": """个人中心（点门户顶栏头像进，是独立页不是浮层）。外层写 <hb-phone title="个人中心" nodots>。属性 who（登录人姓名，必填）、out（底部按钮名，默认「退出登录」）。
+体内每行「字段名 | 值 | 右侧操作(可选)」，-- 单起一行表示另起一张卡。
+例：
+<hb-phone title="个人中心" nodots fix>
+<hb-pme who="周敏">
+手机号 | 138****6021 | 更换
+微信 | 周敏
+--
+语言 | 简体中文 ▾
+</hb-pme>
+</hb-phone>""",
 "hb-conn": """屏间中缝，每行 步骤标题 | 一句说明，行间自动加大箭头。
 例：
 企业微信收到待办 | 不用另装 App，消息点进去就能办
 进入本人工作台 | 销售只看得到自己名下的客户与存货""",
 }
-MOBILE_NOTE = "手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。"
+MOBILE_NOTE = ("手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。\n"
+               "手机端的列表页一律是卡片（hb-ocards），没有手机版表格；只有自定义页面里的表格组件在手机上仍是表格。")
 
 
 def render_docs(names):

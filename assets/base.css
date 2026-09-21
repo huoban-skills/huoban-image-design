@@ -1363,6 +1363,66 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .wempty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 60px 0 40px; font-size: 14px; color: var(--ink-45); }
 .phone .wempty i { width: 60px; height: 60px; border-radius: 50%; background: rgba(0,0,0,.04); }
 
+/* ── 门户（2026-09-21 hb.huobanyun.com 门户实测，安卓 UA 375×812）────────────
+   门户页不用手机顶栏：顶上是门户顶栏＋一级导航条，两条都通栏白底。 */
+
+/* 门户顶栏 44：logo 32 ＋ 门户名 15/500；右侧未登录是 76×32 登录按钮，登录后是 24 圆头像 */
+.phone .p-top { height: 44px; flex: none; background: var(--card-bg); display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+.phone .p-top .plogo { width: 32px; height: 32px; border-radius: 8px; flex: none; background: linear-gradient(135deg, var(--primary), var(--c-orange)); }
+.phone .p-top .pname { font-size: 15px; font-weight: 500; color: var(--ink-85); }
+.phone .p-top .sp { flex: 1; }
+.phone .p-top .pbtn { height: 32px; padding: 0 23px; border-radius: 6px; background: var(--primary); color: #fff; font-size: 14px; display: inline-flex; align-items: center; }
+.phone .p-top .pav { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+
+/* 门户一级导航条 44＋1px 底线：选中态只有下方 30×2 主色横条，文字不变色；
+   页签少时平分整宽，多到装不下就按内容宽左起排、整条横向滚动（右端 22 渐隐） */
+.phone .p-nav { height: 45px; flex: none; background: var(--card-bg); border-bottom: 1px solid var(--line); display: flex; align-items: stretch; overflow: hidden; position: relative; }
+.phone .p-nav > span { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 2px; font-size: 15px; color: var(--ink-85); position: relative; white-space: nowrap; }
+.phone .p-nav.scroll > span { flex: none; padding: 0 12px; }
+.phone .p-nav.scroll::after { content: ""; position: absolute; right: 0; top: 0; bottom: 1px; width: 22px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--card-bg)); }
+.phone .p-nav > span.on::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); bottom: 7px; width: 30px; height: 2px; border-radius: 2px; background: var(--primary); }
+.phone .p-nav .dd { color: var(--ink-65); font-size: 12px; }
+
+/* 分组页签展开的面板：导航条下压一条 2px 主色线，面板白底从上垂下；
+   面板以下整屏盖 45% 黑蒙层（用 ::after 画，靠 .phone 的 overflow:hidden 截断） */
+.phone .p-menu { flex: none; position: relative; z-index: 3; background: var(--card-bg); border-top: 2px solid var(--primary); padding: 0 8px; }
+.phone .p-menu::after { content: ""; position: absolute; left: -8px; right: -8px; top: 100%; height: 812px; background: rgba(0,0,0,.45); }
+.phone .p-menu .pmi { height: 50px; display: flex; align-items: center; gap: 8px; padding: 0 8px; }
+.phone .p-menu .pmi .ico { width: 24px; height: 24px; flex: none; color: var(--primary); }
+.phone .p-menu .pmi .pmn { flex: 1; align-self: stretch; display: flex; align-items: center; font-size: 15px; color: var(--ink-85); border-bottom: 1px solid var(--line); }
+.phone .p-menu .pmi:last-child .pmn { border-bottom: none; }
+
+/* 门户登录页：默认白底，底图是门户自配的可选项（.bg）；卡 338 宽 r8，内容 296 宽、行距 20 */
+.phone .p-login { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 18px; background: var(--card-bg); }
+.phone .p-login.bg { background: linear-gradient(150deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #1b1f4b)); }
+.phone .p-login .lcard { width: 338px; box-sizing: border-box; padding: 33px 21px; background: var(--card-bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,.18); }
+.phone .p-login .lhd { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.phone .p-login .lhd .plogo { width: 40px; height: 40px; border-radius: 10px; flex: none; background: linear-gradient(135deg, var(--primary), var(--c-orange)); }
+.phone .p-login .lnm { font-size: 20px; font-weight: 700; color: var(--ink-85); }
+.phone .p-login .lin { height: 40px; box-sizing: border-box; margin-bottom: 20px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; font-size: 15px; color: var(--ink-25); position: relative; }
+.phone .p-login .lcap .lcb { position: absolute; right: 0; top: 0; bottom: 0; width: 106px; border-radius: 0 6px 6px 0; background: rgba(0,0,0,.04); color: var(--ink-65); display: flex; align-items: center; justify-content: center; }
+.phone .p-login .lbtn { height: 40px; border-radius: 6px; background: var(--primary); opacity: .45; color: #fff; font-size: 15px; display: flex; align-items: center; justify-content: center; }   /* 未填写时的浅色态 */
+.phone .p-login .lwx { height: 40px; margin-top: 20px; border: 1px solid rgba(0,0,0,.04); border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; color: var(--ink-65); }
+.phone .p-login .lwx .wx { width: 22px; height: 18px; border-radius: 9px 9px 9px 3px; background: #09bb07; flex: none; }
+.phone .p-login .lfoot { margin-top: 20px; text-align: center; font-size: 13px; color: var(--ink-25); }
+.phone .p-login .lfoot b { font-weight: 400; color: var(--ink-45); }
+
+/* 个人中心：页底 page-bg，卡 343 宽、卡间距 16；卡内行 48 高、行间细线，末行无线 */
+.phone .p-me { flex: 1; background: var(--page-bg); padding: 16px; }
+.phone .p-me .mecard { height: 104px; box-sizing: border-box; margin-bottom: 16px; padding: 0 16px; display: flex; align-items: center; gap: 16px;
+  background: linear-gradient(105deg, #eef4fb, var(--card-bg) 62%); border: 1px solid rgba(0,0,0,.04); border-radius: 8px; }
+.phone .p-me .meav { width: 72px; height: 72px; border-radius: 50%; flex: none; background: var(--primary); color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center; }
+.phone .p-me .menm { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 700; color: var(--ink-85); }
+.phone .p-me .menm .ico { width: 15px; height: 15px; color: var(--ink-45); }
+.phone .p-me .megroup { margin-bottom: 16px; padding: 0 16px; background: var(--card-bg); border: 1px solid rgba(0,0,0,.04); border-radius: 6px; }
+.phone .p-me .merow { height: 48px; display: flex; align-items: center; gap: 8px; font-size: 15px; border-bottom: 1px solid rgba(0,0,0,.04); }
+.phone .p-me .megroup .merow:last-child { border-bottom: none; }
+.phone .p-me .mel { font-weight: 500; color: var(--ink-85); }
+.phone .p-me .sp { flex: 1; }
+.phone .p-me .mev { color: var(--ink-65); }
+.phone .p-me .mea { padding-left: 9px; margin-left: 9px; border-left: 1px solid var(--line); color: var(--ink-65); }
+.phone .p-me .mebtn { height: 48px; background: var(--card-bg); border: 1px solid rgba(0,0,0,.04); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--ink-85); }
+
 /* 会话流：企业微信待办推送 / 公众号图文消息（微信端样式，未实测） */
 .phone .m-chat { flex: 1; padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
 .phone .mtime { align-self: center; font-size: 11px; color: var(--ink-25); }

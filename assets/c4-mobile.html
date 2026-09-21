@@ -254,3 +254,70 @@
     <span class="mi"><!-- 菜单项 --></span>
   </div>
 </template>
+
+<!-- ══════════ 七、门户（2026-09-21 hb.huobanyun.com 门户实测）══════════
+     门户页不用手机顶栏：顶上是门户顶栏＋一级导航条。登录页与个人中心是整屏形态。 -->
+
+<template data-component="门户顶栏" data-cn="门户顶栏" data-group="手机端"
+          data-measured="44 高白底 pad 0 16；左 logo 32 见方 ＋ 门户名 15/500 ink-85；右未登录是登录按钮 76×32 r6 主色实底，登录后换成 24 圆头像">
+  <div class="p-top">
+    <span class="plogo"></span>
+    <span class="pname"><!-- 门户名 --></span>
+    <span class="sp"></span>
+    <span class="pbtn">登录</span><!-- 登录后换成 <span class="pav">首字</span> -->
+  </div>
+</template>
+
+<template data-component="门户导航条" data-cn="门户导航条" data-group="手机端"
+          data-measured="44 高白底＋1px 底线 rgba(0,0,0,.08)；页签 15/400 ink-85，选中不变色，只在下方 7px 处给 30×2 主色横条；3 个以内平分整宽，再多按内容宽左起排（左右各 12）并整条横向滚动，右端 22 宽渐隐；分组页签带 ▾ 排在最后">
+  <div class="p-nav scroll">
+    <span class="on"><!-- 当前页签 --></span>
+    <span><!-- 页签 --></span>
+    <span><!-- 分组页签 --><span class="dd">▾</span></span>
+  </div>
+</template>
+
+<template data-component="门户分组菜单" data-cn="门户分组菜单" data-group="手机端"
+          data-use="只在讲「门户里怎么找到这一页」时画展开态"
+          data-measured="导航条下压 2px 主色线，白面板垂下（pad 0 8）；每项 50 高＝24 图标在 x16 ＋ 名称 15/400 在 x48；除末项外内容区带 1px 底线，线从 x48 起不通栏；面板以下整屏盖 rgba(0,0,0,.45) 蒙层">
+  <div class="p-menu">
+    <div class="pmi"><svg class="ico"><use href="#i-app-s"/></svg><span class="pmn"><!-- 页面名 --></span></div>
+    <div class="pmi"><svg class="ico"><use href="#i-doc"/></svg><span class="pmn"><!-- 页面名 --></span></div>
+  </div>
+</template>
+
+<template data-architecture="门户登录页" data-cn="门户登录页"
+          data-measured="整屏；底图是门户自配的可选项，默认白底。卡 338 宽 r8、1px 描边、阴影 0 20 40，pad 33 21，内容 296 宽、行距 20；
+   卡头 logo 40 ＋ 门户名 20/700 居中；手机号输入 40 高 r6；验证码行右嵌 106 宽灰底（.04）按钮，只右两角圆；
+   登录按钮 40 高主色实底，未填写时 opacity .45；微信登录 40 高线框；卡底 Powered by 伙伴云 ｜ 免责声明 ｜ 投诉，13/ink-25 居中">
+  <div class="phone">
+    <div class="p-login">
+      <div class="lcard">
+        <div class="lhd"><span class="plogo"></span><span class="lnm"><!-- 门户名 --></span></div>
+        <div class="lin">手机号</div>
+        <div class="lin lcap">验证码<span class="lcb">获取验证码</span></div>
+        <div class="lbtn">登录</div>
+        <div class="lwx"><i class="wx"></i>微信登录</div>
+        <div class="lfoot">Powered by <b>伙伴云</b> ｜ 免责声明 ｜ 投诉</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template data-architecture="个人中心" data-cn="个人中心"
+          data-use="门户顶栏点头像进，是独立页不是浮层"
+          data-measured="顶栏 44＝返回箭头 ＋ 标题 16/500 居中，没有 logo 和门户名，右侧不出 ···；页底 page-bg pad 16；
+   用户卡 343×104 r8 带浅色装饰底（产品是一张图）＝头像 72 圆 ＋ 姓名 ＋ 编辑笔；
+   信息卡 343 宽 r6 白底 1px .04 边、卡间距 16，卡内行 48 高左右留 16、行间 1px .04 线且末行无线，左字段名 15/500、右值 ink-65；
+   退出登录 343×48 白底 r6 线框，文字 14/500 ink-85 居中">
+  <div class="phone">
+    <div class="m-topbar"><span class="bk"><svg class="ico"><use href="#i-prev"/></svg></span><span class="tt">个人中心</span><span class="dots"></span></div>
+    <div class="p-me">
+      <div class="mecard"><span class="meav"><!-- 首字 --></span><span class="menm"><!-- 姓名 --><svg class="ico"><use href="#i-edit"/></svg></span></div>
+      <div class="megroup">
+        <div class="merow"><span class="mel"><!-- 字段名 --></span><span class="sp"></span><span class="mev"><!-- 值 --></span><span class="mea"><!-- 更换 --></span></div>
+      </div>
+      <div class="mebtn">退出登录</div>
+    </div>
+  </div>
+</template>
