@@ -1347,6 +1347,11 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 /* 自定义页面（工作台） */
 .phone .m-workbench { flex: 1; min-height: 0; overflow: hidden; background: var(--card-bg); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
 .phone .wcard { background: var(--card-bg); border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); overflow: hidden; }
+/* 工作台里的明细：手机端没有表格，嵌 hb-ocards 的卡片列表，卡底跟着工作台卡片走 */
+.phone .wcard.wlist { padding: 12px; }
+.phone .wcard.wlist .m-cards { flex: none; background: none; padding: 0; border: none; }
+.phone .wcard.wlist .ocard { border: 1px solid var(--line); margin-bottom: 8px; }
+.phone .wcard.wlist .ocard:last-child { margin-bottom: 0; }
 .phone .wban { height: 80px; border-radius: 9px; background: var(--banner-bg); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 500; color: rgba(255,255,255,.85); box-shadow: 0 20px 40px rgba(0,0,0,.08); }
 .phone .wsc { display: grid; grid-template-columns: 1fr 1fr; row-gap: 44px; padding: 22px 0 22px 60px; }
 .phone .wsc span { display: flex; align-items: center; gap: 8px; font-size: 16px; color: var(--ink-85); line-height: 16px; }

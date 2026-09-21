@@ -802,6 +802,7 @@ sc: 库存看板:pie-s | 出库管理:check-s | 入库管理:trend-s | 库存盘
 tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
 </hb-wpage>
+要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。
 ```
 
 ### hb-chat
@@ -830,7 +831,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 ```
 
 手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。
-手机端的列表页一律是卡片（hb-ocards），没有手机版表格；只有自定义页面里的表格组件在手机上仍是表格。
+手机端没有表格形态：列表页、自定义页面里的明细，一律用 hb-ocards 画成三槽卡片；hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 放进 hb-phone 会报错。
 
 
 ## 手机端 · 门户（2026-09-21 实测）
@@ -900,5 +901,5 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 ```
 
 手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。
-手机端的列表页一律是卡片（hb-ocards），没有手机版表格；只有自定义页面里的表格组件在手机上仍是表格。
+手机端没有表格形态：列表页、自定义页面里的明细，一律用 hb-ocards 画成三槽卡片；hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 放进 hb-phone 会报错。
 

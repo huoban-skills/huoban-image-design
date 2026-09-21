@@ -1478,6 +1478,9 @@ def m_cards(a, body):
 
 # ── 手机端（2026-09-03 H5 实测结构，类名见 assets/c4-mobile.html）──────────
 def m_phone(a, body):
+    if "<table" in body or 'class="table-view' in body:
+        raise ExpandError("手机端没有表格形态：列表页、自定义页面里的明细，一律用 <hb-ocards> 画成三槽卡片；"
+                          "hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 是 PC 组件，放不进 hb-phone")
     bar = ""
     if "nobar" not in a:
         dots = "" if "nodots" in a else "···"
@@ -1700,6 +1703,7 @@ def m_wpage(a, body):
     out = []
     tabs_html = ""
     sub_html = ""
+    card_at = None
     for ln in lines(body):
         if ln.startswith("#"):
             out.append(f'<div class="wban">{esc(ln[1:])}</div>')
@@ -1713,17 +1717,22 @@ def m_wpage(a, body):
             out.append(f'<div class="wcard wsc">{"".join(items)}</div>')
         elif ln.startswith("tabs:"):
             tabs_html = '<div class="wtabs">' + "".join(f'<span{" class=\"on\"" if on else ""}>{esc(n)}</span>' for n, on in star_items(ln[5:])) + "</div>"
+            card_at = len(out) if card_at is None else card_at
         elif ln.startswith("sub:"):
             c = cells(ln[4:])
             chips = ""
             if len(c) > 1:
                 chips = '<span class="chips">' + "".join(f'<span class="chip{" on" if on else ""}">{esc(n)}</span>' for n, on in star_items("|".join(c[1:]))) + "</span>"
             sub_html = f'<div class="wsub"><div class="wsh">{esc(c[0])}{chips}</div><div class="wempty"><i></i>没有找到任务</div></div>'
+            card_at = len(out) if card_at is None else card_at
             warn("hb-wpage 的 sub: 会渲染成「没有找到任务」空态：营销图不放空态，任务列表用 hb-ptasks 另起一屏，或去掉 sub:")
+        elif ln.startswith("<"):
+            out.append(f'<div class="wcard wlist">{ln}</div>')
         else:
-            raise ExpandError(f"<hb-wpage> 行要以 #（横幅）/ sc:（快捷方式）/ tabs:（页签）/ sub:（任务子区）开头：{ln}")
+            raise ExpandError(f"<hb-wpage> 行要以 #（横幅）/ sc:（快捷方式）/ tabs:（页签）/ sub:（任务子区）开头，"
+                              f"或直接嵌一个 <hb-ocards bare> 放明细：{ln}")
     if tabs_html or sub_html:
-        out.append(f'<div class="wcard">{tabs_html}{sub_html}</div>')
+        out.insert(card_at, f'<div class="wcard">{tabs_html}{sub_html}</div>')
     return f'<div class="m-workbench">{"".join(out)}</div>'
 
 
@@ -2922,7 +2931,8 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 sc: 库存看板:pie-s | 出库管理:check-s | 入库管理:trend-s | 库存盘点:chart-s
 tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
-</hb-wpage>""",
+</hb-wpage>
+要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。""",
 "hb-chat": """企业微信会话（微信端样式，未实测）。@时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
 例：
 @今天 09:21
@@ -2972,7 +2982,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 进入本人工作台 | 销售只看得到自己名下的客户与存货""",
 }
 MOBILE_NOTE = ("手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。\n"
-               "手机端的列表页一律是卡片（hb-ocards），没有手机版表格；只有自定义页面里的表格组件在手机上仍是表格。")
+               "手机端没有表格形态：列表页、自定义页面里的明细，一律用 hb-ocards 画成三槽卡片；hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 放进 hb-phone 会报错。")
 
 
 def render_docs(names):
