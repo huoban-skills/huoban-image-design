@@ -32,7 +32,7 @@ PAGE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="hb-skill" content="huoban-image-design 2.3.0">
+<meta name="hb-skill" content="huoban-image-design 2.3.1">
 <title>{title}</title>
 <style>
 {skin_css}

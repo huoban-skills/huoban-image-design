@@ -1435,7 +1435,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .wxmsg { display: flex; gap: 8px; align-items: flex-start; }
 .phone .wxav { width: 32px; height: 32px; border-radius: 6px; flex: none; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; }
 .phone .wxav .ico { width: 18px; height: 18px; }
-.phone .wxb { min-width: 0; flex: 1; }
+.phone .wxb { min-width: 0; flex: 1; margin-right: 51px; }   /* 气泡不占满整宽：卡片 260 宽，右边留出空隙，和真机一样 */
 .phone .wxwho { font-size: 12px; color: var(--ink-45); margin-bottom: 5px; }
 .phone .wxcard { background: var(--card-bg); border-radius: 8px; padding: 13px 14px; }
 .phone .wxcard .wxhd { font-size: 13px; color: var(--ink-45); padding-bottom: 9px; margin-bottom: 11px; border-bottom: 1px dashed rgba(0,0,0,.12); }
