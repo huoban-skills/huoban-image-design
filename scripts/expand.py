@@ -506,9 +506,10 @@ def m_banner(a, body):
             dt = f'<div class="ban-dt"><b>{esc(str(a.get("date", "")))}</b><span>{esc(str(a.get("time", "")))}</span></div>'
         img = f'<div class="ban-img">{a["img"] if isinstance(a.get("img"), str) and "<" in a["img"] else ""}</div>' if "img" in a else ""
         return f'<div class="rich title card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
+    if "solid" in a:
+        raise ExpandError("<hb-banner> 的 solid 已经去掉了：横幅一律无底色、左对齐；要整块背景图就用 card")
     p = f"<p>{esc(ls[1])}</p>" if len(ls) > 1 else ""
-    cls = "rich title" + (" bg-solid" if "solid" in a else "")
-    return f'<div class="{cls}"><h1>{esc(ls[0])}</h1>{p}</div>'
+    return f'<div class="rich title"><h1>{esc(ls[0])}</h1>{p}</div>'
 
 
 # ── 图表 ────────────────────────────────────────────────────────────────
@@ -1701,9 +1702,7 @@ def m_ptasks(a, body):
 
 def m_wpage(a, body):
     out = []
-    tabs_html = ""
-    sub_html = ""
-    card_at = None
+    tab = None          # 页签卡：开了之后，后面的子区与嵌进来的组件都装进同一张卡
     for ln in lines(body):
         if ln.startswith("#"):
             out.append(f'<div class="wban">{esc(ln[1:])}</div>')
@@ -1716,24 +1715,27 @@ def m_wpage(a, body):
                 items.append(f'<span>{ico(ic.strip() or "app-s", tag="<hb-wpage> ")}{esc(n)}</span>')
             out.append(f'<div class="wcard wsc">{"".join(items)}</div>')
         elif ln.startswith("tabs:"):
-            tabs_html = '<div class="wtabs">' + "".join(f'<span{" class=\"on\"" if on else ""}>{esc(n)}</span>' for n, on in star_items(ln[5:])) + "</div>"
-            card_at = len(out) if card_at is None else card_at
+            tabs = "".join(f'<span{" class=\"on\"" if on else ""}>{esc(n)}</span>' for n, on in star_items(ln[5:]))
+            tab = [f'<div class="wtabs">{tabs}</div>']
+            out.append(tab)
         elif ln.startswith("sub:"):
             c = cells(ln[4:])
             chips = ""
             if len(c) > 1:
                 chips = '<span class="chips">' + "".join(f'<span class="chip{" on" if on else ""}">{esc(n)}</span>' for n, on in star_items("|".join(c[1:]))) + "</span>"
-            sub_html = f'<div class="wsub"><div class="wsh">{esc(c[0])}{chips}</div><div class="wempty"><i></i>没有找到任务</div></div>'
-            card_at = len(out) if card_at is None else card_at
+            html = f'<div class="wsub"><div class="wsh">{esc(c[0])}{chips}</div><div class="wempty"><i></i>没有找到任务</div></div>'
+            (tab if tab is not None else out).append(html if tab is not None else f'<div class="wcard">{html}</div>')
             warn("hb-wpage 的 sub: 会渲染成「没有找到任务」空态：营销图不放空态，任务列表用 hb-ptasks 另起一屏，或去掉 sub:")
         elif ln.startswith("<"):
-            out.append(f'<div class="wcard wlist">{ln}</div>')
+            if tab is not None:
+                tab.append(f'<div class="wtb">{ln}</div>')
+            else:
+                out.append(f'<div class="wcard wlist">{ln}</div>')
         else:
             raise ExpandError(f"<hb-wpage> 行要以 #（横幅）/ sc:（快捷方式）/ tabs:（页签）/ sub:（任务子区）开头，"
                               f"或直接嵌一个 <hb-ocards bare> 放明细：{ln}")
-    if tabs_html or sub_html:
-        out.insert(card_at, f'<div class="wcard">{tabs_html}{sub_html}</div>')
-    return f'<div class="m-workbench">{"".join(out)}</div>'
+    html = "".join(f'<div class="wcard">{"".join(x)}</div>' if isinstance(x, list) else x for x in out)
+    return f'<div class="m-workbench">{html}</div>'
 
 
 # ── 门户（2026-09-21 hb.huobanyun.com 门户实测，安卓 UA 375×812）──
@@ -1830,21 +1832,21 @@ def m_pme(a, body):
             f'{cards}<div class="mebtn">{esc(a.get("out", "退出登录"))}</div></div>')
 
 
-def _wx_kv(k, v):
+def _wx_kv(k, v, md):
     cls = ""
     if v.endswith(":link"):
         v, cls = v[:-5].strip(), " link"
-    return f'<div class="wxkv"><span class="k">{esc(k)}</span><span class="v{cls}">{esc(v)}</span></div>'
+    return f'<div class="wxkv"><span class="k">{esc(k + "：" if md else k)}</span><span class="v{cls}">{esc(v)}</span></div>'
 
 
 def m_wxgroup(a, body):
-    msgs, cur, who, avi = [], None, "", "bell"
+    msgs, cur, who, avi, md = [], None, "", "bell", False
 
     def close():
         nonlocal cur
         if cur is not None:
             msgs.append(f'<div class="wxmsg"><span class="wxav">{ico(avi, tag="<hb-wxgroup> ")}</span><div class="wxb">'
-                        f'<div class="wxwho">{esc(who)}</div><div class="wxcard">{"".join(cur)}</div></div></div>')
+                        f'<div class="wxwho">{esc(who)}</div><div class="wxcard{" md" if md else ""}">{"".join(cur)}</div></div></div>')
             cur = None
 
     for ln in lines(body):
@@ -1853,15 +1855,24 @@ def m_wxgroup(a, body):
             msgs.append(f'<div class="mtime">{esc(ln[1:].strip())}</div>')
         elif ln.startswith("!"):
             close()
-            who, _, icn = ln[1:].strip().partition(":")
-            who = who.strip()
-            avi = icn.strip() or "bell"
+            c = cells(ln[1:])
+            who = c[0]
+            md, avi = False, "bell"
+            for t in c[1:]:
+                t = t.strip()
+                if t == "md":
+                    md = True
+                elif t and t != "card":
+                    avi = t
             if not who:
-                raise ExpandError("<hb-wxgroup> 的 ! 后面写发这条消息的机器人名，如 !跟进助手 或 !跟进助手:bell")
+                raise ExpandError("<hb-wxgroup> 的 ! 后面写发这条消息的机器人名，如 !跟进助手；卡片消息不用写类型，"
+                                  "markdown 消息写 !跟进助手 | md，换头像图标写 !跟进助手 | md | bell")
             cur = []
         elif cur is None:
             raise ExpandError(f"<hb-wxgroup> 每条消息要先用「!机器人名」开头：{ln}")
         elif ln.startswith("^"):
+            if md:
+                raise ExpandError("<hb-wxgroup> 的 ^ 顶部小标题只有卡片消息有：markdown 消息没有这一块，把它并进 # 标题")
             cur.append(f'<div class="wxhd">{esc(ln[1:].strip())}</div>')
         elif ln.startswith("#"):
             cur.append(f'<div class="wxt">{esc(ln[1:].strip())}</div>')
@@ -1877,7 +1888,7 @@ def m_wxgroup(a, body):
             cur.append(f'<div class="wxmore"><span>{esc(ln[1:].strip())}</span>{ico("next")}</div>')
         elif " = " in ln:
             k, v = ln.split(" = ", 1)
-            cur.append(_wx_kv(k.strip(), v.strip()))
+            cur.append(_wx_kv(k.strip(), v.strip(), md))
         else:
             cur.append(f'<div class="wxp">{esc(ln)}</div>')
     close()
@@ -2490,7 +2501,7 @@ MACROS = {
     "hb-tasks": (m_tasks, "待办子区：标题 | 时间 | 节点说明；属性 title"),
     "hb-shortcuts": (m_shortcuts, "按钮组件（快捷方式版式）：名称 | 图标；属性 title"),
     "hb-filters": (m_filters, "筛选组件：筛选文本 | 图标"),
-    "hb-banner": (m_banner, "横幅（富文本大标题预设）：第一行页面名称，第二行一句话介绍；属性 solid；card 出背景图卡片式（date、time、img）"),
+    "hb-banner": (m_banner, "横幅（富文本大标题预设）：第一行页面名称，第二行一句话介绍，无底色左对齐；card 出背景图卡片式（date、time、img）"),
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
     "hb-line": (m_line, "折线图卡：同 hb-bar；属性 plain 去掉卡片外壳"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
@@ -2660,7 +2671,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 "hb-cards": """卡片视图，每行 标题 | 字段=值; 字段=值 | 操作:图标:颜色。
 例：
 杭州云图 | 行业=制造; 年采购=¥1,204,000 | 拜访:arrow-right:blue""",
-"hb-banner": """横幅（富文本大标题预设）。第一行页面名称，第二行一句话介绍（口吻规则见 references/principles/workbench.md）；属性 solid 铺纯色背景。
+"hb-banner": """横幅（富文本大标题预设）。第一行页面名称，第二行一句话介绍（口吻规则见 references/principles/workbench.md）。一律无底色、左对齐，标题直接坐在页底上；整块背景图用属性 card。
 属性 card 出背景图卡片式（120 高白卡，实测工作台常用）：date="2026年09月04日"、time="16:51:17" 出日期时间行；img 出右侧图片位（值写 <img src="…"> 放客户配图，空值留渐变占位）。卡片式不放介绍句。
 例：
 <hb-banner>库管工作台
@@ -3042,11 +3053,12 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 语言 | 简体中文 ▾
 </hb-pme>
 </hb-phone>""",
-"hb-wxgroup": """企业微信群消息：群里的机器人卡片（2026-09-21 按群消息截图比例换算，非 DOM 实测）。
-每条消息左边是机器人头像、上面一行发送者名，卡片里按需要放这几种行：
+"hb-wxgroup": """企业微信群消息：群里机器人发的消息（2026-09-21 按群消息截图比例换算，非 DOM 实测）。
+两种消息分开写：卡片消息（默认）有顶部小标题、虚线分隔和底部带箭头的链接行；markdown 消息是一段富文本，没有顶部小标题和分隔线，字段名加粗带冒号跟在同一行，底部链接是条纯蓝字。
+每条消息左边是机器人头像、上面一行发送者名，消息体里按需要放这几种行：
   @15:20            居中时间戳
-  !跟进助手          开一条新消息，写发这条的机器人名；要换头像图标写 !跟进助手:bell
-  ^ 💡 服务资源通知   卡片顶部小灰标题，下面自动带一条虚线
+  !跟进助手          开一条卡片消息；markdown 消息写 !跟进助手 | md；换头像图标写 !跟进助手 | md | bell
+  ^ 💡 服务资源通知   卡片顶部小灰标题，下面自动带一条虚线（只有卡片消息有）
   # 服务包消费记录    卡片大标题
   * -0 工时 | 2026-09-21   居中大数字，第二段是副行
   ~ 服务记录已自动归档     灰底提示块
@@ -3058,7 +3070,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 <hb-phone title="商机跟进群(7)">
 <hb-wxgroup chips="事项管理:linkout | 添加:plus">
 @15:20
-!跟进助手
+!跟进助手 | md
 # ⭐ 客户分配通知
 客户分配至 = 礼礼互娱
 客户名称 = 老苞米电竞

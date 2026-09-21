@@ -579,18 +579,11 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .page { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; background: var(--page-bg); }
 .page > * { flex: none; } /* 组件按内容高度排布，不被压缩重叠 */
 /* 页面标题区：工作台/数据看板顶部的「页面名称＋一句话介绍」。
-   左对齐；默认无背景，标题直接坐在页底上。要背景就加 bg-solid 铺一块干净纯色，
-   几何纹理装饰（网格/环纹/斜纹/点阵/光晕）已废弃，别再加回来 */
+   一律左对齐、无底色，标题直接坐在页底上；整块背景图用 .card 那一档。
+   纯色底（bg-solid）与几何纹理装饰（网格/环纹/斜纹/点阵/光晕）都已废弃，别再加回来 */
 .rich.title { padding: 4px 4px 0; }
 .rich.title h1 { font-size: 30px; font-weight: 600; color: var(--ink-85); }
 .rich.title p { margin-top: 8px; font-size: 16px; color: var(--ink-45); line-height: 1.6; }
-.rich.title.bg-solid {
-  min-height: 108px; border-radius: 9px; padding: 26px 32px;
-  display: flex; flex-direction: column; justify-content: center;
-  background: var(--primary-deep);
-}
-.rich.title.bg-solid h1 { color: #fff; }
-.rich.title.bg-solid p { color: rgba(255, 255, 255, .82); }
 /* 横幅-背景图卡片（2026-09-04 工作台实测）：白卡 r9 高 120 内距 20，整卡铺客户背景图；无图时右侧走主色淡渐变占位 */
 .rich.title.card {
   position: relative; height: 120px; padding: 20px; border-radius: 9px; overflow: hidden;
@@ -1348,11 +1341,12 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .m-workbench { flex: 1; min-height: 0; overflow: hidden; background: var(--card-bg); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
 .phone .wcard { background: var(--card-bg); border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); overflow: hidden; }
 /* 工作台里的明细：手机端没有表格，嵌 hb-ocards 的卡片列表，卡底跟着工作台卡片走 */
-.phone .wcard.wlist { padding: 12px; }
-.phone .wcard.wlist .m-cards { flex: none; background: none; padding: 0; border: none; }
-.phone .wcard.wlist .ocard { border: 1px solid var(--line); margin-bottom: 8px; }
-.phone .wcard.wlist .ocard:last-child { margin-bottom: 0; }
-.phone .wban { height: 80px; border-radius: 9px; background: var(--banner-bg); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 500; color: rgba(255,255,255,.85); box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+.phone .wcard.wlist, .phone .wcard .wtb { padding: 12px; }
+.phone .wcard .wtabs + .wtb { padding-top: 0; }
+.phone .wcard.wlist .m-cards, .phone .wcard .wtb .m-cards { flex: none; background: none; padding: 0; border: none; }
+.phone .wcard.wlist .ocard, .phone .wcard .wtb .ocard { border: 1px solid var(--line); margin-bottom: 8px; }
+.phone .wcard.wlist .ocard:last-child, .phone .wcard .wtb .ocard:last-child { margin-bottom: 0; }
+.phone .wban { padding: 2px 2px 0; font-size: 20px; font-weight: 600; color: var(--ink-85); }   /* 跟 PC 横幅一致：无底色、左对齐 */
 .phone .wsc { display: grid; grid-template-columns: 1fr 1fr; row-gap: 44px; padding: 22px 0 22px 60px; }
 .phone .wsc span { display: flex; align-items: center; gap: 8px; font-size: 16px; color: var(--ink-85); line-height: 16px; }
 .phone .wsc .ico { width: 18px; height: 18px; color: var(--primary); }
@@ -1452,6 +1446,11 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .wxcard .wxkv .v.link { color: var(--primary); }
 .phone .wxcard .wxmore { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--primary); }
 .phone .wxcard .wxmore .ico { width: 13px; height: 13px; color: var(--ink-25); }
+/* markdown 消息：一段富文本，没有顶部小标题和分隔线；字段名加粗带冒号跟在一行里，底部链接是条纯蓝字 */
+.phone .wxcard.md .wxkv .k { color: var(--ink-85); font-weight: 700; min-width: 0; }
+.phone .wxcard.md .wxkv { gap: 6px; }
+.phone .wxcard.md .wxmore { margin-top: 9px; padding-top: 0; border-top: none; justify-content: flex-start; }
+.phone .wxcard.md .wxmore .ico { display: none; }
 /* 群机器人快捷入口：贴在输入条上方 */
 .phone .wxchips { flex: none; background: #f2f2f2; padding: 4px 12px 8px; display: flex; gap: 8px; }
 .phone .wxchips span { background: var(--card-bg); border-radius: 15px; padding: 0 12px; height: 30px; display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--ink-85); }
