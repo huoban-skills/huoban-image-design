@@ -1830,6 +1830,70 @@ def m_pme(a, body):
             f'{cards}<div class="mebtn">{esc(a.get("out", "退出登录"))}</div></div>')
 
 
+def _wx_kv(k, v):
+    cls = ""
+    if v.endswith(":link"):
+        v, cls = v[:-5].strip(), " link"
+    return f'<div class="wxkv"><span class="k">{esc(k)}</span><span class="v{cls}">{esc(v)}</span></div>'
+
+
+def m_wxgroup(a, body):
+    msgs, cur, who, avi = [], None, "", "bell"
+
+    def close():
+        nonlocal cur
+        if cur is not None:
+            msgs.append(f'<div class="wxmsg"><span class="wxav">{ico(avi, tag="<hb-wxgroup> ")}</span><div class="wxb">'
+                        f'<div class="wxwho">{esc(who)}</div><div class="wxcard">{"".join(cur)}</div></div></div>')
+            cur = None
+
+    for ln in lines(body):
+        if ln.startswith("@"):
+            close()
+            msgs.append(f'<div class="mtime">{esc(ln[1:].strip())}</div>')
+        elif ln.startswith("!"):
+            close()
+            who, _, icn = ln[1:].strip().partition(":")
+            who = who.strip()
+            avi = icn.strip() or "bell"
+            if not who:
+                raise ExpandError("<hb-wxgroup> 的 ! 后面写发这条消息的机器人名，如 !跟进助手 或 !跟进助手:bell")
+            cur = []
+        elif cur is None:
+            raise ExpandError(f"<hb-wxgroup> 每条消息要先用「!机器人名」开头：{ln}")
+        elif ln.startswith("^"):
+            cur.append(f'<div class="wxhd">{esc(ln[1:].strip())}</div>')
+        elif ln.startswith("#"):
+            cur.append(f'<div class="wxt">{esc(ln[1:].strip())}</div>')
+        elif ln.startswith("*"):
+            c = cells(ln[1:])
+            sub = f'<div class="wxbs">{esc(c[1])}</div>' if len(c) > 1 else ""
+            cur.append(f'<div class="wxbig">{esc(c[0])}{sub}</div>')
+        elif ln.startswith("~"):
+            cur.append(f'<div class="wxnote">{esc(ln[1:].strip())}</div>')
+        elif ln.startswith('"'):
+            cur.append(f'<div class="wxq">{esc(ln[1:].strip())}</div>')
+        elif ln.startswith(">"):
+            cur.append(f'<div class="wxmore"><span>{esc(ln[1:].strip())}</span>{ico("next")}</div>')
+        elif " = " in ln:
+            k, v = ln.split(" = ", 1)
+            cur.append(_wx_kv(k.strip(), v.strip()))
+        else:
+            cur.append(f'<div class="wxp">{esc(ln)}</div>')
+    close()
+    chips = ""
+    if "chips" in a:
+        items = []
+        for it in cells(str(a["chips"])):
+            if not it:
+                continue
+            n, _, icn = it.partition(":")
+            items.append(f'<span>{ico(icn.strip() or "plus", tag="<hb-wxgroup> ")}{esc(n.strip())}</span>')
+        chips = f'<div class="wxchips">{"".join(items)}</div>'
+    bar = "" if "noinput" in a else f'<div class="wxinput">{ico("headset")}<span class="box">{esc(a.get("input", "发消息或按住…"))}</span>{ico("plus")}</div>'
+    return f'<div class="m-wxg">{"".join(msgs)}</div>{chips}{bar}'
+
+
 def m_chat(a, body):
     out = []
     msg = None
@@ -1852,7 +1916,7 @@ def m_chat(a, body):
             close()
             msg = [f'<div class="mt2">{esc(ln[1:])}</div>']
         elif msg is None:
-            raise ExpandError(f"<hb-chat> 消息要先用「[标签] 标题」或「! 标题」开头：{ln}")
+            raise ExpandError(f"<hb-wxapp> 消息要先用「[标签] 标题」或「! 标题」开头：{ln}")
         elif ln.startswith(">"):
             msg.append(f'<div class="ml"><span>{esc(ln[1:])}</span>{ico("next")}</div>')
         elif " = " in ln:
@@ -2313,7 +2377,7 @@ def m_page(a, body):
         if n in ("hb-row", "hb-tabcard", "hb-col"):
             _walk(raw, n == "hb-row")
     if kind != "mobile":
-        bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|ptop|pnav|pmenu|plogin|pme))\b", a.get("_raw", body))
+        bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|wxapp|wxgroup|ptop|pnav|pmenu|plogin|pme))\b", a.get("_raw", body))
         if bad:
             raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里；PC 页和 PC 浮层里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
     # 演示尺寸和整页一样按完整一页画，必有组件不放宽；超高了减行、压图表高度，不删骨架组件
@@ -2473,7 +2537,8 @@ MACROS = {
     "hb-pmenu": (m_pmenu, "门户分组菜单：分组页签展开的面板＋蒙层；每行 名称:图标"),
     "hb-plogin": (m_plogin, "门户登录页：属性 name、wechat、bg、phone、captcha、code、submit"),
     "hb-pme": (m_pme, "个人中心：属性 who、out；每行 字段名 | 值 | 右侧操作，-- 另起一张卡"),
-    "hb-chat": (m_chat, "企业微信会话：@时间；[标签] 标题 开一条消息；k = v；> 链接；其余为正文"),
+    "hb-wxapp": (m_chat, "企业微信应用消息（发给个人）：@时间；[标签] 标题 开一条消息；k = v；> 链接；其余为正文"),
+    "hb-wxgroup": (m_wxgroup, "企业微信群消息：@时间；!机器人名 开一条；^小标题 / #大标题 / *大数字 / ~灰底块 / \"引用 / k = v / >查看详情"),
     "hb-conn": (m_conn, "屏间中缝说明：每行「步骤标题 | 一句说明」，行间自动加箭头"),
 }
 
@@ -2496,7 +2561,7 @@ GROUPS = [
                                             "hb-funnel", "hb-scatter", "hb-map", "hb-pivot"]),
     ("独立自定义详情页", ["hb-itembar", "hb-hcard", "hb-fields", "hb-steps", "hb-tabcard", "hb-flow", "hb-stream", "hb-comment"]),
     ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
-    ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-chat", "hb-conn"]),
+    ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-wxapp", "hb-wxgroup", "hb-conn"]),
     ("手机端 · 门户（2026-09-21 实测）", ["hb-ptop", "hb-pnav", "hb-pmenu", "hb-plogin", "hb-pme"]),
 ]
 
@@ -2547,7 +2612,7 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 </hb-line>
 </hb-row>
 </hb-float>""",
-"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微会话那一屏用 hb-chat 写在第一个 hb-phone 里。""",
+"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
@@ -2872,7 +2937,7 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 例：
 <div class="stage">
   <div class="duo">
-<hb-phone title="纳承国际 · 存货管理"><hb-chat>…</hb-chat></hb-phone>
+<hb-phone title="纳承国际 · 存货管理"><hb-wxapp>…</hb-wxapp></hb-phone>
 <hb-conn>…</hb-conn>
 <hb-phone title="客户存货单" fix><hb-vbar view="未取完" count="12"/><hb-ocards fab>…</hb-ocards><hb-mtool/></hb-phone>
   </div>
@@ -2933,7 +2998,8 @@ tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
 </hb-wpage>
 要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。""",
-"hb-chat": """企业微信会话（微信端样式，未实测）。@时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
+"hb-wxapp": """企业微信应用消息：应用推给某个人的通知，会话里只有这一个应用在说话，不出头像和发送者名（微信端样式，未实测）。群里的机器人消息用 hb-wxgroup。
+@时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
 例：
 @今天 09:21
 [取货审批 · 待办] 王丽娟 的取货申请待你确认
@@ -2975,6 +3041,31 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 --
 语言 | 简体中文 ▾
 </hb-pme>
+</hb-phone>""",
+"hb-wxgroup": """企业微信群消息：群里的机器人卡片（2026-09-21 按群消息截图比例换算，非 DOM 实测）。
+每条消息左边是机器人头像、上面一行发送者名，卡片里按需要放这几种行：
+  @15:20            居中时间戳
+  !跟进助手          开一条新消息，写发这条的机器人名；要换头像图标写 !跟进助手:bell
+  ^ 💡 服务资源通知   卡片顶部小灰标题，下面自动带一条虚线
+  # 服务包消费记录    卡片大标题
+  * -0 工时 | 2026-09-21   居中大数字，第二段是副行
+  ~ 服务记录已自动归档     灰底提示块
+  " 咨询陪玩系统，要看演示  引用块（左侧竖线）
+  客户名称 = 老苞米电竞     字段行；值写成 18204580942:link 出蓝色
+  > 查看详情          卡片底部链接行
+属性 chips="事项管理:linkout | 添加:plus" 出输入条上方的群机器人快捷入口；input 改输入框占位；noinput 不画输入条。
+例：
+<hb-phone title="商机跟进群(7)">
+<hb-wxgroup chips="事项管理:linkout | 添加:plus">
+@15:20
+!跟进助手
+# ⭐ 客户分配通知
+客户分配至 = 礼礼互娱
+客户名称 = 老苞米电竞
+联系人电话 = 18204580942:link
+" 咨询陪玩系统，要看演示
+> 查看详情
+</hb-wxgroup>
 </hb-phone>""",
 "hb-conn": """屏间中缝，每行 步骤标题 | 一句说明，行间自动加大箭头。
 例：

@@ -2396,12 +2396,12 @@
       "kind": "component",
       "id": "m-chat",
       "type_key": null,
-      "cn": "企业微信会话",
+      "cn": "企业微信应用消息",
       "old_class": "chat",
       "file": "c4-mobile.html",
-      "name": "企业微信待办会话",
+      "name": "企业微信应用消息",
       "group": "手机端",
-      "macro": "hb-chat",
+      "macro": "hb-wxapp",
       "grid": null,
       "variants": [],
       "measured": "imitated",
@@ -2420,7 +2420,7 @@
       "file": "c4-mobile.html",
       "name": "公众号图文会话＋底部菜单",
       "group": "手机端",
-      "macro": "hb-chat",
+      "macro": "hb-wxapp",
       "grid": null,
       "variants": [
         "mp"
@@ -3201,6 +3201,25 @@
         "phone"
       ],
       "note": null
+    },
+    {
+      "kind": "component",
+      "id": "m-wxg",
+      "type_key": null,
+      "cn": "企业微信群消息",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "企业微信群消息",
+      "group": "手机端",
+      "macro": "hb-wxgroup",
+      "grid": null,
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": "按 2026-09-21 群消息截图比例换算，非 DOM 实测"
     }
   ]
 }

@@ -1428,7 +1428,40 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .p-me .mea { padding-left: 9px; margin-left: 9px; border-left: 1px solid var(--line); color: var(--ink-65); }
 .phone .p-me .mebtn { height: 48px; background: var(--card-bg); border: 1px solid rgba(0,0,0,.04); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--ink-85); }
 
-/* 会话流：企业微信待办推送 / 公众号图文消息（微信端样式，未实测） */
+/* ── 企业微信群消息（2026-09-21 按群消息截图比例换算，非 DOM 实测）──────────
+   群里机器人发的卡片：左头像 ＋ 发送者名 ＋ 白卡气泡；底部可选快捷入口条与输入条。 */
+.phone .m-wxg { flex: 1; min-height: 0; overflow: hidden; background: #f2f2f2; padding: 14px 12px 4px; display: flex; flex-direction: column; gap: 14px; }
+.phone .m-wxg .mtime { align-self: center; font-size: 12px; color: var(--ink-45); }
+.phone .wxmsg { display: flex; gap: 8px; align-items: flex-start; }
+.phone .wxav { width: 32px; height: 32px; border-radius: 6px; flex: none; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; }
+.phone .wxav .ico { width: 18px; height: 18px; }
+.phone .wxb { min-width: 0; flex: 1; }
+.phone .wxwho { font-size: 12px; color: var(--ink-45); margin-bottom: 5px; }
+.phone .wxcard { background: var(--card-bg); border-radius: 8px; padding: 13px 14px; }
+.phone .wxcard .wxhd { font-size: 13px; color: var(--ink-45); padding-bottom: 9px; margin-bottom: 11px; border-bottom: 1px dashed rgba(0,0,0,.12); }
+.phone .wxcard .wxt { font-size: 17px; font-weight: 700; color: var(--ink-85); line-height: 1.45; }
+.phone .wxcard .wxt + * { margin-top: 11px; }
+.phone .wxcard .wxbig { margin: 12px 0; text-align: center; font-size: 28px; font-weight: 700; color: var(--ink-85); }
+.phone .wxcard .wxbig .wxbs { font-size: 12px; font-weight: 400; color: var(--ink-45); margin-top: 4px; }
+.phone .wxcard .wxnote { background: var(--field-bg); border-radius: 6px; padding: 10px 11px; font-size: 13px; color: var(--ink-45); line-height: 1.7; margin-bottom: 11px; }
+.phone .wxcard .wxq { border-left: 3px solid rgba(0,0,0,.08); padding-left: 10px; font-size: 14px; color: var(--ink-65); line-height: 1.7; margin: 9px 0; }
+.phone .wxcard .wxp { font-size: 14px; color: var(--ink-65); line-height: 1.7; margin-top: 6px; }
+.phone .wxcard .wxkv { display: flex; gap: 10px; font-size: 14px; line-height: 26px; }
+.phone .wxcard .wxkv .k { color: var(--ink-45); flex: none; min-width: 62px; }
+.phone .wxcard .wxkv .v { color: var(--ink-85); min-width: 0; }
+.phone .wxcard .wxkv .v.link { color: var(--primary); }
+.phone .wxcard .wxmore { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--primary); }
+.phone .wxcard .wxmore .ico { width: 13px; height: 13px; color: var(--ink-25); }
+/* 群机器人快捷入口：贴在输入条上方 */
+.phone .wxchips { flex: none; background: #f2f2f2; padding: 4px 12px 8px; display: flex; gap: 8px; }
+.phone .wxchips span { background: var(--card-bg); border-radius: 15px; padding: 0 12px; height: 30px; display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--ink-85); }
+.phone .wxchips .ico { width: 14px; height: 14px; color: var(--primary); }
+/* 输入条 */
+.phone .wxinput { flex: none; height: 52px; background: #f7f7f7; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 12px; color: var(--ink-65); }
+.phone .wxinput .ico { width: 22px; height: 22px; flex: none; }
+.phone .wxinput .box { flex: 1; height: 34px; background: var(--card-bg); border-radius: 17px; display: flex; align-items: center; padding: 0 14px; font-size: 14px; color: var(--ink-25); }
+
+/* 应用消息流：企业微信应用推给个人的通知 / 公众号图文消息（微信端样式，未实测） */
 .phone .m-chat { flex: 1; padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
 .phone .mtime { align-self: center; font-size: 11px; color: var(--ink-25); }
 .phone .msg { max-width: 88%; background: var(--card-bg); border-radius: 10px; padding: 13px 14px; }
@@ -1441,7 +1474,7 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
   display: flex; justify-content: space-between; align-items: center; }
 .phone .msg .ml .ico { width: 13px; height: 13px; }
 
-/* 公众号底部菜单栏（仅公众号会话形态用，企业微信会话没有这一条） */
+/* 公众号底部菜单栏（仅公众号会话形态用，企业微信应用消息没有这一条） */
 .phone .wmenu { height: 50px; flex: none; background: var(--card-bg); border-top: 1px solid var(--line); display: flex; align-items: stretch; }
 .phone .wmenu .kb { width: 46px; display: flex; align-items: center; justify-content: center; color: var(--ink-45); border-right: 1px solid var(--line); }
 .phone .wmenu .kb .ico { width: 18px; height: 18px; }
