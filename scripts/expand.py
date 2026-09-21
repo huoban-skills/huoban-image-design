@@ -1956,6 +1956,7 @@ def warn(msg):
 
 
 VIEW_MACROS = {"hb-grid", "hb-kanban", "hb-cards"}
+CHART_MACROS = {"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map"}
 PAGE_SLOTS = {
     "list": dict(
         cn="列表和视图页",
@@ -2348,6 +2349,17 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
     for r in spec["required"]:
         if r not in deep:
             raise ExpandError(f"<hb-page kind=\"{kind}\"> 缺 <{r}>：{spec['cn']}必有。顺序：{' → '.join(spec['order'])}")
+    # 骨架组件只认底图里的（deep 不含浮层）：画布比例靠减数据达成，不靠删组件或把组件挪进浮层
+    have = set(deep)
+    trim = "压比例先减数据：明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮；组件留在底图"
+    if kind == "dashboard":
+        if not have & CHART_MACROS:
+            raise ExpandError(f"<hb-page kind=\"dashboard\"> 底图里没有图表：数据看板必有一张主指标的趋势图（浮层里的不算）。{trim}")
+        for label, ms in (("单指标", {"hb-stats", "hb-multistats"}), ("筛选", {"hb-filters"}), ("明细（透视表或表格列表）", {"hb-pivot", "hb-list"})):
+            if not have & ms:
+                warn(f"数据看板底图里没有{label}：骨架是 横幅 → 筛选 → 单指标 → 图表行 → 明细，宫格式纯图表型才可以不放单指标和明细。{trim}")
+    if kind == "workbench" and not have & {"hb-list", "hb-tabcard", "hb-pivot"}:
+        warn(f"工作台底图里没有底部那块数据（标签页／表格列表／透视表）：三种版式底部都有。{trim}")
     if spec.get("need_view") and not (set(names) & VIEW_MACROS):
         warn("列表页顶层没有视图宏（hb-grid/hb-kanban/hb-cards）：用模板手写的甘特/日历/任务/透视视图请放在 hb-tools 之后")
     # 顺序：按 order 表的位次应单调不减（视图宏都算"视图"位）；order_free 的宏位置自由，不参与比对

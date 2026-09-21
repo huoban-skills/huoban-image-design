@@ -502,13 +502,16 @@ def check(path, render=False, allow_local=False):
         if covered > 0.25 * win_w * page_h:
             add("Medium", "float-cover", f"浮层盖住底图约 {covered / (win_w * page_h):.0%}：最多四分之一：只截画面的一块局部，或把宽度收小（480～920 里取小值）", line_of(body, m.start()))
 
-    # ── High：演示尺寸的数据看板骨架不全（为了压高度删了筛选、图表或明细）──
-    if SLIDE_RE.search(body) and re.search(r'data-kind="dashboard"', body):
+    # ── 数据看板底图骨架不全（为了压比例删了筛选、图表或明细，或把它们挪进了浮层）：两档尺寸都查 ──
+    if re.search(r'data-kind="dashboard"', body):
         main = re.split(r'class="[^"]*\bmk-float\b', body)[0]        # 只看底图，浮层里的不算
-        miss = [n for n, pat in (("筛选", r'class="filter"'), ("图表", r'<svg[^>]*class="[^"]*chart|class="[^"]*\bchart\b'),
-                                 ("明细（透视表或表格列表）", r'class="til-|class="pivot|<table')) if not re.search(pat, main)]
-        if miss:
-            add("High", "slide-skeleton", f"演示尺寸的数据看板缺{'、'.join(miss)}：骨架是 横幅 → 筛选 → 单指标 → 图表行 → 明细，不能为了压高度删掉；超高就减明细行数或压图表高度")
+        slide = bool(SLIDE_RE.search(body))
+        for n, pat in (("筛选", r'class="filter"'), ("图表", r'<svg[^>]*class="[^"]*chart|class="[^"]*\bchart\b'),
+                       ("明细（透视表或表格列表）", r'class="til-|class="pivot|<table')):
+            if not re.search(pat, main):
+                sev = "High" if slide or n == "图表" else "Medium"     # 默认尺寸下筛选、明细在宫格式里可无，降一档
+                add(sev, "base-skeleton", f"数据看板底图缺{n}：骨架是 横幅 → 筛选 → 单指标 → 图表行 → 明细，不为压比例删掉，也不挪进浮层；"
+                                          f"先减数据（明细减到 4 行、单指标 4 个、图表卡压矮），再横向重排")
     if SLIDE_RE.search(body) and not any(x["rule"] == "slide-height" for x in findings):
         ph = page_height(body)
         est = None
@@ -520,7 +523,7 @@ def check(path, render=False, allow_local=False):
             est = ph + (104 if "item-grid" in body else 76) + 48      # 顶栏或记录功能区 ＋ 页面上下内边距
         if est:
             if est > SLIDE_MAX_H + 60:
-                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_MAX_H}：底图会接近 4:3，不像真实显示器，放进 PPT 还被按高度缩小。把明细与主图表并排（hb-row spans=\"14|10\"），或把放不下的几块挪进浮层")
+                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_MAX_H}：底图会接近 4:3，不像真实显示器，放进 PPT 还被按高度缩小。先减数据（明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮），再把明细与主图表并排（hb-row spans=\"14|10\"）；骨架组件留在底图，不删、不挪进浮层")
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -548,16 +551,16 @@ def check(path, render=False, allow_local=False):
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown", "slide-height")]
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
-                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_MAX_H}：底图 {1200}×{sh} 比 {1200/sh:.2f}，接近 4:3，不像真实显示器。把明细与主图表并排（hb-row spans=\"14|10\"），或把放不下的几块挪进浮层")
+                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_MAX_H}：底图 {1200}×{sh} 比 {1200/sh:.2f}，接近 4:3，不像真实显示器。先减数据（明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮），再把明细与主图表并排（hb-row spans=\"14|10\"）；骨架组件留在底图，不删、不挪进浮层")
             st = r.get("stage") or {}
             # 整张图的宽高比（含浮层向下探出的部分），两档尺寸通用；手机图壳高固定、全屏产品图跟着屏幕走，都不查
             exempt = re.search(r'kind="mobile"', body) or re.search(r'class="stage[^"]*\bproduct\b', body)
             if st.get("w") and st.get("h") and not exempt:
                 ratio = st["w"] / st["h"]
                 if ratio < RATIO_HIGH:
-                    add("High", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于硬下限 {RATIO_HIGH}：图太竖，在报告或演示稿里一屏放不下。先横向重排（看板图表行 12+6+6、底部两表并排；详情页字段组 cols=4），再不行就拆成两张图")
+                    add("High", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于硬下限 {RATIO_HIGH}：图太竖，在报告或演示稿里一屏放不下。先减数据（明细行数、字段数、图表高度），再横向重排（看板图表行 12+6+6、底部两表并排；详情页字段组 cols=4）；骨架组件不删，仍不行就拆成两张各自完整的图")
                 elif ratio < RATIO_OK:
-                    add("Medium", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于目标 {RATIO_OK}（区间 {RATIO_OK}–{RATIO_THIN}）：先横向重排；重排后仍够不到，可让位于信息密度并在验收表第 8 条写明理由")
+                    add("Medium", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于目标 {RATIO_OK}（区间 {RATIO_OK}–{RATIO_THIN}）：先减数据、再横向重排，骨架组件不删；重排后仍够不到，可让位于信息密度并在验收表第 8 条写明理由")
                 elif ratio > RATIO_THIN:
                     add("Medium", "figure-thin", f"整张图宽高比 {ratio:.2f}，高于 {RATIO_THIN}，画面偏扁、内容偏少：底图按完整一页画（看板是筛选、指标、一排图表、明细 4–6 行；列表页表格 8–14 行），或把浮层做足（四块排两行）把整图撑起来")
             fb = r.get("floatBox") or {}
