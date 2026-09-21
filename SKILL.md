@@ -24,8 +24,8 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组件与待办 → 标签页 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
 | 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
-| 手机端（上面任一页面的手机版） | mobile | 对应页面篇；手机组件用途用 `extract_templates.py assets/c4-mobile.html --list` 看 | 单屏或 2～3 屏流程；不套产品壳，用手机宏 |
-| 门户（登录页、门户导航、个人中心） | mobile | 同上 | hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav；登录页和个人中心各占一屏 |
+| 手机端（上面任一页面的手机版、企业微信消息） | mobile | mobile；手机版工作台、详情页的内容取舍另读对应页面篇 | 单屏或 2～3 屏流程，多屏时每屏界面类型不同；不套产品壳，用手机宏 |
+| 门户（登录页、门户导航、个人中心） | mobile | mobile | hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav；登录页和个人中心各占一屏 |
 
 要选图表类型或拿不准该用哪个组件时再读 component-guide；新造或调整皮肤时另读 [references/skin/custom-skin.md](references/skin/custom-skin.md)。
 

@@ -2297,8 +2297,34 @@ def m_row(a, body):
     return '<div class="w-row">' + "".join(items) + "</div>"
 
 
+# 手机界面类型：按顺序判，先判特征更强的（任务列表、工作台体内也有卡片列表）
+SCREEN_KINDS = [
+    ("门户登录页", ('class="p-login',)), ("个人中心", ('class="p-me"',)),
+    ("企业微信群消息", ('class="m-wxg"',)), ("公众号会话", ('class="wmenu"',)), ("企业微信应用消息", ('class="m-chat"',)),
+    ("流程任务列表", ('class="m-ptasks"',)), ("任务办理页", ('class="m-taskbar"',)),
+    ("新建／编辑页", ('class="m-savebar"',)), ("记录详情页", ('class="m-rec"',)),
+    ("手机工作台", ('class="m-workbench"',)), ("工作区首页", ('class="m-home"',)),
+    ("列表页", ('class="m-viewbar"', 'class="m-cards"')),
+]
+
+
+def screen_kind(html):
+    for name, marks in SCREEN_KINDS:
+        if any(m in html for m in marks):
+            return name
+    return None
+
+
 def m_screens(a, body):
     html = body.strip()
+    seen = {}
+    for i, seg in enumerate(html.split('<div class="phone')[1:], 1):
+        kind = screen_kind(seg.split('<div class="conn">')[0])
+        if kind and kind in seen:
+            raise ExpandError(f"<hb-screens> 第 {seen[kind]} 屏和第 {i} 屏都是「{kind}」：多屏流程每一屏要是不同类型的界面"
+                              f"（消息 → 列表 → 记录页这样一步换一种），同类的两屏合成一屏，或换成流程里的下一种界面")
+        if kind:
+            seen[kind] = i
     phones = html.count('<div class="phone')
     conns = html.count('<div class="conn">')
     if phones < 2 or phones > 3:
@@ -2485,7 +2511,7 @@ MACROS = {
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
     "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～920（无标题）；体内用 hb-row／hb-col 排一块小画面，至少两块 PC 组件"),
-    "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏"),
+    "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏，每屏界面类型不同"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
     "hb-views": (m_views, "视图页签行：名称 | 图标，* 前缀＝当前视图"),
@@ -2618,7 +2644,7 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 </hb-line>
 </hb-row>
 </hb-float>""",
-"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。""",
+"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。每一屏要是不同类型的界面，两屏同类会报错（类型表见 references/principles/mobile.md）。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。

@@ -84,10 +84,10 @@ hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统
 ```
 
 ### hb-screens
-手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏
+手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏，每屏界面类型不同
 
 ```
-手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。
+手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。每一屏要是不同类型的界面，两屏同类会报错（类型表见 references/principles/mobile.md）。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。
 ```
 
 
