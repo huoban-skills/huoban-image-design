@@ -2259,7 +2259,7 @@ def m_float(a, body):
         raise ExpandError('<hb-float> 固定在底图右下，没有 side 属性：PC 页面左边是导航（详情页左边是页头与字段），浮层放左会盖住它们；去掉 side')
     w = str(a.get("w", "640")).rstrip("px")
     if not w.isdigit() or not 400 <= int(w) <= 920:
-        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～920（默认 640；演示尺寸 400～640）：浮层是一块小画面，右缘探出画布 200')
+        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～920（默认 640；演示尺寸 400～700）：浮层是一块小画面，右缘探出画布 200')
     if "title" in a:
         raise ExpandError('<hb-float> 不带浮层标题：去掉 title 属性，要说明的话写在体内组件卡片自己的 title 上')
     n_cards = len(re.findall(r'class="w-card', body))
@@ -2403,7 +2403,7 @@ def m_page(a, body):
         raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
     size = a.get("size", "full")
     if size not in ("full", "slide"):
-        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1200 宽、高 900 以内，底图按完整一页画）')
+        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1300 宽、高 867 以内，底图按完整一页画）')
     if size == "slide" and (canvas != "marketing" or kind in ("screen", "mobile")):
         raise ExpandError('<hb-page size="slide"> 只用在营销类的电脑端页面：大屏、手机端和产品设计类画布不用演示尺寸')
     parts = _top_level(a.get("_raw", body))
@@ -2470,8 +2470,8 @@ def m_page(a, body):
             fw = re.search(r"--float-w:(\d+)px", h)
             if "mk-float-phone" in h:
                 continue              # 手机单屏宽度固定 300，不走宽度区间
-            if fw and not 400 <= int(fw.group(1)) <= 640:
-                raise ExpandError(f'演示尺寸下 <hb-float w> 写 400～640（现在 {fw.group(1)}）：窗口只有 1200 宽')
+            if fw and not 400 <= int(fw.group(1)) <= 700:
+                raise ExpandError(f'演示尺寸下 <hb-float w> 写 400～700（现在 {fw.group(1)}）：窗口只有 1300 宽')
     else:
         for h in floats:
             fw = re.search(r"--float-w:(\d+)px", h)
@@ -2631,7 +2631,7 @@ GROUPS = [
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1200 宽、窗口高 800 以内，由 check.py `slide-height` 检查；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，不删骨架组件；浮层宽 400～640 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 867 以内（超过报 Medium，超过 930 报 High），由 check.py `slide-height` 检查；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，不删骨架组件；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
@@ -2657,7 +2657,7 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～920，默认 640；演示尺寸 400～640）；不带浮层标题，要说明的话写在体内组件卡片的 title 上。
+"hb-float": """营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～920，默认 640；演示尺寸 400～700）；不带浮层标题，要说明的话写在体内组件卡片的 title 上。
 浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，至少两块组件，推荐三四块排两行；外面自动套一道细窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。不复制底层已有内容。
 体内两种写法二选一，不混放：PC 组件（上面这种），或一个手机单屏——讲「同一件事在手机上怎么办」时，体内只写一个 <hb-phone>（不写 fix、不放 hb-screens，浮层不写 w）。手机壳自己就是框，不再套窗口框，按 0.8 倍显示（300 宽）、高度按内容撑，内容控制在 600 以内。手机宏要包在 hb-phone 里，散放会报错。
 例（手机单屏）：

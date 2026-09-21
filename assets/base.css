@@ -100,11 +100,11 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .mk-float-phone .phone { zoom: .8; margin: 0; height: auto; box-shadow: 0 14px 36px rgba(0, 0, 0, .16); }
 
 .stage.auto.product .window { border-radius: 0; border: 0; }
-/* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。窗口 1200 宽，浮层内容不缩小，详情页边距收窄 */
-.stage.auto.slide { width: 1200px; }
-.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1200px; }
-.stage.auto.slide.has-float { width: 1400px; }
-.stage.auto.slide.has-float .window, .stage.auto.slide.has-float .item-page { width: 1200px; }
+/* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。窗口 1300 宽（整图 1500：图片位 930 宽时主体字 8px），浮层内容不缩小，详情页边距收窄 */
+.stage.auto.slide { width: 1300px; }
+.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1300px; }
+.stage.auto.slide.has-float { width: 1500px; }
+.stage.auto.slide.has-float .window, .stage.auto.slide.has-float .item-page { width: 1300px; }
 .stage.auto.slide .item-page-canvas { padding: 32px 48px; }
 .stage.auto.slide .float-screen > * { zoom: 1; }   /* 演示尺寸窗口更窄，再缩 0.8 只剩 6.9px，低于浮层底线，所以不缩 */
 .stage.auto.slide .kanban-columns { gap: 16px; }          /* 演示尺寸：看板各列均分宽度，全部列都露出来 */
