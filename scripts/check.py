@@ -442,7 +442,8 @@ def check(path, render=False, allow_local=False):
             add("High", "float-left", "浮层放在了左侧：左边是导航（详情页是页头与字段），会被盖住；浮层只从右侧探出，用 <hb-float> 默认位置")
     if re.search(r'class="(ocard|m-workbench|m-chat|m-wxg|rec-card|m-tool)\b', body) and 'class="phone' not in body:
         add("High", "mobile-in-pc", "PC 图里出现了手机组件（订单卡、手机工作台、企微消息流等），样式只在 hb-phone 里生效，会散成一堆裸文字：PC 页和 PC 浮层改用 hb-fields、hb-list、hb-multistats 这类 PC 组件")
-    if 'class="phone' in body and ("<table" in body or 'class="table-view' in body):
+    _ph = body.split("mk-float-phone", 1)[1] if "mk-float-phone" in body else (body if 'class="phone' in body else "")   # PC 底图＋手机浮层时只看浮层那段
+    if _ph and ("<table" in _ph or 'class="table-view' in _ph):
         add("High", "mobile-table", "手机图里画了表格：手机端没有表格形态，列表页和自定义页面里的明细一律是三槽卡片，改用 <hb-ocards>")
     if 'class="wempty"' in body or "暂无数据" in body:
         add("Medium", "empty-state", "画面里有「没有找到任务／暂无数据」空态：营销图每个区域都要有内容，给它几行数据或去掉这块")
@@ -566,7 +567,10 @@ def check(path, render=False, allow_local=False):
             fb = r.get("floatBox") or {}
             if fb.get("w") and fb.get("h"):
                 fr_ = fb["w"] / fb["h"]
-                if fr_ < FLOAT_RATIO_MIN:
+                if "mk-float-phone" in body:
+                    if fb["h"] > 600:
+                        add("Medium", "float-phone-tall", f"浮层里的手机高 {fb['h']}px（实测），超过 600：整图会被拉竖。减卡片张数或字段数，让这一屏只讲一件事")
+                elif fr_ < FLOAT_RATIO_MIN:
                     add("Medium", "float-ratio", f"浮层 {fb['w']}×{fb['h']}，宽高比 {fr_:.2f}，低于 {FLOAT_RATIO_MIN}：竖成了条，不像另一屏画面。两块组件改左右并排（hb-row spans=\"12|12\"），或把其中一块压矮")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")

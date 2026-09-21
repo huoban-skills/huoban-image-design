@@ -2263,7 +2263,17 @@ def m_float(a, body):
     if "title" in a:
         raise ExpandError('<hb-float> 不带浮层标题：去掉 title 属性，要说明的话写在体内组件卡片自己的 title 上')
     n_cards = len(re.findall(r'class="w-card', body))
-    if n_cards < 2:
+    phones = body.count('<div class="phone')
+    if phones:
+        if 'class="duo"' in body or phones > 1:
+            raise ExpandError("<hb-float> 里的手机只放单屏：一个 <hb-phone>，不放 <hb-screens> 流程壳；要讲多屏流程另出一张手机图")
+        if n_cards or re.sub(r"\s+", "", body).find('<divclass="phone') != 0:
+            raise ExpandError("<hb-float> 里手机单屏和 PC 组件二选一，不混放：要么一个 <hb-phone>，要么用 <hb-row>／<hb-col> 排 PC 组件")
+        if "h-fix" in body.split(">", 1)[0]:
+            raise ExpandError("<hb-float> 里的 <hb-phone> 不写 fix：浮层里的手机按内容撑高，内容控制在 600 以内，固定 812 会把整图拉成竖条")
+        if "w" in a:
+            raise ExpandError("<hb-float> 放手机单屏时不写 w：手机壳按 0.8 倍显示，宽度固定 300")
+        return f'<div class="mk-float mk-float-phone" style="--float-w:300px">{body.strip()}</div>'
         raise ExpandError(f'<hb-float> 里只有 {n_cards} 块组件：浮层是一块小画面，至少放两块，用 <hb-row>／<hb-col> 排，比如明细表配一张汇总图；推荐三四块排两行')
     return (f'<div class="mk-float" style="--float-w:{w}px">'
             f'<div class="float-screen">{body.strip()}</div></div>')
@@ -2421,9 +2431,15 @@ def m_page(a, body):
         if n in ("hb-row", "hb-tabcard", "hb-col"):
             _walk(raw, n == "hb-row")
     if kind != "mobile":
-        bad = re.search(r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|wxapp|wxgroup|ptop|pnav|pmenu|plogin|pme))\b", a.get("_raw", body))
+        _mob = r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|wxapp|wxgroup|ptop|pnav|pmenu|plogin|pme))\b"
+        _raw = a.get("_raw", body)
+        bad = re.search(_mob, re.sub(r"<hb-float\b.*?</hb-float>", "", _raw, flags=re.S))
         if bad:
-            raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里；PC 页和 PC 浮层里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
+            raise ExpandError(f"<{bad.group(1)}> 是手机组件，只能放在 kind=\"mobile\" 的页面里，或整屏包在 <hb-phone> 里放进 <hb-float>；PC 页里放 hb-fields、hb-list、hb-multistats、hb-stats 这类 PC 组件，样式才会生效")
+        for fl in re.findall(r"<hb-float\b.*?</hb-float>", _raw, flags=re.S):
+            loose = re.search(_mob, re.sub(r"<hb-phone\b.*?</hb-phone>", "", fl, flags=re.S))
+            if loose:
+                raise ExpandError(f"<hb-float> 里的 <{loose.group(1)}> 要包在 <hb-phone> 里：手机宏的样式只在手机壳里生效，散放会变成裸文字")
     # 演示尺寸和整页一样按完整一页画，必有组件不放宽；超高了减行、压图表高度，不删骨架组件
     _check_slots(kind, spec, names, deep, first_screen)
     floats, main_parts, nav_html = [], [], ""
@@ -2452,11 +2468,15 @@ def m_page(a, body):
         stage_cls.append("slide")
         for h in floats:
             fw = re.search(r"--float-w:(\d+)px", h)
+            if "mk-float-phone" in h:
+                continue              # 手机单屏宽度固定 300，不走宽度区间
             if fw and not 400 <= int(fw.group(1)) <= 640:
                 raise ExpandError(f'演示尺寸下 <hb-float w> 写 400～640（现在 {fw.group(1)}）：窗口只有 1200 宽')
     else:
         for h in floats:
             fw = re.search(r"--float-w:(\d+)px", h)
+            if "mk-float-phone" in h:
+                continue
             if fw and not 480 <= int(fw.group(1)) <= 920:
                 raise ExpandError(f'<hb-float w="{fw.group(1)}"> 宽度写 480～920（默认 640）：浮层左边不能越过底图中线；400 起只在演示尺寸 size="slide" 下可用')
     stage_style = ""
@@ -2522,7 +2542,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～920（无标题）；体内用 hb-row／hb-col 排一块小画面，至少两块 PC 组件"),
+    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～920（无标题）；体内用 hb-row／hb-col 排至少两块 PC 组件，或只放一个 hb-phone 手机单屏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏，每屏界面类型不同"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -2638,8 +2658,19 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
 "hb-float": """营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～920，默认 640；演示尺寸 400～640）；不带浮层标题，要说明的话写在体内组件卡片的 title 上。
-浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，至少两块组件，推荐三四块排两行；外面自动套一道细窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。只放 PC 组件；手机宏（hb-ocards、hb-rec 等）样式只在 hb-phone 里生效，放进来会散成裸文字，expand 会报错。不复制底层已有内容。
-例：
+浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，至少两块组件，推荐三四块排两行；外面自动套一道细窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。不复制底层已有内容。
+体内两种写法二选一，不混放：PC 组件（上面这种），或一个手机单屏——讲「同一件事在手机上怎么办」时，体内只写一个 <hb-phone>（不写 fix、不放 hb-screens，浮层不写 w）。手机壳自己就是框，不再套窗口框，按 0.8 倍显示（300 宽）、高度按内容撑，内容控制在 600 以内。手机宏要包在 hb-phone 里，散放会报错。
+例（手机单屏）：
+<hb-float>
+<hb-phone title="任务办理">
+<hb-rec title="CK-0037 领用出库" noqr>
+物资 | 茅台飞天 53° | text
+!数量 | 6 | num:瓶
+</hb-rec>
+<hb-taskbar who="周敏" sub="库管审批">通过 | 驳回</hb-taskbar>
+</hb-phone>
+</hb-float>
+例（PC 组件）：
 <hb-float w="640">
 <hb-row spans="12|12">
 <hb-list title="整改超期门店" nock noidx count="9">

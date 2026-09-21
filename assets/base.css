@@ -96,6 +96,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
   position: absolute; z-index: 3; top: calc(50% + 16px); right: -200px; width: var(--float-w, 640px); margin: 0;
 }
 
+/* 浮层放手机单屏：手机壳自己就是框，不套窗口框；两档尺寸都按 0.8 倍显示（300 宽），高度按内容撑 */
+.stage.auto .mk-float-phone .phone { zoom: .8; margin: 0; height: auto; box-shadow: 0 14px 36px rgba(0, 0, 0, .16); }
+
 .stage.auto.product .window { border-radius: 0; border: 0; }
 /* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。窗口 1200 宽，浮层内容不缩小，详情页边距收窄 */
 .stage.auto.slide { width: 1200px; }
