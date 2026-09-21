@@ -500,14 +500,9 @@ def m_banner(a, body):
     ls = lines(body)
     if not ls:
         raise ExpandError("<hb-banner> 第一行是页面名称，第二行是一句话介绍")
-    if "card" in a:
-        dt = ""
-        if "date" in a or "time" in a:
-            dt = f'<div class="ban-dt"><b>{esc(str(a.get("date", "")))}</b><span>{esc(str(a.get("time", "")))}</span></div>'
-        img = f'<div class="ban-img">{a["img"] if isinstance(a.get("img"), str) and "<" in a["img"] else ""}</div>' if "img" in a else ""
-        return f'<div class="rich title card"><div class="ban-body"><h1>{esc(ls[0])}</h1>{dt}</div>{img}</div>'
-    if "solid" in a:
-        raise ExpandError("<hb-banner> 的 solid 已经去掉了：横幅一律无底色、左对齐；要整块背景图就用 card")
+    for gone in ("solid", "card"):
+        if gone in a:
+            raise ExpandError(f"<hb-banner> 的 {gone} 已经去掉了：横幅一律无底色、无背景图、左对齐，只有页面名和一句话介绍")
     p = f"<p>{esc(ls[1])}</p>" if len(ls) > 1 else ""
     return f'<div class="rich title"><h1>{esc(ls[0])}</h1>{p}</div>'
 
@@ -2501,7 +2496,7 @@ MACROS = {
     "hb-tasks": (m_tasks, "待办子区：标题 | 时间 | 节点说明；属性 title"),
     "hb-shortcuts": (m_shortcuts, "按钮组件（快捷方式版式）：名称 | 图标；属性 title"),
     "hb-filters": (m_filters, "筛选组件：筛选文本 | 图标"),
-    "hb-banner": (m_banner, "横幅（富文本大标题预设）：第一行页面名称，第二行一句话介绍，无底色左对齐；card 出背景图卡片式（date、time、img）"),
+    "hb-banner": (m_banner, "横幅（富文本大标题预设）：第一行页面名称，第二行一句话介绍；无底色、无背景图、左对齐"),
     "hb-bar": (m_bar, "柱状图卡：labels=横轴|…；每行「系列名 | 值,值,… | 颜色」"),
     "hb-line": (m_line, "折线图卡：同 hb-bar；属性 plain 去掉卡片外壳"),
     "hb-donut": (m_donut, "环图卡：每行「名称 | 值 | 颜色」；属性 center=标签|值"),
@@ -2671,12 +2666,11 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 "hb-cards": """卡片视图，每行 标题 | 字段=值; 字段=值 | 操作:图标:颜色。
 例：
 杭州云图 | 行业=制造; 年采购=¥1,204,000 | 拜访:arrow-right:blue""",
-"hb-banner": """横幅（富文本大标题预设）。第一行页面名称，第二行一句话介绍（口吻规则见 references/principles/workbench.md）。一律无底色、左对齐，标题直接坐在页底上；整块背景图用属性 card。
-属性 card 出背景图卡片式（120 高白卡，实测工作台常用）：date="2026年09月04日"、time="16:51:17" 出日期时间行；img 出右侧图片位（值写 <img src="…"> 放客户配图，空值留渐变占位）。卡片式不放介绍句。
+"hb-banner": """横幅（富文本大标题预设）。第一行页面名称，第二行一句话介绍（口吻规则见 references/principles/workbench.md）。
+一律无底色、无背景图、左对齐，标题直接坐在页底上，只占一行高；手机端横幅同样这么画。
 例：
 <hb-banner>库管工作台
-实现物资出入库与盘点的集中管理</hb-banner>
-<hb-banner card date="2026年09月04日" time="16:51:17" img>任务工作台</hb-banner>""",
+实现物资出入库与盘点的集中管理</hb-banner>""",
 "hb-filters": """行：筛选文本 | 图标，图标默认 f-select（日期用 f-date）。
 例：
 统计月份：2026 年 8 月 | f-date

@@ -142,7 +142,7 @@ def est_card(cls, inner, col_w):
     if {"item-steps", "item-tiles"} & set(c):
         return 40
     if "rich" in c and "title" in c:
-        return 120 if "card" in c else (100 if "bg-solid" in c else 80)
+        return 80
     if "grid" in c and "w-card" not in c:
         rows = max(len(re.findall(r"<tr\b", inner)) - 1, 0)
         return 32 + 35 * rows + (40 if "til-foot" in inner or "pager" in inner else 0)

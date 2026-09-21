@@ -1077,28 +1077,6 @@
       "note": "官方 ERP 样板实测：工作台/看板/大屏横幅＝rich 大标题预设，24×5，card 样式渐变背景浅色字；不是 cover element（各页 has_cover 均 false）"
     },
     {
-      "kind": "component",
-      "id": "rich",
-      "type_key": "rich",
-      "cn": "富文本（大标题预设，背景图卡片式）",
-      "old_class": "w-banner card",
-      "file": "c3-page-detail.html",
-      "name": "横幅-背景图卡片",
-      "group": "工作台",
-      "macro": "hb-banner",
-      "grid": null,
-      "variants": [
-        "title",
-        "card"
-      ],
-      "measured": "measured",
-      "allowed_in": [
-        "page:workbench",
-        "page:dashboard"
-      ],
-      "note": null
-    },
-    {
       "kind": "architecture",
       "id": "w-row",
       "page_kind": "workbench",

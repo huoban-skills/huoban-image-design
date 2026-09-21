@@ -579,24 +579,11 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .page { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; background: var(--page-bg); }
 .page > * { flex: none; } /* 组件按内容高度排布，不被压缩重叠 */
 /* 页面标题区：工作台/数据看板顶部的「页面名称＋一句话介绍」。
-   一律左对齐、无底色，标题直接坐在页底上；整块背景图用 .card 那一档。
-   纯色底（bg-solid）与几何纹理装饰（网格/环纹/斜纹/点阵/光晕）都已废弃，别再加回来 */
+   一律左对齐、无底色、无背景图，标题直接坐在页底上。
+   纯色底、整卡背景图与几何纹理装饰（网格/环纹/斜纹/点阵/光晕）都已废弃，别再加回来 */
 .rich.title { padding: 4px 4px 0; }
 .rich.title h1 { font-size: 30px; font-weight: 600; color: var(--ink-85); }
 .rich.title p { margin-top: 8px; font-size: 16px; color: var(--ink-45); line-height: 1.6; }
-/* 横幅-背景图卡片（2026-09-04 工作台实测）：白卡 r9 高 120 内距 20，整卡铺客户背景图；无图时右侧走主色淡渐变占位 */
-.rich.title.card {
-  position: relative; height: 120px; padding: 20px; border-radius: 9px; overflow: hidden;
-  background: linear-gradient(90deg, var(--card-bg) 45%, var(--primary-soft)); box-shadow: var(--shadow-card);
-}
-.rich.title.card .ban-body { position: relative; }
-.rich.title.card h1 { font-size: 30px; font-weight: 500; line-height: 42px; color: var(--ink-85); position: relative; }
-.rich.title.card .ban-dt { display: flex; align-items: center; height: 20px; margin-top: 18px; position: relative; }
-.rich.title.card .ban-dt b { font-size: 16px; font-weight: 600; color: var(--ink-85); padding-right: 7px; margin-right: 6px; border-right: 1px solid var(--line); }
-.rich.title.card .ban-dt span { font-size: 14px; color: var(--ink-65); }
-.rich.title.card .ban-img { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; }
-.rich.title.card .ban-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.rich.title.card .ban-img:empty { display: none; }
 /* 横幅与同行组件（如快捷按钮）：按钮不进横幅内部，横幅让宽、右侧组件按内容宽 */
 .w-row:has(> .rich.title) { align-items: center; }
 .w-row > .rich.title { flex: 1 1 auto; min-width: 0; }
