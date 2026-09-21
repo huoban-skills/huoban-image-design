@@ -10,7 +10,9 @@
    浏览器预览显示为白底，PNG 导出配 --default-background-color=00000000 得透明底。
    （SVG 嵌报告管线除外，那条路仍需垫 rect，见 canvas/report-embed.md） */
 body {
-  font-family: var(--font, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif);
+  /* 中文字体栈：先本机（macOS / Windows），再 Linux 无头环境常见的 Noto / 思源，最后交给 sans-serif */
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+    "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "WenQuanYi Micro Hei", sans-serif);
   font-size: 14px; color: var(--ink-85); background: transparent;
   padding: 48px 32px; width: max-content; min-width: 100%;
   display: flex; min-height: 100vh; /* 画布模式：视口高于画布时垂直居中成画框式包边 */
