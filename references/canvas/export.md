@@ -1,4 +1,4 @@
-# 导出 PNG／SVG（只在用户或报告明确要时读）
+# 导出 PNG（只在用户或报告明确要时读）
 
 默认交付物是单文件 HTML，本页只管"要图片文件"的情况。
 
@@ -19,14 +19,6 @@ unzip -q -o /tmp/chs.zip -d ~ && chmod +x ~/chrome-headless-shell-linux64/chrome
 ```
 
   路径必须带完整 `/-/binary/chrome-for-testing/`，裸域名会 302 限速。运行时报 dbus 错误属正常。
-
-## SVG（嵌报告）
-
-```bash
-python3 scripts/export.py "{客户或项目名}/图名.html" --svg     # 同目录出 图名.svg，不需要 Chrome
-```
-
-把 `<style>`＋图标雪碧图＋`.stage` 包进 `<svg><foreignObject>`；脚本已处理三个必修点：内嵌 `<svg` 补 xmlns、`<br>` 转 `<br/>`、foreignObject 前垫不透明白底（留透明像素手机端 PDF 会渲成灰块）。没有 Chrome 时高度按 1000 估算，打开若有裁切改 `<svg height>`。
 
 ## 渲染探针（check.py 的渲染检查用）
 

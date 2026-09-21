@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""可选导出：PNG（要 Chrome）、SVG（不要 Chrome）、渲染探针（给 check.py 的渲染检查用）。
+"""可选导出：PNG（要 Chrome）、渲染探针（给 check.py 的渲染检查用）。
 
 用法：
     python3 scripts/export.py 图.html --png                 # 出 图@2x.png（同目录）；找不到 Chrome 退出码 2 并给手动命令
     python3 scripts/export.py 图.html --png --out 路径.png
-    python3 scripts/export.py 图.html --svg                 # 出 图.svg：foreignObject 包 HTML，嵌报告用，不需要 Chrome
     python3 scripts/export.py 图.html --probe               # 渲染探针 JSON（空隙、裁切、浮层出界、并排不齐）
 
-默认交付物是 HTML，本脚本只在用户或报告明确要 PNG/SVG 时用。
+默认交付物是 HTML，本脚本只在用户或报告明确要 PNG 时用。
 Chrome 探测顺序：CHROME_BIN → macOS 本机 Chrome → ~/chrome-headless-shell-linux64 → Playwright 装的 Chromium → PATH 里的 chrome-headless-shell/google-chrome/chromium。
 不自动下载；沙箱里没有 Chrome 就跳过 PNG，交 HTML。
 """
@@ -25,8 +24,7 @@ from pathlib import Path
 MANUAL = """未找到 Chrome，PNG 未导出。HTML 已是可交付的源文件；确需 PNG 时任选：
   1. 本机装了 Chrome：CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" python3 scripts/export.py 图.html --png
   2. Linux 沙箱可联网：下载 chrome-headless-shell（约 120MB）到 ~/chrome-headless-shell-linux64/ 后重跑：
-     curl -sL -o /tmp/chs.zip "https://registry.npmmirror.com/-/binary/chrome-for-testing/152.0.7977.54/linux64/chrome-headless-shell-linux64.zip" && unzip -q -o /tmp/chs.zip -d ~ && chmod +x ~/chrome-headless-shell-linux64/chrome-headless-shell
-  3. 嵌报告用矢量：python3 scripts/export.py 图.html --svg（不需要 Chrome）"""
+     curl -sL -o /tmp/chs.zip "https://registry.npmmirror.com/-/binary/chrome-for-testing/152.0.7977.54/linux64/chrome-headless-shell-linux64.zip" && unzip -q -o /tmp/chs.zip -d ~ && chmod +x ~/chrome-headless-shell-linux64/chrome-headless-shell"""
 
 
 def find_chrome():
@@ -179,48 +177,10 @@ def export_png(path, out=None):
     return 0
 
 
-def export_svg(path, out=None):
-    """把 <style>＋.stage 包进 <svg><foreignObject>，报告嵌图用。四个必修点：svg 补 xmlns、<br>/<img> 自闭合、<style> 包 CDATA、垫不透明 rect。"""
-    text = Path(path).read_text(encoding="utf-8")
-    # CSS 注释里有裸 < （如 /* 一律 <svg class="ico"> */），XML 解析会当成标签；包 CDATA
-    styles = "".join(f"<style>/*<![CDATA[*/{re.sub(r'</?style[^>]*>', '', m)}/*]]>*/</style>"
-                     for m in re.findall(r"<style[^>]*>.*?</style>", text, flags=re.S))
-    m = re.search(r'(<div class="stage[^"]*"[^>]*>.*)</body>', text, flags=re.S)
-    if not m:
-        sys.stderr.write("找不到 <div class=\"stage\">，不是本 skill 的产物\n")
-        return 1
-    stage = re.sub(r"<script>.*?</script>", "", m.group(1), flags=re.S).strip()
-    icons = re.search(r'<svg[^>]*style="display:none"[^>]*>.*?</svg>', text, flags=re.S)
-    body = (icons.group(0) if icons else "") + stage
-    body = re.sub(r"<svg(?![^>]*xmlns)", '<svg xmlns="http://www.w3.org/2000/svg"', body)
-    body = re.sub(r"<br\s*>", "<br/>", body)
-    body = re.sub(r"<img([^>]*?)(?<!/)>", r"<img\1/>", body)
-    info = probe(path) or {}
-    st = info.get("stage") or {}
-    w = st.get("w") or (1100 if "duo" in stage[:600] else 1640)
-    h = st.get("h") or 1000
-    if not st:
-        sys.stderr.write("提示：没有 Chrome，SVG 高度按 1000 估算；打开后若有裁切，手动改 <svg height>\n")
-    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">'
-           f'<rect width="100%" height="100%" fill="#ffffff"/>'
-           f'<foreignObject width="{w}" height="{h}"><div xmlns="http://www.w3.org/1999/xhtml">{styles}{body}</div></foreignObject></svg>')
-    import xml.etree.ElementTree as ET
-    try:
-        ET.fromstring(svg.encode("utf-8"))
-    except ET.ParseError as e:
-        sys.stderr.write(f"SVG 不是合法 XML：{e}。常见原因：未闭合的 <br>/<img>、正文里的裸 & 符号\n")
-        return 1
-    out = out or str(Path(path).with_suffix(".svg"))
-    Path(out).write_text(svg, encoding="utf-8")
-    sys.stderr.write(f"已导出：{out}（{w}×{h}）\n")
-    return 0
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("file")
     ap.add_argument("--png", action="store_true")
-    ap.add_argument("--svg", action="store_true")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--out")
     a = ap.parse_args()
@@ -231,8 +191,6 @@ def main():
             return 2
         print(json.dumps(r, ensure_ascii=False))
         return 0
-    if a.svg:
-        return export_svg(a.file, a.out)
     if a.png:
         return export_png(a.file, a.out)
     ap.print_help()

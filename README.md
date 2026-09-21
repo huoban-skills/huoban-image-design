@@ -1,6 +1,6 @@
 # huoban-image-design
 
-生成伙伴云系统界面示意图。产出单文件 HTML（默认交付）；PNG／SVG 按需导出。画面忠于真实产品组件，里面跑的是客户自己的字段和数据。
+生成伙伴云系统界面示意图。产出单文件 HTML（默认交付）；PNG 按需导出。画面忠于真实产品组件，里面跑的是客户自己的字段和数据。
 
 给客户讲方案时需要一张"系统长什么样"的图，手绘不像、真去搭一遍太慢、截图又没有客户的业务数据。这个 skill 用真实产品实测出的组件结构，通过骨架宏拼装示意图。
 
@@ -21,7 +21,7 @@
 给这个方案配一张订单列表页的图，营销版
 ```
 
-交付物落在 `{客户或项目名}/01-图名.html`；要图片时 `python3 scripts/export.py 图.html --png`（要 Chrome）或 `--svg`（不要）。
+交付物落在 `{客户或项目名}/01-图名.html`；要图片时 `python3 scripts/export.py 图.html --png`（要 Chrome）。
 
 ## 架构
 
@@ -38,7 +38,7 @@
 宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 60 余个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
-配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；有浏览器时自动加渲染检查，`--no-render` 关；`--acceptance` 起草验收表）、`export.py`（PNG／SVG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
+配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；有浏览器时自动加渲染检查，`--no-render` 关；`--acceptance` 起草验收表）、`export.py`（PNG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
 
 ## 皮肤
 
