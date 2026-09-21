@@ -40,10 +40,14 @@ PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "�
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
 SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
-SLIDE_MAX_H = 900      # 演示尺寸窗口高度上限（1200 宽）
-SLIDE_RATIO_OK = 1.3   # 整张图（含浮层探出部分）宽高比：不低于 1.3，推荐 1.3–1.6
-SLIDE_RATIO_HIGH = 1.25  # 低于这个值才报 High：放进 PPT 会被按高度明显缩小
-FLOAT_ZOOM = 0.8        # 画面浮层里的内容缩到 0.8 倍显示（base.css .float-screen）
+SLIDE_MAX_H = 800      # 演示尺寸窗口高度上限（1200 宽 ⇒ 底图比 ≥1.5，接近真实显示器；堆到 900 就成了 4:3）
+# 整张图（含浮层探出部分）宽高比，两档尺寸通用：一屏原则——图在载体里不该要滚动才看完
+RATIO_OK = 1.45        # 目标下限：低于它报 Medium，先横向重排，重排后仍够不到可让位于信息密度
+RATIO_HIGH = 1.25      # 硬下限：低于它报 High，图竖得在载体里一屏放不下
+RATIO_THIN = 1.85      # 高于它报 Medium：画面偏扁、内容偏少
+FLOAT_RATIO_MIN = 1.2  # 浮层自身宽高比下限：低于它就竖成了条，不像另一屏画面
+SLIDE_RATIO_OK, SLIDE_RATIO_HIGH, SLIDE_RATIO_THIN = RATIO_OK, RATIO_HIGH, RATIO_THIN   # 旧名保留
+FLOAT_ZOOM = 0.8        # 默认尺寸的浮层内容缩 0.8（base.css .float-screen）；演示尺寸不缩，见下
 SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5)}
 
 
@@ -514,7 +518,7 @@ def check(path, render=False, allow_local=False):
             est = ph + (104 if "item-grid" in body else 76) + 48      # 顶栏或记录功能区 ＋ 页面上下内边距
         if est:
             if est > SLIDE_MAX_H + 60:
-                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_MAX_H}：放进 PPT 会被按高度缩小，字看不清。少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
+                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_MAX_H}：底图会接近 4:3，不像真实显示器，放进 PPT 还被按高度缩小。把明细与主图表并排（hb-row spans=\"14|10\"），或把放不下的几块挪进浮层")
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -542,16 +546,23 @@ def check(path, render=False, allow_local=False):
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown", "slide-height")]
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_MAX_H:
-                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_MAX_H}：放进 PPT 会被按高度缩小，字看不清。少几行，或把放不下的几块挪进浮层（看板、工作台常用），再不行删一块")
+                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_MAX_H}：底图 {1200}×{sh} 比 {1200/sh:.2f}，接近 4:3，不像真实显示器。把明细与主图表并排（hb-row spans=\"14|10\"），或把放不下的几块挪进浮层")
             st = r.get("stage") or {}
-            if SLIDE_RE.search(body) and st.get("w") and st.get("h"):   # 整张图的宽高比，含浮层向下探出的部分
+            # 整张图的宽高比（含浮层向下探出的部分），两档尺寸通用；手机图壳高固定、全屏产品图跟着屏幕走，都不查
+            exempt = re.search(r'kind="mobile"', body) or re.search(r'class="stage[^"]*\bproduct\b', body)
+            if st.get("w") and st.get("h") and not exempt:
                 ratio = st["w"] / st["h"]
-                if ratio < SLIDE_RATIO_HIGH:
-                    add("High", "slide-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于 {SLIDE_RATIO_HIGH}：放进 PPT 会被按高度明显缩小。浮层改成左右并排或减行，底图少几行")
-                elif ratio < SLIDE_RATIO_OK:
-                    add("Medium", "slide-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于 {SLIDE_RATIO_OK}：推荐 {SLIDE_RATIO_OK}–1.6，浮层压矮一点或底图少一两行")
-                elif ratio > 1.75 and not re.search(r'kind="mobile"', body):
-                    add("Medium", "slide-thin", f"整张图宽高比 {ratio:.2f}，画面偏扁、内容偏少：窗口高度上限是 {SLIDE_MAX_H}，底图按完整一页画（看板是筛选、指标、一排图表、明细 4–6 行；列表页表格 8–10 行），别为了放浮层把底图削薄")
+                if ratio < RATIO_HIGH:
+                    add("High", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于硬下限 {RATIO_HIGH}：图太竖，在报告或演示稿里一屏放不下。先横向重排（看板图表行 12+6+6、底部两表并排；详情页字段组 cols=4），再不行就拆成两张图")
+                elif ratio < RATIO_OK:
+                    add("Medium", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于目标 {RATIO_OK}（区间 {RATIO_OK}–{RATIO_THIN}）：先横向重排；重排后仍够不到，可让位于信息密度并在验收表第 8 条写明理由")
+                elif ratio > RATIO_THIN:
+                    add("Medium", "figure-thin", f"整张图宽高比 {ratio:.2f}，高于 {RATIO_THIN}，画面偏扁、内容偏少：底图按完整一页画（看板是筛选、指标、一排图表、明细 4–6 行；列表页表格 8–14 行），或把浮层做足（四块排两行）把整图撑起来")
+            fb = r.get("floatBox") or {}
+            if fb.get("w") and fb.get("h"):
+                fr_ = fb["w"] / fb["h"]
+                if fr_ < FLOAT_RATIO_MIN:
+                    add("Medium", "float-ratio", f"浮层 {fb['w']}×{fb['h']}，宽高比 {fr_:.2f}，低于 {FLOAT_RATIO_MIN}：竖成了条，不像另一屏画面。两块组件改左右并排（hb-row spans=\"12|12\"），或把其中一块压矮")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):

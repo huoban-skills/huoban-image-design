@@ -43,6 +43,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 ### 2. 写骨架片段
 
 - 按需求单的画布类型读 [references/canvas/marketing.md](references/canvas/marketing.md) 或 [references/canvas/product-design.md](references/canvas/product-design.md)。
+- **先按载体定画布尺寸，再排内容**：建议报告用默认尺寸，PPT 用演示尺寸 `size="slide"`；其他载体和字号底线的算法见 marketing.md「先按载体选画布尺寸」，整图比例见同篇「整图比例：一屏原则」。
 - 看槽位表，只取要用的宏的语法：
 
 ```bash
@@ -125,9 +126,9 @@ python3 scripts/export.py "{客户或项目名}/图名.html" --svg     # 嵌报�
 | 场景 | HTML（默认交付） | PNG／SVG（可选） |
 | --- | --- | --- |
 | 独立出图 | `{客户或项目名}/01-图名.html` | 同一文件夹 `01-图名@2x.png`／`01-图名.svg` |
-| 报告配图 | 报告项目 `figures/{客户或项目名}/` | 报告项目 `figures/` |
+| 报告配图 | 报告项目 `figures/源文件/` | 报告项目 `figures/` |
 
-片段与探针中间产物放 scratchpad，不留在交付目录。
+片段与探针中间产物放 scratchpad，不留在交付目录。报告配图的目录结构由 huoban-solution-report 定义（PNG 放 `figures/`、HTML 源稿放 `figures/源文件/`），本表只是指针。
 
 ## 写作规则
 

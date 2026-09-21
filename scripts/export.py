@@ -111,6 +111,7 @@ PROBE = r"""
     var sr = st.getBoundingClientRect();
     document.querySelectorAll('.mk-float').forEach(function (fl) {
       var fr = fl.getBoundingClientRect();
+      out.floatBox = { w: Math.round(fr.width), h: Math.round(fr.height) };
       if (fr.bottom > sr.bottom + 2) out.extra.push({ kind: 'float-out', over: Math.round(fr.bottom - sr.bottom) });
       if (fr.top < sr.top - 2) out.extra.push({ kind: 'float-out', over: Math.round(sr.top - fr.top) });
       var base = st.querySelector('.window, .item-page');
@@ -179,9 +180,11 @@ def export_png(path, out=None):
 
 
 def export_svg(path, out=None):
-    """把 <style>＋.stage 包进 <svg><foreignObject>，报告嵌图用。三个必修点：svg 补 xmlns、<br> 自闭合、垫不透明 rect。"""
+    """把 <style>＋.stage 包进 <svg><foreignObject>，报告嵌图用。四个必修点：svg 补 xmlns、<br>/<img> 自闭合、<style> 包 CDATA、垫不透明 rect。"""
     text = Path(path).read_text(encoding="utf-8")
-    styles = "".join(re.findall(r"<style[^>]*>.*?</style>", text, flags=re.S))
+    # CSS 注释里有裸 < （如 /* 一律 <svg class="ico"> */），XML 解析会当成标签；包 CDATA
+    styles = "".join(f"<style>/*<![CDATA[*/{re.sub(r'</?style[^>]*>', '', m)}/*]]>*/</style>"
+                     for m in re.findall(r"<style[^>]*>.*?</style>", text, flags=re.S))
     m = re.search(r'(<div class="stage[^"]*"[^>]*>.*)</body>', text, flags=re.S)
     if not m:
         sys.stderr.write("找不到 <div class=\"stage\">，不是本 skill 的产物\n")
@@ -205,7 +208,7 @@ def export_svg(path, out=None):
     try:
         ET.fromstring(svg.encode("utf-8"))
     except ET.ParseError as e:
-        sys.stderr.write(f"SVG 不是合法 XML：{e}。常见原因：未闭合的 <br>/<img>、裸 & 符号\n")
+        sys.stderr.write(f"SVG 不是合法 XML：{e}。常见原因：未闭合的 <br>/<img>、正文里的裸 & 符号\n")
         return 1
     out = out or str(Path(path).with_suffix(".svg"))
     Path(out).write_text(svg, encoding="utf-8")
