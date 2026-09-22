@@ -306,6 +306,87 @@ def page_height(body):
     return total + ROW_GAP * (n - 1) if n else None
 
 
+
+# ── 版式（High）：按页面原则的版式表查组件的顺序与归属，只看底图 ─────────────
+def _blk_kind(cls):
+    """把 .page 里的块归成版式表里的角色。"""
+    if "rich title" in cls: return "banner"
+    if cls.startswith("filter"): return "filter"
+    if cls.startswith("w-row stats-"): return "stats"
+    if "w-card tabs" in cls or cls.startswith("tabs"): return "tabs"
+    if "table_item_list" in cls: return "list"
+    if "chart_table" in cls: return "pivot"
+    if "chart_single" in cls: return "stats"
+    if "w-card chart" in cls: return "chart"
+    if "w-card button" in cls: return "button"
+    if "multi_stats" in cls or "procedure_process" in cls: return "todo"
+    if "progress_bar" in cls or "category_summary" in cls: return "aux"
+    return "other"
+
+
+def _row_members(inner):
+    """一行 w-row 里的组件角色（穿过 span-N 与 w-col）。"""
+    out = []
+    for cls, sub in top_divs(inner):
+        if cls.startswith("span-") or cls == "w-col":
+            out += _row_members(sub)
+        else:
+            out.append(_blk_kind(cls))
+    return out
+
+
+def layout_findings(body, kind):
+    page = _inner_of(body, r'<div class="page[^"]*">')
+    if page is None:
+        return []
+    main = re.split(r'class="[^"]*\bmk-float\b', page)[0]
+    blocks = []
+    for cls, inner in top_divs(main):
+        if cls.startswith("w-row") and "stats-" not in cls:
+            blocks.append(("row", _row_members(inner)))
+        else:
+            blocks.append((_blk_kind(cls), []))
+    out = []
+    if kind == "dashboard":
+        rank = {"banner": 0, "filter": 1, "stats": 2, "chart": 3, "pivot": 4, "list": 4, "tabs": 4}
+        order = "横幅 → 筛选 → 单指标行 → 图表行 → 明细（透视表／表格列表）；页签分段式是 横幅 → 单指标行 → 标签页 24 通栏"
+        last, seen = -1, []
+        for k, members in blocks:
+            if k == "row":
+                kinds = set(members)
+                if "tabs" in kinds:
+                    out.append(f"标签页和别的组件并排了：看板的标签页 24 通栏，明细放进页签里，不和它并排。版式：{order}")
+                if kinds & {"list", "pivot"} and "chart" in kinds:
+                    out.append(f"明细（表格列表／透视表）和图表排在同一行：看板的明细在图表行之下，不和图表同行。版式：{order}")
+                if "stats" in kinds and ("chart" in kinds or "list" in kinds or "pivot" in kinds):
+                    out.append("单指标和图表／明细排在同一行：单指标独占一行，在图表行之上")
+                if len([m for m in members if m == "chart"]) > 3:
+                    out.append("图表行超过 3 栏：最多三栏，官方样板 16+8、12+12、12+6+6")
+                r = max((rank.get(m, -1) for m in members), default=-1)
+                low = min((rank.get(m, 9) for m in members if m in rank), default=9)
+            else:
+                r = low = rank.get(k, -1)
+            if low != 9 and low < last and low >= 0:
+                out.append(f"「{k if k != 'row' else '／'.join(members)}」出现在了更靠后的组件之后。版式：{order}")
+            if r >= 0:
+                last = max(last, r)
+    elif kind == "workbench":
+        order = "横幅 → 单指标行 → 按钮组件 → 待办行 → 底部（标签页／表格列表／透视表）；数据主栏式是 横幅 → 主栏 16 ＋ 侧栏 8"
+        if blocks and blocks[0][0] != "banner":
+            out.append(f"横幅不在首位。版式：{order}")
+        seen_todo = seen_bottom = False
+        for k, members in blocks:
+            kinds = set(members) if k == "row" else {k}
+            if "tabs" in kinds and k == "row":
+                out.append(f"标签页和别的组件并排了：工作台的标签页 24 通栏。版式：{order}")
+            if "chart" in kinds and not (seen_todo or seen_bottom) and "button" not in kinds and "todo" not in kinds:
+                out.append(f"图表放到了按钮组件和待办行之前：工作台的图表权重最低，收进标签页或放页面末尾。版式：{order}")
+            if "button" in kinds and seen_todo and "todo" not in kinds:
+                out.append(f"按钮组件排在了待办行之后：先发起再处理，按钮组件在待办行之上。版式：{order}")
+            if "todo" in kinds: seen_todo = True
+            if kinds & {"tabs", "list", "pivot"}: seen_bottom = True
+    return out
+
 def check(path, render=False, allow_local=False):
     text = Path(path).read_text(encoding="utf-8")
     styles, body = split_doc(text)
@@ -456,6 +537,9 @@ def check(path, render=False, allow_local=False):
             add("Medium", "list-no-action", f"这张图讲的是「{_verb.group()}」这类操作，表格却没有按钮：讲点有动作、画面是列表，列表就要带按钮；表头最后一列加 操作:ops，格里写下一步动作（去巡检:check:blue）")
         elif 'class="ocard"' in body and 'class="obtn"' not in body:
             add("Medium", "list-no-action", f"这张图讲的是「{_verb.group()}」这类操作，手机卡片却没有按钮：讲点有动作、画面是列表，列表就要带按钮；hb-ocards 每行第四段写 按钮名:图标")
+    _kind_m = re.search(r'class="stage auto[^"]*" data-kind="(\w+)"', body)
+    for msg in layout_findings(body, _kind_m.group(1) if _kind_m else ""):
+        add("High", "layout", msg)
     if 'class="wempty"' in body or "暂无数据" in body:
         add("Medium", "empty-state", "画面里有「没有找到任务／暂无数据」空态：营销图每个区域都要有内容，给它几行数据或去掉这块")
 
