@@ -103,6 +103,15 @@ PROBE = r"""
       if (d > 24) out.uneven.push({ diff: d, short: arr[0].cls, shortH: arr[0].h, tall: arr[arr.length - 1].cls, tallH: arr[arr.length - 1].h });
     });
   });
+  // 单指标：卡太窄时标签会被省略号截掉、数值会溢出去压住火花线
+  out.statcut = [];
+  document.querySelectorAll('.w-card.chart_single').forEach(function (c) {
+    var lb = c.querySelector('.st-lb'), vl = c.querySelector('.st-vl');
+    var what = [];
+    if (lb && lb.scrollWidth > lb.clientWidth + 1) what.push('标签「' + lb.textContent.trim() + '」');
+    if (vl && vl.scrollWidth > vl.clientWidth + 1) what.push('数值「' + vl.textContent.trim() + '」');
+    if (what.length) out.statcut.push({ w: Math.round(c.getBoundingClientRect().width), what: what.join('、') });
+  });
   var win = document.querySelector('.window.cut');
   if (win && win.scrollHeight > win.clientHeight + 4) out.extra.push({ kind: 'clipped', over: win.scrollHeight - win.clientHeight });
   if (st) {

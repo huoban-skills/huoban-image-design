@@ -18,7 +18,7 @@
 
 ```
 整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 867 以内（超过报 Medium，超过 930 报 High），由 check.py `slide-height` 检查；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，不删骨架组件；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 722～867，也就是底图比 1.5～1.8；超过 867 报 Medium、超过 930 报 High（`slide-height`），低于 722 报 Medium、低于 666 报 High（`slide-flat`）；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，太扁了把这些行数补回去，都不删骨架组件；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。
 ```
 
@@ -948,7 +948,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 手机端没有表格形态：列表页、自定义页面里的明细，一律用 hb-ocards 画成三槽卡片；hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 放进 hb-phone 会报错。
 
 
-## 手机端 · 扫码入口
+## 扫码与二维码（hb-scan 手机端扫码，hb-qr 是 PC 端出码，成对）
 
 ### hb-scan
 扫码页（企业微信扫一扫）：属性 title、label（码下方的标签文字）、tip（提示一句）；整屏灰底＋二维码示意
@@ -961,6 +961,18 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 <hb-phone nobar fix><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>
 ```
 
-手机上没有独立的「审批流程条」组件：审批走流程任务列表（hb-ptasks）和记录页＋任务办理区（hb-rec ＋ hb-taskbar），不要画 PC 那种时间线。
-手机端没有表格形态：列表页、自定义页面里的明细，一律用 hb-ocards 画成三槽卡片；hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 放进 hb-phone 会报错。
+### hb-qr
+二维码卡：记录二维码＋下方说明行；属性 value（码里的内容）、title、cap、span
+
+```
+二维码卡（记录二维码，打印出来贴在设备、货位、资产上）。属性 value（码里编进去的内容，缺省用 title）、title、cap（码下方一行小字）、span。
+体内每行 字段名 | 值，是这个码对应的那条记录的说明行（设备名称、唯一编号、所在位置），1～4 行。
+装了 segno 出真码（能扫出 value），没装退回示意图案并打印一行提示。
+例：
+<hb-qr title="二维码标签" value="https://app.huoban.com/item/SB-ZS-018" cap="扫码查看这台设备的档案与履历">
+设备名称 | 海天 HTF160X2 注塑机
+设备唯一编号 | SB-ZS-018
+所属车间 | 注塑车间 3 号机位
+</hb-qr>
+```
 

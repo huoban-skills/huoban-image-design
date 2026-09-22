@@ -1213,6 +1213,66 @@ def m_subtotal(a, body):
     return span_wrap(a, card)
 
 
+
+def qr_matrix(value):
+    """二维码点阵。装了 segno 出真码（能扫），没装就退回示意图案（扫不出来，出图时会提示）。"""
+    try:
+        import segno
+    except ImportError:
+        n = 25
+        h = 0
+        for ch in value:
+            h = (h * 131 + ord(ch)) & 0xFFFFFFFF
+        m = [[False] * n for _ in range(n)]
+        for y in range(n):
+            for x in range(n):
+                h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+                m[y][x] = bool((h >> 16) & 1)
+        for oy, ox in ((0, 0), (0, n - 7), (n - 7, 0)):          # 三个定位角
+            for y in range(7):
+                for x in range(7):
+                    edge = y in (0, 6) or x in (0, 6)
+                    core = 2 <= y <= 4 and 2 <= x <= 4
+                    m[oy + y][ox + x] = edge or core
+            for y in range(-1, 8):                                # 定位角外圈留白
+                for x in range(-1, 8):
+                    yy, xx = oy + y, ox + x
+                    if 0 <= yy < n and 0 <= xx < n and (y in (-1, 7) or x in (-1, 7)):
+                        m[yy][xx] = False
+        return m, False
+    q = segno.make(value, error="m")
+    rows = [[bool(c) for c in row] for row in q.matrix]
+    return rows, True
+
+
+def m_qr(a, body):
+    """二维码卡：记录二维码＋下方说明行，打印出来贴在设备、货位、资产上。"""
+    value = a.get("value") or a.get("title") or "HUOBAN-RECORD"
+    m, real = qr_matrix(value)
+    n = len(m)
+    q = 2                                                          # 静区
+    side = n + q * 2
+    cells_ = "".join(f'<rect x="{x + q}" y="{y + q}" width="1" height="1"/>'
+                     for y in range(n) for x in range(n) if m[y][x])
+    svg = (f'<svg class="qr-img" viewBox="0 0 {side} {side}" shape-rendering="crispEdges" '
+           f'xmlns="http://www.w3.org/2000/svg"><rect width="{side}" height="{side}" fill="#fff"/>'
+           f'<g fill="var(--ink-85)">{cells_}</g></svg>')
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        if len(c) < 2:
+            raise ExpandError(f"<hb-qr> 每行「字段名 | 值」：{ln}")
+        rows.append(f'<div class="qr-row"><span>{esc(c[0])}</span><b>{esc(c[1])}</b></div>')
+    if not rows:
+        raise ExpandError("<hb-qr> 至少写一行「字段名 | 值」，说明这个码是哪条记录的")
+    cap = f'<div class="qr-cap">{esc(a["cap"])}</div>' if "cap" in a else ""
+    card = (f'<div class="w-card qr-card">{card_head(a, "hb-qr")}'
+            f'<div class="qr-body">{svg}{cap}<div class="qr-rows">{"".join(rows)}</div></div></div>')
+    if not real:
+        WARNINGS.append("<hb-qr> 没装 segno，二维码是示意图案（扫不出来）；要能扫就 pip3 install segno 后重跑")
+    return span_wrap(a, card)
+
+
 def m_cover(a, body):
     """页面封面：封面 280 高取内容区全宽，页面图标 80×80 压在封面下沿，标题 40/56/500。"""
     title = a.get("title", "")
@@ -2063,10 +2123,10 @@ WZ-LH-0233 | 商务伴手礼 B 款 | 礼盒:purple | 18 | 李文彬
         allowed={"hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-tasks", "hb-row", "hb-col", "hb-tabcard",
                  "hb-pivot", "hb-filters", "hb-float", "hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar",
                  "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map",
-                 "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal"},
+                 "hb-multistats", "hb-procs", "hb-list", "hb-progress", "hb-subtotal", "hb-qr"},
         required=["hb-nav", "hb-banner", "hb-shortcuts"],
         order=["hb-nav", "hb-cover", "hb-banner", "hb-stats", "hb-shortcuts", "hb-row", "hb-tasks", "hb-multistats",
-               "hb-procs", "hb-progress", "hb-subtotal", "hb-list", "hb-pivot", "hb-tabcard", "hb-float"],
+               "hb-procs", "hb-progress", "hb-subtotal", "hb-qr", "hb-list", "hb-pivot", "hb-tabcard", "hb-float"],
         order_free={"hb-tabcard"},
         first_screen_ban={"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel",
                           "hb-scatter", "hb-map", "hb-filters"},
@@ -2119,11 +2179,11 @@ CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
         cn="数据看板",
         allowed={"hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-col", "hb-bar", "hb-line", "hb-donut",
                  "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map", "hb-pivot", "hb-tabcard",
-                 "hb-float", "hb-multistats", "hb-list", "hb-progress", "hb-subtotal"},
+                 "hb-float", "hb-multistats", "hb-list", "hb-progress", "hb-subtotal", "hb-qr"},
         required=["hb-nav", "hb-banner"],
         order=["hb-nav", "hb-cover", "hb-banner", "hb-filters", "hb-stats", "hb-row", "hb-bar", "hb-line", "hb-donut",
                "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map", "hb-multistats",
-               "hb-progress", "hb-subtotal", "hb-pivot", "hb-list", "hb-float"],
+               "hb-progress", "hb-subtotal", "hb-qr", "hb-pivot", "hb-list", "hb-float"],
         doc="产品壳 → 横幅（必，一行高）→ 筛选（可选）→ 单指标一行（看板必有）→ 图表行（hb-row 16+8 或 12+12）→ 透视表/明细（底部：一张通栏，两张 hb-row 12+12，再多往下接）。",
         example="""<hb-page kind="dashboard" ws="云图贸易" page="库存分析" me="周">
 <hb-nav>
@@ -2167,9 +2227,9 @@ CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
         cn="自定义详情页",
         allowed={"hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-col", "hb-tabcard", "hb-flow",
                  "hb-stats", "hb-pivot", "hb-grid", "hb-float", "hb-multistats", "hb-list", "hb-progress",
-                 "hb-subtotal", "hb-stream", "hb-comment"},
+                 "hb-subtotal", "hb-qr", "hb-stream", "hb-comment"},
         required=["hb-itembar", "hb-hcard", "hb-fields", "hb-tabcard"],
-        order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-list", "hb-tabcard",
+        order=["hb-itembar", "hb-cover", "hb-hcard", "hb-steps", "hb-fields", "hb-row", "hb-qr", "hb-list", "hb-tabcard",
                "hb-flow", "hb-stream", "hb-comment", "hb-float"],
         doc="记录功能区（必）→ 封面（可选，放最前）→ 页头卡片（必）→ 状态条（可选）→ 字段组（必；单栏通栏，双栏 hb-row spans=13|11 主栏字段、侧栏数字，或 16|8 主栏标签页放字段与明细、侧栏放流程与动态）→ 标签页（必）→ 流程执行记录、动态、评论。"
             "页头卡片、字段组必有：一条记录先说清是哪条、有哪些字段，页签内的字段组也算。图表宏只能放在 hb-row 或 hb-tabcard 体内，不在顶层。"
@@ -2633,6 +2693,7 @@ MACROS = {
     "hb-list": (m_list, "表格列表：体内同 hb-grid（首行表头）；属性 title、span、tools、count"),
     "hb-progress": (m_progress, "进度条：每行「名称 | 完成值 | 目标值 | 颜色」；属性 title、span、style=bar|text"),
     "hb-subtotal": (m_subtotal, "分类汇总：首行是合计，其后每行「名称 | 数值」；属性 title、span"),
+    "hb-qr": (m_qr, "二维码卡：记录二维码＋下方说明行；属性 value（码里的内容）、title、cap、span"),
     "hb-cover": (m_cover, "页面封面：属性 title、sub、icon；放页面最前，封面 280 高＋80 图标＋40 号大标题"),
     "hb-stream": (m_stream, "动态：每行「人名 | 时间 | 内容」，人名写 sys:名 出系统动态；属性 span"),
     "hb-comment": (m_comment, "评论：每行「人名 | 时间 | 内容」，无行出空态；属性 title、span"),
@@ -2691,12 +2752,12 @@ GROUPS = [
     ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-wxapp", "hb-wxgroup", "hb-conn"]),
     ("手机端 · 门户（2026-09-21 实测）", ["hb-ptop", "hb-pnav", "hb-pmenu", "hb-plogin", "hb-pme"]),
-    ("手机端 · 扫码入口", ["hb-scan"]),
+    ("扫码与二维码（hb-scan 手机端扫码，hb-qr 是 PC 端出码，成对）", ["hb-scan", "hb-qr"]),
 ]
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 867 以内（超过报 Medium，超过 930 报 High），由 check.py `slide-height` 检查；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，不删骨架组件；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 722～867，也就是底图比 1.5～1.8；超过 867 报 Medium、超过 930 报 High（`slide-height`），低于 722 报 Medium、低于 666 报 High（`slide-flat`）；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，太扁了把这些行数补回去，都不删骨架组件；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
@@ -2942,6 +3003,16 @@ CK-20260823-0036 | 武夷山大红袍 | 6 | 陈晓东 | 已出库:green
 9 月生产计划 | 8200 | 10000 | purple
 9 月发货计划 | 6400 | 10000
 </hb-progress>""",
+"hb-qr": """二维码卡（记录二维码，打印出来贴在设备、货位、资产上）。属性 value（码里编进去的内容，缺省用 title）、title、cap（码下方一行小字）、span。
+体内每行 字段名 | 值，是这个码对应的那条记录的说明行（设备名称、唯一编号、所在位置），1～4 行。
+装了 segno 出真码（能扫出 value），没装退回示意图案并打印一行提示。
+例：
+<hb-qr title="二维码标签" value="https://app.huoban.com/item/SB-ZS-018" cap="扫码查看这台设备的档案与履历">
+设备名称 | 海天 HTF160X2 注塑机
+设备唯一编号 | SB-ZS-018
+所属车间 | 注塑车间 3 号机位
+</hb-qr>""",
+
 "hb-subtotal": """分类汇总（官方 subtotal）。属性 title、span。首行是合计行（加粗），其后每行 名称 | 数值。
 条目 40 高，右侧是纯文本、没有胶囊，顶部多一条合计行——与多项统计的区别就在这两点。
 例：

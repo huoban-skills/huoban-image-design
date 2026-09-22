@@ -1677,3 +1677,13 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .screen .grid tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--ink-85) 4%, transparent); }
 .screen .til-foot { border-top: 1px solid var(--line); color: var(--ink-45); }
 .screen .legend { color: var(--ink-65); padding: 0 0 2px; gap: 16px; }
+
+/* ── 二维码卡（hb-qr，仿写：打印标签预览） ── */
+.qr-card .qr-body{padding:14px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.qr-card .qr-img{width:118px;height:118px;display:block;border:1px solid var(--line);border-radius:6px;padding:4px;background:#fff}
+.qr-card .qr-cap{font-size:11px;color:var(--ink-45);text-align:center;line-height:1.5}
+.qr-card .qr-rows{width:100%;display:flex;flex-direction:column;gap:2px}
+.qr-card .qr-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;line-height:1.6;padding:3px 0;border-top:1px solid var(--line)}
+.qr-card .qr-row:first-child{border-top:0}
+.qr-card .qr-row span{color:var(--ink-45);white-space:nowrap}
+.qr-card .qr-row b{color:var(--ink-85);font-weight:500;text-align:right}

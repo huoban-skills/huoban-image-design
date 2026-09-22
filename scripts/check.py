@@ -43,6 +43,8 @@ SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
 SLIDE_W = 1300         # 演示尺寸窗口宽（整图 1500：图片位 930 宽时主体字 13px 渲染成 8px，正好在底线上）
 SLIDE_MAX_H = 867      # 目标上限：底图比 ≥1.5，像一块真实显示器；超过它报 Medium，可让位于信息密度
 SLIDE_HARD_H = 930     # 硬上限：底图比 <1.4，接近 4:3；超过它报 High
+SLIDE_MIN_H = 722      # 目标下限：底图比 ≤1.8；再扁就是内容太少，浮层一探出整图就显空，报 Medium
+SLIDE_FLAT_H = 665     # 硬下限：底图比 >1.95，扁成一条；报 High
 # 整张图（含浮层探出部分）宽高比，两档尺寸通用：一屏原则——图在载体里不该要滚动才看完
 RATIO_OK = 1.45        # 目标下限：低于它报 Medium，先横向重排，重排后仍够不到可让位于信息密度
 RATIO_HIGH = 1.25      # 硬下限：低于它报 High，图竖得在载体里一屏放不下
@@ -461,6 +463,8 @@ def check(path, render=False, allow_local=False):
     for m in re.finditer(r'<div class="[^"]*\bview-grid\b[^"]*">.*?</table>', body, re.S):
         rows = len(re.findall(r"<tr(?![^>]*class=\"group\")", m.group(0))) - 1
         lo, hi = SCALE["grid_rows"]
+        if SLIDE_RE.search(body):
+            hi = 18          # 演示尺寸窗口只有 1300 宽，表格要多几行才把底图撑到 1.5–1.8 的比例
         if rows and (rows < lo or rows > hi):
             add("Medium", "scale-limit", f"网格视图 {rows} 行：常态 {lo}～{hi} 行，少了像凑数，多了被窗口裁断也无意义", line_of(body, m.start()))
     for m in re.finditer(r'<div class="w-row[^"]*">', body):
@@ -562,6 +566,10 @@ def check(path, render=False, allow_local=False):
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and SLIDE_MAX_H < sh <= SLIDE_HARD_H:
                 add("Medium", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过目标 {SLIDE_MAX_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，低于 1.5。先减数据、再横向重排；骨架组件放不下时可让位于信息密度，在验收表第 8 条写明理由（硬上限 {SLIDE_HARD_H}）")
+            if SLIDE_RE.search(body) and sh and SLIDE_FLAT_H < sh < SLIDE_MIN_H:
+                add("Medium", "slide-flat", f"演示尺寸窗口高 {sh}px（实测），低于目标 {SLIDE_MIN_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，高于 1.8，内容偏少；有浮层时浮层比底图还高，整图显空。按页面原则把骨架组件的数据补回去（列表页表格 10–14 行、字段组每组 6～8 个字段、明细 5–6 行、图表卡别压太矮），不是加组件")
+            if SLIDE_RE.search(body) and sh and sh <= SLIDE_FLAT_H:
+                add("High", "slide-flat", f"演示尺寸窗口高 {sh}px（实测），底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，扁成一条、不像一整页：把骨架组件的数据补到页面原则给的条数，列表页表格补到 10–14 行")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_HARD_H:
                 add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_HARD_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，接近 4:3，不像真实显示器。先减数据（明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮），再把明细与主图表并排（hb-row spans=\"14|10\"）；骨架组件留在底图，不删、不挪进浮层")
             st = r.get("stage") or {}
@@ -583,6 +591,8 @@ def check(path, render=False, allow_local=False):
                         add("Medium", "float-phone-tall", f"浮层里的手机高 {fb['h']}px（实测），超过 600：整图会被拉竖。减卡片张数或字段数，让这一屏只讲一件事")
                 elif fr_ < FLOAT_RATIO_MIN:
                     add("Medium", "float-ratio", f"浮层 {fb['w']}×{fb['h']}，宽高比 {fr_:.2f}，低于 {FLOAT_RATIO_MIN}：竖成了条，不像另一屏画面。两块组件改左右并排（hb-row spans=\"12|12\"），或把其中一块压矮")
+            for sc in r.get("statcut", []):
+                add("High", "stat-cut", f"单指标卡只有 {sc['w']}px 宽，{sc['what']}被截断：左文右图形态一张卡至少要 190px（标签＋28px 数值＋69px 火花线），演示尺寸放不下 5 个以上。改居中大数形态、减一个指标，或把单位收短")
             if r.get("floatCover", 0) > 0.25:
                 add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：最多四分之一，只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):

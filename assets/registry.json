@@ -3216,6 +3216,27 @@
         "phone"
       ],
       "note": "企业微信扫一扫，按 iOS 端截图仿写"
+    },
+    {
+      "kind": "architecture",
+      "id": "w-qr",
+      "type_key": null,
+      "cn": "二维码卡",
+      "old_class": null,
+      "file": "c3-page-detail.html",
+      "name": "二维码卡",
+      "macro": "hb-qr",
+      "grid": null,
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "page:detail",
+        "page:list",
+        "page:dashboard",
+        "page:workbench",
+        "float"
+      ],
+      "note": "记录二维码＋说明行，打印贴设备/货位/资产；装了 segno 出真码，没装退回示意图案"
     }
   ]
 }

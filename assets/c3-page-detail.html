@@ -477,3 +477,19 @@
   </div>
   <div class="flow-foot">查看详细记录</div>
 </template>
+
+<template data-architecture="二维码卡" data-cn="二维码卡"
+          data-use="讲「这条记录的码打印出来贴在设备、货位、资产上」时用；与手机端的扫码页是一对，一个出码、一个扫码"
+          data-measured="仿写，未实测 DOM：白卡内 118 见方二维码（白底 r6 细边、4 内距），码下 11 号提示一行居中，再下是 1～4 行说明（左标签 12/ink-45、右值 12/500/ink-85，行间细分隔线）">
+  <div class="w-card qr-card">
+    <div class="wc-hd">二维码标签</div>
+    <div class="qr-body">
+      <svg class="qr-img"><!-- 由 hb-qr 生成：装了 segno 是真码，没装是示意图案 --></svg>
+      <div class="qr-cap">扫码打开这条记录</div>
+      <div class="qr-rows">
+        <div class="qr-row"><span>设备名称</span><b>海天 HTF160X2 注塑机</b></div>
+        <div class="qr-row"><span>设备唯一编号</span><b>SB-ZS-018</b></div>
+      </div>
+    </div>
+  </div>
+</template>
