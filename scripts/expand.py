@@ -1785,9 +1785,30 @@ def m_ptasks(a, body):
             f'<span class="b text">批量</span><span class="vic on">{ico("filter")}</span></div><div class="m-cards">{"".join(cards)}</div>{app}')
 
 
+WPAGE_ORDER = ["横幅", "快捷方式", "标签页", "单指标", "图表", "卡片列表"]
+
+
+def _wpage_kind(ln):
+    if ln.startswith("#"): return "横幅"
+    if ln.startswith("sc:"): return "快捷方式"
+    if ln.startswith("tabs:"): return "标签页"
+    if ln.startswith("<"):
+        if "stats-" in ln[:80]: return "单指标"
+        if 'class="w-card chart' in ln[:80]: return "图表"
+        if 'class="ocard"' in ln[:120]: return "卡片列表"
+    return None
+
+
 def m_wpage(a, body):
     out = []
     tab = None          # 页签卡：开了之后，后面的子区与嵌进来的组件都装进同一张卡
+    seq = [k for k in (_wpage_kind(ln) for ln in lines(body)) if k]
+    for i in range(1, len(seq)):
+        if WPAGE_ORDER.index(seq[i]) < WPAGE_ORDER.index(seq[i - 1]):
+            raise ExpandError(f"<hb-wpage> 里「{seq[i]}」排在了「{seq[i - 1]}」之后：手机端的版式是 {' → '.join(WPAGE_ORDER)}"
+                              "（工作台＝横幅 → 快捷方式 → 标签页＋卡片列表；看板＝横幅 → 标签页 → 单指标两个一行 → 图表一行一个 → 卡片列表）")
+    if "单指标" in seq and "图表" not in seq:
+        warn("手机看板只有单指标没有图表：版式是 单指标 → 图表 → 卡片列表，至少放一张图表（hb-bar／hb-line／hb-donut）")
     for ln in lines(body):
         if ln.startswith("#"):
             out.append(f'<div class="wban">{esc(ln[1:])}</div>')
@@ -3220,7 +3241,7 @@ tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
 </hb-wpage>
 要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。
-手机看板也用它：体内按顺序直接嵌 hb-stats（自动两个一行）、hb-bar／hb-line／hb-donut 等图表宏（一行一个）和 hb-ocards bare，不用 hb-row／hb-col。""",
+手机看板也用它：体内按顺序直接嵌 hb-stats（自动两个一行）、hb-bar／hb-line／hb-donut 等图表宏（一行一个）和 hb-ocards bare，不用 hb-row／hb-col。\n体内顺序固定为 横幅 → 快捷方式 → 标签页 → 单指标 → 图表 → 卡片列表，写反了报错：工作台是前三样加卡片列表，看板是横幅、标签页加后三样。""",
 "hb-wxapp": """企业微信应用消息：应用推给某个人的通知，会话里只有这一个应用在说话，不出头像和发送者名（微信端样式，未实测）。群里的机器人消息用 hb-wxgroup。
 @时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
 例：
