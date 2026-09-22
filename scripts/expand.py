@@ -1477,6 +1477,8 @@ def m_phone(a, body):
     if "<table" in body or 'class="table-view' in body:
         raise ExpandError("手机端没有表格形态：列表页、自定义页面里的明细，一律用 <hb-ocards> 画成三槽卡片；"
                           "hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 是 PC 组件，放不进 hb-phone")
+    if 'class="m-workbench"' in body and 'class="m-cards"' in body and 'class="wtb"' not in body and 'class="wlist"' not in body:
+        raise ExpandError("<hb-phone> 里 hb-wpage 后面单独放了 hb-ocards：工作台会撑满整屏，卡片被挤到屏底、中间空一大块。把 <hb-ocards bare> 写进 <hb-wpage> 体内（tabs: 那行之后），明细就收进页签卡")
     bar = ""
     if "nobar" not in a:
         dots = "" if "nodots" in a else "···"
