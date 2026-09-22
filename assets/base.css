@@ -1337,8 +1337,8 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .wcard.wlist .ocard, .phone .wcard .wtb .ocard { border: 1px solid var(--line); margin-bottom: 8px; }
 .phone .wcard.wlist .ocard:last-child, .phone .wcard .wtb .ocard:last-child { margin-bottom: 0; }
 .phone .wban { padding: 2px 2px 0; font-size: 20px; font-weight: 600; color: var(--ink-85); }   /* 跟 PC 横幅一致：无底色、左对齐 */
-.phone .wsc { display: grid; grid-template-columns: 1fr 1fr; row-gap: 44px; padding: 22px 0 22px 60px; }
-.phone .wsc span { display: flex; align-items: center; gap: 8px; font-size: 16px; color: var(--ink-85); line-height: 16px; }
+.phone .wsc { display: grid; grid-template-columns: 1fr 1fr; row-gap: 44px; padding: 22px 12px; }   /* 两列各自居中，整块不偏 */
+.phone .wsc span { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; color: var(--ink-85); line-height: 16px; }
 .phone .wsc .ico { width: 18px; height: 18px; color: var(--primary); }
 .phone .wtabs { height: 40px; display: flex; align-items: stretch; gap: 20px; padding: 0 16px; border-bottom: 1px solid var(--line); }
 .phone .wtabs span { display: inline-flex; align-items: center; font-size: 16px; color: var(--ink-65); position: relative; }
