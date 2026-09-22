@@ -2478,6 +2478,8 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
         if n in spec.get("first_screen_ban", set()):
             warn(f"<hb-page kind=\"{kind}\"> 顶层放了 <{n}>：{spec['cn']}首屏不放图表与筛选，要放就收进 <hb-tabcard> 或放页面末尾")
     for n in names:
+        if n == "hb-float" and kind == "screen":
+            raise ExpandError("数据大屏不放浮层：大屏本身就是一整块画面，要讲的都画在屏里；去掉 <hb-float>")
         if n not in allowed:
             raise ExpandError(f"<hb-page kind=\"{kind}\"> 顶层不能放 <{n}>；{spec['cn']}顶层可用：{'、'.join(sorted(allowed))}。"
                               f"{'图表与筛选请放进 <hb-tabcard> 或页面末尾。' if n in spec.get('first_screen_ban', set()) else ''}")
