@@ -815,6 +815,7 @@ tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
 </hb-wpage>
 要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。
+手机看板也用它：体内按顺序直接嵌 hb-stats（自动两个一行）、hb-bar／hb-line／hb-donut 等图表宏（一行一个）和 hb-ocards bare，不用 hb-row／hb-col。
 ```
 
 ### hb-wxapp

@@ -1558,6 +1558,8 @@ def m_phone(a, body):
     if "<table" in body or 'class="table-view' in body:
         raise ExpandError("手机端没有表格形态：列表页、自定义页面里的明细，一律用 <hb-ocards> 画成三槽卡片；"
                           "hb-grid／hb-list／hb-pivot／hb-kanban／hb-cards 是 PC 组件，放不进 hb-phone")
+    if 'class="w-row"' in body or 'class="w-col"' in body:
+        raise ExpandError("<hb-phone> 里不用 hb-row／hb-col：手机端一行只放一个组件，单指标由 hb-stats 自己排成两个一行；把组件按顺序直接写进 hb-wpage 体内")
     if 'class="m-workbench"' in body and 'class="ocard"' in body and 'class="wtb"' not in body and 'class="wlist"' not in body:
         raise ExpandError("<hb-phone> 里 hb-wpage 后面单独放了 hb-ocards：工作台会撑满整屏，卡片被挤到屏底、中间空一大块。把 <hb-ocards bare> 写进 <hb-wpage> 体内（tabs: 那行之后），明细就收进页签卡")
     bar = ""
@@ -3217,7 +3219,8 @@ sc: 库存看板:pie-s | 出库管理:check-s | 入库管理:trend-s | 库存盘
 tabs: *出入库情况 | 仓库报表
 sub: 出库审批 | 全部 | *待执行 | 已完成
 </hb-wpage>
-要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。""",
+要在工作台里放一段明细，直接嵌一个 <hb-ocards bare>（手机端没有表格，不要放 hb-list／hb-pivot）。
+手机看板也用它：体内按顺序直接嵌 hb-stats（自动两个一行）、hb-bar／hb-line／hb-donut 等图表宏（一行一个）和 hb-ocards bare，不用 hb-row／hb-col。""",
 "hb-wxapp": """企业微信应用消息：应用推给某个人的通知，会话里只有这一个应用在说话，不出头像和发送者名（微信端样式，未实测）。群里的机器人消息用 hb-wxgroup。
 @时间 出时间戳；[标签] 标题 开一条带标签的消息，! 标题 开一条无标签消息；字段 = 值（等号两边有空格）出键值行；> 文字 出底部链接；其余行是正文。
 例：

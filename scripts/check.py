@@ -537,6 +537,12 @@ def check(path, render=False, allow_local=False):
             add("Medium", "list-no-action", f"这张图讲的是「{_verb.group()}」这类操作，表格却没有按钮：讲点有动作、画面是列表，列表就要带按钮；表头最后一列加 操作:ops，格里写下一步动作（去巡检:check:blue）")
         elif 'class="ocard"' in body and 'class="obtn"' not in body:
             add("Medium", "list-no-action", f"这张图讲的是「{_verb.group()}」这类操作，手机卡片却没有按钮：讲点有动作、画面是列表，列表就要带按钮；hb-ocards 每行第四段写 按钮名:图标")
+    for m in re.finditer(r'<div class="phone', body):
+        seg = body[m.start():]
+        seg = seg[:seg.find('<div class="phone', 1)] if seg.find('<div class="phone', 1) > 0 else seg
+        for cls, inner in re.findall(r'<div class="(w-row(?! stats-)[^"]*)">', seg):
+            add("High", "layout", "手机屏里出现了并排行：手机端除单指标两个一行外，一行只放一个组件，去掉 hb-row 按顺序竖排")
+            break
     _kind_m = re.search(r'class="stage auto[^"]*" data-kind="(\w+)"', body)
     for msg in layout_findings(body, _kind_m.group(1) if _kind_m else ""):
         add("High", "layout", msg)

@@ -1335,6 +1335,10 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .m-workbench { flex: 1; min-height: 0; overflow: hidden; background: var(--card-bg); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
 .phone .wcard { background: var(--card-bg); border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); overflow: hidden; }
 /* 工作台里的明细：手机端没有表格，嵌 hb-ocards 的卡片列表，卡底跟着工作台卡片走 */
+/* 手机看板：单指标两个一行，其余组件一行一个；PC 的单指标卡、图表卡放进来按 335 宽排 */
+.phone .m-workbench .w-row[class*="stats-"] { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: none; box-shadow: none; padding: 0; border: 0; }
+.phone .m-workbench .w-row[class*="stats-"] .chart_single { border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+.phone .m-workbench .w-card.chart { border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); }
 .phone .wcard.wlist, .phone .wcard .wtb { padding: 12px; }
 .phone .wcard .wtabs:has(+ .wtb) { border-bottom: none; }   /* 页签下面直接接卡片：不留那条底线，选中页签的下划线就是分界 */
 .phone .wcard.wlist .m-cards, .phone .wcard .wtb .m-cards { flex: none; background: none; padding: 0; border: none; }
