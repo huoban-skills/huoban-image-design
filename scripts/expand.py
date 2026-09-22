@@ -2532,7 +2532,7 @@ def m_page(a, body):
         raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
     size = a.get("size", "full")
     if size not in ("full", "slide"):
-        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1400 宽、高 1000 以内，版式和必有组件按页面原则出齐）')
+        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，整图 1600 宽，底图无浮层 1600、有浮层 1400，版式和必有组件按页面原则出齐）')
     if size == "slide" and (canvas != "marketing" or kind in ("screen", "mobile")):
         raise ExpandError('<hb-page size="slide"> 只用在营销类的电脑端页面：大屏、手机端和产品设计类画布不用演示尺寸')
     parts = _top_level(a.get("_raw", body))
@@ -2767,7 +2767,7 @@ GROUPS = [
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1400 宽、窗口高 778～1000，也就是底图比 1.4～1.8；超过 1000 报 Medium、超过 1120 报 High（`slide-height`），低于 778 报 Medium、低于 718 报 High（`slide-flat`）；版式和必有组件按页面原则出齐、顺序不改，放不下宁可偏高；超高了减明细行数、压图表高度，太扁了把这些行数补回去；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，整图恒 1600，底图无浮层 1600、有浮层 1400；底图比目标 1.4～1.8（无浮层窗口高 889～1143，有浮层 778～1000），高过 1.25 的上限报 High、低过 1.95 的下限报 High，中间两档报 Medium（`slide-height`／`slide-flat`）；版式和必有组件按页面原则出齐、顺序不改，放不下宁可偏高；超高了减明细行数、压图表高度，太扁了把这些行数补回去；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。

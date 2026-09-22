@@ -101,8 +101,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 
 .stage.auto.product .window { border-radius: 0; border: 0; }
 /* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。窗口 1400 宽（整图 1600：1440 视口的图片位 1041 宽时主体字 8.5px），浮层内容不缩小，详情页边距收窄 */
-.stage.auto.slide { width: 1400px; }
-.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1400px; }
+/* 整图恒 1600：底图无浮层时铺满 1600，有浮层时 1400 给浮层留探出空间 */
+.stage.auto.slide { width: 1600px; }
+.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1600px; }
 .stage.auto.slide.has-float { width: 1600px; }
 .stage.auto.slide.has-float .window, .stage.auto.slide.has-float .item-page { width: 1400px; }
 .stage.auto.slide .item-page-canvas { padding: 32px 48px; }
