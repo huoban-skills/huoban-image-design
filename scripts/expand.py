@@ -1796,7 +1796,7 @@ def m_plogin(a, body):
         label = a["wechat"] if isinstance(a["wechat"], str) else "微信登录"
         wx = f'<div class="lwx"><i class="wx"></i>{esc(label)}</div>'
     if "bg" in a:
-        raise ExpandError("<hb-plogin> 的 bg 已经是默认：登录页默认铺主色渐变底，要白底写 plain")
+        raise ExpandError("<hb-plogin> 的 bg 已经是默认：登录页默认铺极淡的主色纯色底，要白底写 plain")
     cls = "p-login" + (" plain" if "plain" in a else "")
     return (f'<div class="{cls}"><div class="lcard">'
             f'<div class="lhd">{"<span class=\"plogo\"></span>" if "logo" in a else ""}<span class="lnm">{esc(name)}</span></div>'
@@ -3105,7 +3105,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 自定义组件:app-s
 产品功能边界:doc
 </hb-pmenu>""",
-"hb-plogin": """门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、plain（白底；默认铺主色渐变底，客户有品牌底图时导出后另换）、logo（卡头门户名左侧出 logo 占位；默认只有门户名）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
+"hb-plogin": """门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、plain（白底；默认铺极淡的主色纯色底，客户有品牌底图时导出后另换）、logo（卡头门户名左侧出 logo 占位；默认只有门户名）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
 登录按钮画成未填写的浅色态，卡底固定带 Powered by 伙伴云 ｜ 免责声明 ｜ 投诉。
 例：
 <hb-phone nobar fix><hb-plogin name="伙伴生态合作" wechat/></hb-phone>""",
