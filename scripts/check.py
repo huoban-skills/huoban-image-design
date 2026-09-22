@@ -40,11 +40,11 @@ PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "�
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
 SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
-SLIDE_W = 1300         # 演示尺寸窗口宽（整图 1500：图片位 930 宽时主体字 13px 渲染成 8px，正好在底线上）
-SLIDE_MAX_H = 930      # 目标上限：底图比 ≥1.4；超过它报 Medium，版式与骨架组件优先，可让位
-SLIDE_HARD_H = 1040    # 硬上限：底图比 <1.25；超过它报 High
-SLIDE_MIN_H = 722      # 目标下限：底图比 ≤1.8；再扁就是内容太少，浮层一探出整图就显空，报 Medium
-SLIDE_FLAT_H = 665     # 硬下限：底图比 >1.95，扁成一条；报 High
+SLIDE_W = 1400         # 演示尺寸窗口宽（整图 1600：图片位 1041 宽（1440 视口）时主体字 13px 渲染成 8.5px；1280 视口只有 7.5px）
+SLIDE_MAX_H = 1000     # 目标上限：底图比 ≥1.4；超过它报 Medium，版式与骨架组件优先，可让位
+SLIDE_HARD_H = 1120    # 硬上限：底图比 <1.25；超过它报 High
+SLIDE_MIN_H = 778      # 目标下限：底图比 ≤1.8；再扁就是内容太少，浮层一探出整图就显空，报 Medium
+SLIDE_FLAT_H = 717     # 硬下限：底图比 >1.95，扁成一条；报 High
 # 整张图（含浮层探出部分）宽高比，两档尺寸通用：一屏原则——图在载体里不该要滚动才看完
 RATIO_OK = 1.45        # 目标下限：低于它报 Medium，先横向重排，重排后仍够不到可让位于信息密度
 RATIO_HIGH = 1.25      # 硬下限：低于它报 High，图竖得在载体里一屏放不下
@@ -464,7 +464,7 @@ def check(path, render=False, allow_local=False):
         rows = len(re.findall(r"<tr(?![^>]*class=\"group\")", m.group(0))) - 1
         lo, hi = SCALE["grid_rows"]
         if SLIDE_RE.search(body):
-            hi = 18          # 演示尺寸窗口只有 1300 宽，表格要多几行才把底图撑到 1.5–1.8 的比例
+            hi = 18          # 演示尺寸窗口只有 1400 宽，表格要多几行才把底图撑到 1.5–1.8 的比例
         if rows and (rows < lo or rows > hi):
             add("Medium", "scale-limit", f"网格视图 {rows} 行：常态 {lo}～{hi} 行，少了像凑数，多了被窗口裁断也无意义", line_of(body, m.start()))
     for m in re.finditer(r'<div class="w-row[^"]*">', body):
