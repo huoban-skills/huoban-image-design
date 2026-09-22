@@ -1120,6 +1120,9 @@ def m_procs(a, body):
     return span_wrap(a, card)
 
 
+ACTION_LIST_RE = re.compile(r"待[检审核批办理处跟进发收付派领取签验回]|超时|逾期|异常|预警|待办|未[检审核批办处]")
+
+
 def m_list(a, body):
     """表格列表：外壳（标题 40 ＋ 表体 ＋ 分页 40）＋ hb-grid 的表体；体内语法同 hb-grid。"""
     ga = {"bare": True}
@@ -1127,6 +1130,10 @@ def m_list(a, body):
         if k in a:
             ga[k] = a[k]
     grid = m_grid(ga, body)
+    head = (lines(body) or [""])[0]
+    title = str(a.get("title", ""))
+    if ACTION_LIST_RE.search(title) and ":ops" not in head:
+        warn(f"hb-list「{title}」列出的记录有下一步动作，最后一列要放行内按钮（列名:ops，格里写 去巡检:check:blue），按钮名就是那个动作")
     tools = []
     for t in [x.strip() for x in str(a.get("tools", "")).split("|") if x.strip()]:
         if t not in LIST_TOOL_ICONS:
@@ -2899,6 +2906,7 @@ tiles 选项字段平铺，值写「选项 / *当前:颜色 / 选项」，独占
 采购申请 | CG-20260820-0012 | 财务复核 | 已完成:green | 8月20日
 </hb-procs>""",
 "hb-list": """表格列表（官方 table_item_list，工作区里用得最多的组件）。属性 title、span、tools（工具图标，| 分：搜索/新建/新增/导出/导入/更多/筛选/打印/分享/设置）、count（记录数，出底部「共 N 条」）、nock / noidx / total 透传给表体。
+列出的记录有下一步动作时（今日待检、待审批、超时未接、异常明细），最后一列放行内按钮：列名写 操作:ops，格里写 去巡检:check:blue，按钮名就是那个动作；标题带「待／超时／异常」而没有 :ops 列会提示。
 体内就是 hb-grid 的写法：首行表头（列名:类型 / :sum=值），其后每行一条记录。
 外壳实测：标题行 40、表头 32、数据行 35、底部分页条 40，白卡圆角 9。
 例：

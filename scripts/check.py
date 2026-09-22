@@ -447,6 +447,10 @@ def check(path, render=False, allow_local=False):
     _ph = body.split("mk-float-phone", 1)[1] if "mk-float-phone" in body else (body if 'class="phone' in body else "")   # PC 底图＋手机浮层时只看浮层那段
     if _ph and ("<table" in _ph or 'class="table-view' in _ph):
         add("High", "mobile-table", "手机图里画了表格：手机端没有表格形态，列表页和自定义页面里的明细一律是三槽卡片，改用 <hb-ocards>")
+    for m in re.finditer(r'<div class="w-card table_item_list">\s*<div class="wc-hd[^"]*">(?:<[^>]+>)*([^<]+)', body):
+        blk = body[m.start():body.find("til-foot", m.start()) if body.find("til-foot", m.start()) > 0 else m.start() + 4000]
+        if re.search(r"待[检审核批办理处跟进发收付派领取签验回]|超时|逾期|异常|预警|待办|未[检审核批办处]", m.group(1)) and "op-btn" not in blk:
+            add("Medium", "list-no-action", f"表格列表「{m.group(1).strip()}」列的是待处理的记录，却没有操作按钮：最后一列加 操作:ops，格里写下一步动作（去巡检:check:blue）", line_of(body, m.start()))
     if 'class="wempty"' in body or "暂无数据" in body:
         add("Medium", "empty-state", "画面里有「没有找到任务／暂无数据」空态：营销图每个区域都要有内容，给它几行数据或去掉这块")
 
