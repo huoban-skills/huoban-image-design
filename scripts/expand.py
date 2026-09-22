@@ -1793,9 +1793,11 @@ def m_plogin(a, body):
     if "wechat" in a:
         label = a["wechat"] if isinstance(a["wechat"], str) else "微信登录"
         wx = f'<div class="lwx"><i class="wx"></i>{esc(label)}</div>'
-    cls = "p-login" + (" bg" if "bg" in a else "")
+    if "bg" in a:
+        raise ExpandError("<hb-plogin> 的 bg 已经是默认：登录页默认铺主色渐变底，要白底写 plain")
+    cls = "p-login" + (" plain" if "plain" in a else "")
     return (f'<div class="{cls}"><div class="lcard">'
-            f'<div class="lhd"><span class="plogo"></span><span class="lnm">{esc(name)}</span></div>'
+            f'<div class="lhd">{"<span class=\"plogo\"></span>" if "logo" in a else ""}<span class="lnm">{esc(name)}</span></div>'
             f'<div class="lin">{esc(a.get("phone", "手机号"))}</div>'
             f'<div class="lin lcap">{esc(a.get("captcha", "验证码"))}<span class="lcb">{esc(a.get("code", "获取验证码"))}</span></div>'
             f'<div class="lbtn">{esc(a.get("submit", "登录"))}</div>{wx}'
@@ -2599,7 +2601,7 @@ MACROS = {
     "hb-ptop": (m_ptop, "门户顶栏：属性 name（门户名）、user（登录人姓名，出头像）、login（未登录时的按钮名）"),
     "hb-pnav": (m_pnav, "门户导航条：一级页签，* 前缀＝当前，名后缀 :g ＝分组页签；属性 fill、scroll"),
     "hb-pmenu": (m_pmenu, "门户分组菜单：分组页签展开的面板＋蒙层；每行 名称:图标"),
-    "hb-plogin": (m_plogin, "门户登录页：属性 name、wechat、bg、phone、captcha、code、submit"),
+    "hb-plogin": (m_plogin, "门户登录页：属性 name、wechat、plain、logo、phone、captcha、code、submit"),
     "hb-pme": (m_pme, "个人中心：属性 who、out；每行 字段名 | 值 | 右侧操作，-- 另起一张卡"),
     "hb-wxapp": (m_chat, "企业微信应用消息（发给个人）：@时间；[标签] 标题 开一条消息；k = v；> 链接；其余为正文"),
     "hb-wxgroup": (m_wxgroup, "企业微信群消息：@时间；!机器人名 开一条；^小标题 / #大标题 / *大数字 / ~灰底块 / \"引用 / k = v / >查看详情"),
@@ -3101,7 +3103,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 自定义组件:app-s
 产品功能边界:doc
 </hb-pmenu>""",
-"hb-plogin": """门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、bg（铺门户自配的品牌底图；不给就是默认白底）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
+"hb-plogin": """门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、plain（白底；默认铺主色渐变底，客户有品牌底图时导出后另换）、logo（卡头门户名左侧出 logo 占位；默认只有门户名）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
 登录按钮画成未填写的浅色态，卡底固定带 Powered by 伙伴云 ｜ 免责声明 ｜ 投诉。
 例：
 <hb-phone nobar fix><hb-plogin name="伙伴生态合作" wechat/></hb-phone>""",
