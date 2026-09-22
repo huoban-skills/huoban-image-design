@@ -32,7 +32,7 @@ PAGE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="hb-skill" content="huoban-image-design 2.8.2">
+<meta name="hb-skill" content="huoban-image-design 2.8.3">
 <title>{title}</title>
 <style>
 {skin_css}
@@ -49,7 +49,6 @@ PAGE = """<!DOCTYPE html>
 </body>
 </html>
 """
-
 
 def main():
     ap = argparse.ArgumentParser()
@@ -97,7 +96,6 @@ def main():
             head = "" if "本图布局" in raw else "/* ── 本图布局 ── */\n"
             extra = head + raw
 
-
     # 客户图片：<img src="本地路径"> 内嵌为 data URI（相对内容文件目录或当前目录），保证单文件可再导出
     import mimetypes
     def _inline(m):
@@ -133,7 +131,6 @@ def main():
         import export
         export.export_png(str(out))
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

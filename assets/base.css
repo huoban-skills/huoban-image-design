@@ -1242,6 +1242,10 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .m-tool span, .phone .apptab span { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: var(--ink-65); }
 .phone .m-tool .ico, .phone .apptab .ico { width: 22px; height: 22px; }
 .phone .m-tool .dis { color: var(--ink-25); }
+/* 记录快捷按钮行（2026-09-22 按 H5 详情页截图仿写）：贴在记录操作条上方，左起排、主色线框带 ✓，装不下的从右边切掉 */
+.phone .m-qbtns { flex: none; display: flex; gap: 8px; padding: 8px 12px; background: var(--page-bg); border-top: 1px solid var(--line); overflow: hidden; white-space: nowrap; }
+.phone .m-qbtns span { flex: none; height: 32px; padding: 0 12px; border: 1px solid var(--primary); border-radius: 6px; background: var(--card-bg); color: var(--primary); font-size: 14px; display: inline-flex; align-items: center; gap: 4px; }
+.phone .m-qbtns .ico { width: 14px; height: 14px; }
 .phone .apptab { border-top: 0.5px solid rgba(0,0,0,.12); }
 .phone .apptab .on { color: var(--primary); }
 

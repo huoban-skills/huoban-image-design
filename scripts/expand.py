@@ -1675,7 +1675,12 @@ def m_mtool(a, body):
             cls.append("on")
         out.append(f'<span{" class=\"" + " ".join(cls) + "\"" if cls else ""}>{ico(icon, tag="<hb-mtool> ")}{esc(label)}</span>')
     wrap = "apptab" if mode == "app" else "m-tool"
-    return f'<div class="{wrap}">' + "".join(out) + "</div>"
+    qb = ""
+    if isinstance(a.get("btns"), str) and a["btns"].strip():
+        if mode != "obar":
+            raise ExpandError('<hb-mtool btns> 只配 mode="obar"：记录快捷按钮排在记录操作条上方，列表工具栏和应用页签栏没有这一行')
+        qb = '<div class="m-qbtns">' + "".join(f'<span>{ico("check")}{esc(b)}</span>' for b in cells(a["btns"]) if b) + "</div>"
+    return qb + f'<div class="{wrap}">' + "".join(out) + "</div>"
 
 
 def rec_field(c, edit):
@@ -2714,7 +2719,7 @@ MACROS = {
     "hb-mhome": (m_mhome, "工作区首页：属性 tabs=表格|*流程…；每行一个分组，- 前缀为展开的表"),
     "hb-vbar": (m_vbar, "列表页视图条：属性 view、count、icon、nosearch"),
     "hb-ocards": (m_ocards, "三槽卡片列表：标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮:图标 | img；属性 fab、pager、bare"),
-    "hb-mtool": (m_mtool, "底部 56 栏：mode=list（列表工具栏，默认）/ obar（记录操作条）/ app（应用页签栏）；体内可自定义项"),
+    "hb-mtool": (m_mtool, "底部 56 栏：mode=list（列表工具栏，默认）/ obar（记录操作条，btns=快捷按钮 | … 排在条上方）/ app（应用页签栏）；体内可自定义项"),
     "hb-rec": (m_rec, "记录页：属性 title、edit、noqr、elapsed；# 分组；字段名 | 值 | 类型(text/sel/opt/mem/rel/img/num:单位)；! 前缀高亮；> 子表页签"),
     "hb-fbar": (m_fbar, "表单保存条：属性 cancel、save、more"),
     "hb-taskbar": (m_taskbar, "任务办理区：属性 who、sub；体内按钮名 | 按钮名"),
@@ -3172,9 +3177,10 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 孙国强：0 件｜朝阳门店 | | 库位=A-03-02-02:gray; 当前库存数量=0; 库存下限=1
 </hb-ocards>""",
 "hb-mtool": """底部 56 栏。mode="list"（默认：列统计/字段设置/分组/筛选/排序）、mode="obar"（记录详情操作条：上一条置灰/下一条/编辑/评论/更多）、mode="app"（企业级应用页签：空间/*流程/通知/我的）；体内写 名:图标 | 名 可自定义，* 前缀高亮，:dis 置灰。
+记录详情页的操作条是固定的五项，业务快捷按钮不进操作条：写 btns="报修 | 报保养 | 查履历"，按钮排在操作条上方一行、左对齐、主色线框带 ✓，装不下的从右边切掉。只配 mode="obar"。
 例：
 <hb-mtool/>
-<hb-mtool mode="obar"/>
+<hb-mtool mode="obar" btns="补录交接数据 | 查看标准表单 | 清洗服务包工时"/>
 <hb-mtool>列统计 | 筛选 | 排序</hb-mtool>""",
 "hb-rec": """记录页（详情/编辑/新建/任务办理共用）。属性 title（记录标题；新建写表名）、edit（编辑态白值框）、noqr、elapsed="1.7天"（任务页顶部耗时条）。
 体内：# 分组名 出居中分组标题；字段名 | 值 | 类型——类型缺省文本，sel 带下拉箭头，opt 选项并排（值写 当前值:blue / 其他 / 其他），mem 成员胶囊（多人 / 分），rel 关联（值写 主行 / 副行），img 图片（值写张数），num:元 数值带单位；值前缀 ~ 出占位灰字（「请先选择：仓库」「保存后显示计算结果」）；字段名前缀 ! 整块青绿高亮（计算字段、本节点可编辑字段）；> 页签1 | 页签2 | 来自 出库明细 的数据 · 共 1 条 出子表页签。
