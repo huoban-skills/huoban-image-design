@@ -1381,8 +1381,8 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .p-menu .pmi .pmn { flex: 1; align-self: stretch; display: flex; align-items: center; font-size: 15px; color: var(--ink-85); border-bottom: 1px solid var(--line); }
 .phone .p-menu .pmi:last-child .pmn { border-bottom: none; }
 
-/* 门户登录页：默认铺主色渐变底（产品里是门户自配的底图，示意图用主色渐变代替），plain 白底；卡 338 宽 r8，内容 296 宽、行距 20 */
-.phone .p-login { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 18px; background: linear-gradient(150deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #1b1f4b)); }
+/* 门户登录页：默认铺主色淡渐变底（产品里是门户自配的底图，示意图用主色淡渐变代替，深了会压过白卡），plain 白底；卡 338 宽 r8，内容 296 宽、行距 20 */
+.phone .p-login { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 18px; background: linear-gradient(150deg, color-mix(in srgb, var(--primary) 14%, #fff), color-mix(in srgb, var(--primary) 38%, #fff)); }
 .phone .p-login.plain { background: var(--card-bg); }
 .phone .p-login .lcard { width: 338px; box-sizing: border-box; padding: 33px 21px; background: var(--card-bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,.18); }
 .phone .p-login .lhd { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
