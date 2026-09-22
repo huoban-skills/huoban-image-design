@@ -3198,6 +3198,24 @@
         "phone"
       ],
       "note": "按 2026-09-21 群消息截图比例换算，非 DOM 实测"
+    },
+    {
+      "kind": "architecture",
+      "id": "m-scan",
+      "type_key": null,
+      "cn": "扫码页",
+      "old_class": null,
+      "file": "c4-mobile.html",
+      "name": "扫码页",
+      "macro": "hb-scan",
+      "grid": null,
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "page:mobile",
+        "phone"
+      ],
+      "note": "企业微信扫一扫，按 iOS 端截图仿写"
     }
   ]
 }

@@ -348,3 +348,17 @@
   <div class="wxchips"><span><svg class="ico"><use href="#i-linkout"/></svg><!-- 群机器人快捷入口 --></span></div>
   <div class="wxinput"><svg class="ico"><use href="#i-headset"/></svg><span class="box">发消息或按住…</span><svg class="ico"><use href="#i-plus"/></svg></div>
 </template>
+
+<!-- ══════════ 八、扫码入口（企业微信扫一扫，按 iOS 端截图仿写）══════════ -->
+
+<template data-architecture="扫码页" data-cn="扫码页"
+          data-use="讲「现场对着标签扫一下」怎么进系统时用作第一屏，后接记录详情页或新建／编辑页"
+          data-measured="整屏灰底当取景画面；顶栏 44＝左 28 圆 ✕ ＋ 标题 16/500 白字居中；中间白底 r10 卡放二维码示意 150 见方（伪码），一条白色扫描光线横过；底部两个 56 圆钮「相册」「轻触照亮」，13 号白字，距底 64">
+  <div class="phone">
+    <div class="m-scan">
+      <div class="scan-top"><span class="x"><svg class="ico"><use href="#i-close"/></svg></span><span class="tt">扫一扫</span></div>
+      <div class="scan-body"><div class="scan-line"></div><div class="scan-qr"><!-- 由 hb-scan 生成的伪二维码 svg --></div></div>
+      <div class="scan-bottom"><span><i><svg class="ico"><use href="#i-f-image"/></svg></i>相册</span><span><i class="torch"></i>轻触照亮</span></div>
+    </div>
+  </div>
+</template>

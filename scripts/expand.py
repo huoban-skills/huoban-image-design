@@ -1905,6 +1905,38 @@ def m_wxgroup(a, body):
     return f'<div class="m-wxg">{"".join(msgs)}</div>{chips}{bar}'
 
 
+def _qr_svg(seed, n=25, cell=6):
+    """画一个像二维码的占位（三个定位角＋伪随机模块），不是真码，扫不出内容。"""
+    import zlib
+    rnd = zlib.crc32(seed.encode("utf-8"))
+    def bit(i, j):
+        nonlocal rnd
+        rnd = (rnd * 1103515245 + 12345 + i * 31 + j * 7) & 0x7fffffff
+        return (rnd >> 13) & 1
+    rects = []
+    for i in range(n):
+        for j in range(n):
+            in_finder = (i < 7 and j < 7) or (i < 7 and j >= n - 7) or (i >= n - 7 and j < 7)
+            if in_finder:
+                a, b = (i if i < 7 else i - (n - 7)), (j if j < 7 else j - (n - 7))
+                on = a in (0, 6) or b in (0, 6) or (2 <= a <= 4 and 2 <= b <= 4)
+            else:
+                on = bit(i, j)
+            if on:
+                rects.append(f'<rect x="{j * cell}" y="{i * cell}" width="{cell}" height="{cell}"/>')
+    size = n * cell
+    return f'<svg class="qr" viewBox="0 0 {size} {size}" width="{size}" height="{size}">{"".join(rects)}</svg>'
+
+
+def m_scan(a, body):
+    title = esc(a.get("title", "扫一扫"))
+    tip = f'<div class="scan-tip">{esc(a["tip"])}</div>' if isinstance(a.get("tip"), str) and a["tip"] else ""
+    label = f'<div class="scan-label">{esc(a["label"])}</div>' if isinstance(a.get("label"), str) and a["label"] else ""
+    return (f'<div class="m-scan"><div class="scan-top"><span class="x">{ico("close")}</span><span class="tt">{title}</span></div>'
+            f'<div class="scan-body"><div class="scan-line"></div><div class="scan-qr">{_qr_svg(a.get("label", title))}{label}</div>{tip}</div>'
+            f'<div class="scan-bottom"><span><i>{ico("f-image")}</i>相册</span><span><i class="torch"></i>轻触照亮</span></div></div>')
+
+
 def m_chat(a, body):
     out = []
     msg = None
@@ -2315,6 +2347,7 @@ def m_row(a, body):
 
 # 手机界面类型：按顺序判，先判特征更强的（任务列表、工作台体内也有卡片列表）
 SCREEN_KINDS = [
+    ("扫码页", ('class="m-scan"',)),
     ("门户登录页", ('class="p-login',)), ("个人中心", ('class="p-me"',)),
     ("企业微信群消息", ('class="m-wxg"',)), ("公众号会话", ('class="wmenu"',)), ("企业微信应用消息", ('class="m-chat"',)),
     ("流程任务列表", ('class="m-ptasks"',)), ("任务办理页", ('class="m-taskbar"',)),
@@ -2436,7 +2469,7 @@ def m_page(a, body):
         if n in ("hb-row", "hb-tabcard", "hb-col"):
             _walk(raw, n == "hb-row")
     if kind != "mobile":
-        _mob = r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|wxapp|wxgroup|ptop|pnav|pmenu|plogin|pme))\b"
+        _mob = r"<(hb-(?:phone|screens|mhome|vbar|ocards|mtool|rec|fbar|taskbar|ptasks|wpage|chat|conn|wxapp|wxgroup|scan|ptop|pnav|pmenu|plogin|pme))\b"
         _raw = a.get("_raw", body)
         bad = re.search(_mob, re.sub(r"<hb-float\b.*?</hb-float>", "", _raw, flags=re.S))
         if bad:
@@ -2601,6 +2634,7 @@ MACROS = {
     "hb-taskbar": (m_taskbar, "任务办理区：属性 who、sub；体内按钮名 | 按钮名"),
     "hb-ptasks": (m_ptasks, "流程任务列表：属性 tabs、count、dot、app；每行「发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮」"),
     "hb-wpage": (m_wpage, "手机工作台：# 页面名；sc: 名:图标 | …；tabs: *页签 | 页签；sub: 子区名 | 全部 | *待执行 | 已完成"),
+    "hb-scan": (m_scan, "扫码页（企业微信扫一扫）：属性 title、label（码下方的标签文字）、tip（提示一句）；整屏灰底＋二维码示意"),
     "hb-ptop": (m_ptop, "门户顶栏：属性 name（门户名）、user（登录人姓名，出头像）、login（未登录时的按钮名）、logo（出 logo 占位，默认不出）"),
     "hb-pnav": (m_pnav, "门户导航条：一级页签，* 前缀＝当前，名后缀 :g ＝分组页签；属性 fill、scroll"),
     "hb-pmenu": (m_pmenu, "门户分组菜单：分组页签展开的面板＋蒙层；每行 名称:图标"),
@@ -2632,6 +2666,7 @@ GROUPS = [
     ("数据大屏（2026-09-14 实测官方六张样板，c5-screen.html）", ["hb-screen", "hb-scol", "hb-skpi", "hb-scard", "hb-sbars", "hb-svisual"]),
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-wxapp", "hb-wxgroup", "hb-conn"]),
     ("手机端 · 门户（2026-09-21 实测）", ["hb-ptop", "hb-pnav", "hb-pmenu", "hb-plogin", "hb-pme"]),
+    ("手机端 · 扫码入口", ["hb-scan"]),
 ]
 
 DOCS = {
@@ -3087,6 +3122,11 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 @昨天 17:06
 ! 本周配货已确认
 8 家门店的配货申请已由库管确认，合计 76 件。""",
+"hb-scan": """扫码页：企业微信「扫一扫」那一屏，讲「现场对着标签扫一下」怎么进系统。整屏灰底当取景画面，顶栏左 ✕ 右空、标题居中，中间一张白底二维码示意（伪码，扫不出内容），一条扫描光线横过，底部「相册」「轻触照亮」两个圆钮。外层写 <hb-phone nobar fix>。
+属性 title（默认「扫一扫」）、label（二维码下方的标签文字，如物资编号）、tip（码下面的一句提示，如「对准物资标签上的二维码」）。自闭合写法。
+扫码页之后接记录详情页或新建／编辑页，讲扫到的是哪条记录、扫完填什么。
+例：
+<hb-phone nobar fix><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>""",
 "hb-ptop": """门户顶栏 44，替代 hb-phone 自带的返回顶栏（外层写 <hb-phone nobar>）。属性 name（门户名，必填）、user（登录人姓名，右侧出 24 圆头像）、login（未登录时右侧按钮名，默认「登录」）、logo（门户名左侧出 32 见方 logo 占位；默认不出，示意图里占位色块比没有更假）。自闭合写法。
 未登录出登录按钮，登录后出头像；两者不同时出现。
 例：
