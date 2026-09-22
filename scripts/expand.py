@@ -458,7 +458,7 @@ def m_stats(a, body):
             sp = spark_svg(spark) if spark else ""
             out.append(f'<div class="w-card chart_single strip"><div class="st-bd"><div class="st-lb">{esc(label)}</div><div class="st-vl">{vl}</div></div>{sp}</div>')
     n = len(ls)
-    cls = "w-row" + (f" stats-{n}" if n in (4, 5, 6) else "")
+    cls = f"w-row stats-{n}"
     return f'<div class="{cls}">' + "".join(out) + "</div>"
 
 

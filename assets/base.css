@@ -621,7 +621,7 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .chart_single.strip .st-bd { min-width: 0; }
 .chart_single.strip .st-lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* 统计条一行 N 个：真实产品常见 4~6 个并排 */
-.w-row.stats-4 > *, .w-row.stats-5 > *, .w-row.stats-6 > * { flex: 1; min-width: 0; }
+.w-row[class*="stats-"] > * { flex: 1; min-width: 0; }
 .st-spark { width: 69px; height: 40px; color: var(--c-green); }
 .st-spark.purple { color: var(--c-purple); }
 .st-spark svg { width: 100%; height: 100%; }
