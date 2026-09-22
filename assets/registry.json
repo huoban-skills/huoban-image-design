@@ -2087,7 +2087,7 @@
       "macro": "hb-phone",
       "variants": [],
       "measured": "measured",
-      "note": null
+      "note": "只用于 PC 图的浮层；独立手机图一律流程壳"
     },
     {
       "kind": "architecture",

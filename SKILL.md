@@ -39,12 +39,12 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 - 按 [references/intake.md](references/intake.md) 追问；皮肤按 [references/skin/routing.md](references/skin/routing.md) 选。
 - 完成标准：题库问空、终稿"决定与默认"列没有"待问"、用户对终稿回了确认。**初稿被认可不算确认；三条不齐，不进入步骤 2。**
-- huoban-solution-ppt 传来需求单终稿时（画布营销类、皮肤已定、决定与默认已填实），跳过定盘子、初稿和逐图提问，只保留终稿这一道"确认"闸门。片段写 `<hb-page size="slide">` 用演示尺寸，围绕这一页的讲点画成完整的一页，高度规则见 references/canvas/marketing.md「演示尺寸」。输出到它指定的 `配图/` 目录，每张都导出 PNG。
+- huoban-solution-ppt 传来需求单终稿时（画布营销类、皮肤已定、决定与默认已填实），跳过定盘子、初稿和逐图提问，只保留终稿这一道"确认"闸门。片段写 `<hb-page size="slide">` 用演示尺寸，围绕这一页的讲点画成完整的一页，尺寸与比例见 references/canvas/marketing.md 第 1、2 节。输出到它指定的 `配图/` 目录，每张都导出 PNG。
 
 ### 2. 写骨架片段
 
 - 按需求单的画布类型读 [references/canvas/marketing.md](references/canvas/marketing.md) 或 [references/canvas/product-design.md](references/canvas/product-design.md)。
-- **先按载体定画布尺寸，再排内容**：建议报告用默认尺寸，PPT 用演示尺寸 `size="slide"`；其他载体和字号底线的算法见 marketing.md「先按载体选画布尺寸」，整图比例见同篇「整图比例：一屏原则」。
+- **先按载体定画布尺寸，再排内容**：建议报告用默认尺寸，PPT 用演示尺寸 `size="slide"`；其他载体和字号底线见 marketing.md「按载体选尺寸」，比例与数据量见同篇「按比例定内容量」。
 - 看槽位表，只取要用的宏的语法：
 
 ```bash
@@ -143,6 +143,6 @@ python3 scripts/export.py "{客户或项目名}/图名.html" --png     # 2x PNG�
 | 组件宽高自适应 | 组件占几栏、多高按布局和画面自适应；实测记录里的 w×h 只是样板的一次配置 |
 | 层次也是实测的 | "白卡浮在灰底上"还是"透明融进容器"，以结构文件 `data-measured` 为准；没有注释的先实测再画 |
 | 组件底色优先级 | 纯白 ＞ 很浅的背景色 ＞ 深色块；深色只留给一级顶栏、状态标签 |
-| 比例靠减数据，不删组件 | 画布有比例限制，底图的组件仍按页面原则出齐；够不到比例时减行数、字段数、压图表高度，再横向重排，不删骨架组件、不把它们挪进浮层（顺序见 references/canvas/marketing.md「整图比例」） |
+| 比例靠减数据，不删组件 | 画布有比例限制，底图的组件仍按页面原则出齐；够不到比例时减行数、字段数、压图表高度，再横向重排，不删骨架组件、不把它们挪进浮层（顺序见 references/canvas/marketing.md「按比例定内容量」） |
 | 只写业务结论 | 示意图内容不留设计过程的痕迹 |
 | Skill 资产是唯一结构真相源 | 新实采的界面结构直接沉淀到对应的 assets/c1～c5、base.css 和 registry.json |
