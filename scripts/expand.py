@@ -1121,6 +1121,20 @@ def m_procs(a, body):
 
 
 ACTION_LIST_RE = re.compile(r"待[检审核批办理处跟进发收付派领取签验回]|超时|逾期|异常|预警|待办|未[检审核批办处]")
+ACTION_RE = re.compile(r"审批|审核|办理|处理|巡检|点检|保养|出库|入库|领用|领取|接单|派单|派工|报修|维修|确认|核对|登记|打卡|回访|签收|发货|收货|盘点|复核|催办|跟进|分配|回收|结算|核销|退回|驳回|报备|补录|派发|受理|验收|开单|录入")   # 图的讲点里有这些动作，画面又是列表，列表就得带按钮
+
+
+def _list_needs_action(html):
+    """整张图的可见文字里有动作词，而列表（表格／表格列表／手机卡片）没有按钮 → 返回缺按钮的列表类型。"""
+    text = re.sub(r"<[^>]+>", " ", html)
+    hit = ACTION_RE.search(text)
+    if not hit:
+        return None, None
+    if "<table" in html and "op-btn" not in html:
+        return "表格", hit.group()
+    if 'class="ocard"' in html and 'class="obtn"' not in html:
+        return "手机卡片", hit.group()
+    return None, None
 
 
 def m_list(a, body):
@@ -2567,6 +2581,10 @@ def m_page(a, body):
     if floats:                 # 浮层和底图装进同一个定位框：浮层按底图尺寸落在右下象限
         body_html = f'<div class="stage-body">{body_html}{"".join(floats)}</div>'
         floats = []
+    _kind, _verb = _list_needs_action(body_html)
+    if _kind:
+        warn(f"这张图讲的是「{_verb}」这类操作，画面里的{_kind}却没有按钮：讲点有动作、画面是列表，列表就要带按钮——"
+             f"{'表头最后一列写 操作:ops，格里写 去巡检:check:blue' if _kind == '表格' else '卡片每行第四段写 按钮名:图标'}，按钮名就是那个动作")
     return f'<div class="{" ".join(stage_cls)}" data-kind="{kind}"{st}>{body_html}{"".join(floats)}</div>'
 
 
@@ -2906,7 +2924,7 @@ tiles 选项字段平铺，值写「选项 / *当前:颜色 / 选项」，独占
 采购申请 | CG-20260820-0012 | 财务复核 | 已完成:green | 8月20日
 </hb-procs>""",
 "hb-list": """表格列表（官方 table_item_list，工作区里用得最多的组件）。属性 title、span、tools（工具图标，| 分：搜索/新建/新增/导出/导入/更多/筛选/打印/分享/设置）、count（记录数，出底部「共 N 条」）、nock / noidx / total 透传给表体。
-列出的记录有下一步动作时（今日待检、待审批、超时未接、异常明细），最后一列放行内按钮：列名写 操作:ops，格里写 去巡检:check:blue，按钮名就是那个动作；标题带「待／超时／异常」而没有 :ops 列会提示。
+图的讲点里有操作（审批、巡检、出库、接单、派单、处理…）而画面是列表时，列表必须带按钮：列名写 操作:ops，格里写 去巡检:check:blue，按钮名就是那个动作。整张图有动作词而表格没有 :ops 列会提示（手机卡片同理，按钮写在每行第四段）。
 体内就是 hb-grid 的写法：首行表头（列名:类型 / :sum=值），其后每行一条记录。
 外壳实测：标题行 40、表头 32、数据行 35、底部分页条 40，白卡圆角 9。
 例：
