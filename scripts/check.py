@@ -41,8 +41,8 @@ PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "�
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
 SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
 SLIDE_W = 1300         # 演示尺寸窗口宽（整图 1500：图片位 930 宽时主体字 13px 渲染成 8px，正好在底线上）
-SLIDE_MAX_H = 867      # 目标上限：底图比 ≥1.5，像一块真实显示器；超过它报 Medium，可让位于信息密度
-SLIDE_HARD_H = 930     # 硬上限：底图比 <1.4，接近 4:3；超过它报 High
+SLIDE_MAX_H = 930      # 目标上限：底图比 ≥1.4；超过它报 Medium，版式与骨架组件优先，可让位
+SLIDE_HARD_H = 1040    # 硬上限：底图比 <1.25；超过它报 High
 SLIDE_MIN_H = 722      # 目标下限：底图比 ≤1.8；再扁就是内容太少，浮层一探出整图就显空，报 Medium
 SLIDE_FLAT_H = 665     # 硬下限：底图比 >1.95，扁成一条；报 High
 # 整张图（含浮层探出部分）宽高比，两档尺寸通用：一屏原则——图在载体里不该要滚动才看完
@@ -520,10 +520,10 @@ def check(path, render=False, allow_local=False):
     if re.search(r'data-kind="dashboard"', body):
         main = re.split(r'class="[^"]*\bmk-float\b', body)[0]        # 只看底图，浮层里的不算
         slide = bool(SLIDE_RE.search(body))
-        for n, pat in (("筛选", r'class="filter"'), ("图表", r'<svg[^>]*class="[^"]*chart|class="[^"]*\bchart\b'),
+        for n, pat in (("筛选", r'class="filter"'), ("趋势图（柱状／折线／面积／双轴，环图和条形图不算）", r'data-chart="(?:bar|line|area|biaxial)"'),
                        ("明细（透视表或表格列表）", r'class="til-|class="pivot|<table')):
             if not re.search(pat, main):
-                sev = "High" if slide or n == "图表" else "Medium"     # 默认尺寸下筛选、明细在宫格式里可无，降一档
+                sev = "High" if slide or n.startswith("趋势图") else "Medium"     # 默认尺寸下筛选、明细在宫格式里可无，降一档
                 add(sev, "base-skeleton", f"数据看板底图缺{n}：骨架是 横幅 → 筛选 → 单指标 → 图表行 → 明细，不为压比例删掉，也不挪进浮层；"
                                           f"先减数据（明细减到 4 行、单指标 4 个、图表卡压矮），再横向重排")
     if SLIDE_RE.search(body) and not any(x["rule"] == "slide-height" for x in findings):
@@ -537,7 +537,7 @@ def check(path, render=False, allow_local=False):
             est = ph + (104 if "item-grid" in body else 76) + 48      # 顶栏或记录功能区 ＋ 页面上下内边距
         if est:
             if est > SLIDE_HARD_H + 60:
-                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_HARD_H}：底图会接近 4:3，不像真实显示器，放进 PPT 还被按高度缩小。先减数据（明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮），再把明细与主图表并排（hb-row spans=\"14|10\"）；骨架组件留在底图，不删、不挪进浮层")
+                add("High", "slide-height", f"演示尺寸窗口高约 {int(est)}px（估算），超过 {SLIDE_HARD_H}：底图会接近 4:3，不像真实显示器，放进 PPT 还被按高度缩小。先把数据收到下限（明细 4 行、字段组每组 4 个字段、单指标 4 个、图表卡压矮），再做版式允许的横向重排（图表行 12+6+6、底部两表并排、字段组 cols=4）；版式和骨架组件不动、不挪进浮层")
 
     # ── High：横幅写成某个具体人 ───────────────────────────────────
     for bm in re.finditer(r'<div class="[^"]*\brich title\b[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</)', body, re.S):
@@ -565,13 +565,13 @@ def check(path, render=False, allow_local=False):
             findings[:] = [f for f in findings if f["rule"] not in ("column-short", "float-cover", "height-unknown", "slide-height")]
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             if SLIDE_RE.search(body) and sh and SLIDE_MAX_H < sh <= SLIDE_HARD_H:
-                add("Medium", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过目标 {SLIDE_MAX_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，低于 1.5。先减数据、再横向重排；骨架组件放不下时可让位于信息密度，在验收表第 8 条写明理由（硬上限 {SLIDE_HARD_H}）")
+                add("Medium", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过目标 {SLIDE_MAX_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，低于 1.4。先把数据收到下限、再做版式允许的横向重排；版式和骨架组件放不下时让位，在验收表第 8 条写明理由（硬上限 {SLIDE_HARD_H}）")
             if SLIDE_RE.search(body) and sh and SLIDE_FLAT_H < sh < SLIDE_MIN_H:
                 add("Medium", "slide-flat", f"演示尺寸窗口高 {sh}px（实测），低于目标 {SLIDE_MIN_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，高于 1.8，内容偏少；有浮层时浮层比底图还高，整图显空。按页面原则把骨架组件的数据补回去（列表页表格 10–14 行、字段组每组 6～8 个字段、明细 5–6 行、图表卡别压太矮），不是加组件")
             if SLIDE_RE.search(body) and sh and sh <= SLIDE_FLAT_H:
                 add("High", "slide-flat", f"演示尺寸窗口高 {sh}px（实测），底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，扁成一条、不像一整页：把骨架组件的数据补到页面原则给的条数，列表页表格补到 10–14 行")
             if SLIDE_RE.search(body) and sh and sh > SLIDE_HARD_H:
-                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_HARD_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，接近 4:3，不像真实显示器。先减数据（明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮），再把明细与主图表并排（hb-row spans=\"14|10\"）；骨架组件留在底图，不删、不挪进浮层")
+                add("High", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过 {SLIDE_HARD_H}：底图 {SLIDE_W}×{sh} 比 {SLIDE_W/sh:.2f}，接近 4:3，不像真实显示器。先把数据收到下限（明细 4 行、字段组每组 4 个字段、单指标 4 个、图表卡压矮），再做版式允许的横向重排（图表行 12+6+6、底部两表并排、字段组 cols=4）；版式和骨架组件不动、不挪进浮层")
             st = r.get("stage") or {}
             # 整张图的宽高比（含浮层向下探出的部分），两档尺寸通用；手机图壳高固定、全屏产品图跟着屏幕走，都不查
             exempt = re.search(r'kind="mobile"', body) or re.search(r'class="stage[^"]*\bproduct\b', body)

@@ -588,7 +588,7 @@ def chart_shell(a, tagname, inner_html, extra=""):
     cls = "chart plain" if "plain" in a else "w-card chart"
     span = f' span-{a["span"]}' if "span" in a else ""
     ex = f" {extra}" if extra else ""
-    return f'<div class="{cls}{ex}{span}">{card_head(a, tagname)}{inner_html}</div>'
+    return f'<div class="{cls}{ex}{span}" data-chart="{tagname[3:]}">{card_head(a, tagname)}{inner_html}</div>'
 
 
 def chart_card(a, inner, legend, tagname, par="none"):
@@ -2080,6 +2080,7 @@ def warn(msg):
 
 VIEW_MACROS = {"hb-grid", "hb-kanban", "hb-cards"}
 CHART_MACROS = {"hb-bar", "hb-line", "hb-donut", "hb-area", "hb-hbar", "hb-biaxial", "hb-funnel", "hb-scatter", "hb-map"}
+TREND_MACROS = {"hb-bar", "hb-line", "hb-area", "hb-biaxial"}   # 看板必有的那张「主指标怎么变」的图；环图、条形图、漏斗不算
 PAGE_SLOTS = {
     "list": dict(
         cn="列表和视图页",
@@ -2487,8 +2488,8 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
     have = set(deep)
     trim = "压比例先减数据：明细减到 4 行、字段组每组 4～6 个字段、单指标 4 个、图表卡压矮；组件留在底图"
     if kind == "dashboard":
-        if not have & CHART_MACROS:
-            raise ExpandError(f"<hb-page kind=\"dashboard\"> 底图里没有图表：数据看板必有一张主指标的趋势图（浮层里的不算）。{trim}")
+        if not have & TREND_MACROS:
+            raise ExpandError(f"<hb-page kind=\"dashboard\"> 底图里没有趋势图：数据看板必有一张主指标怎么变的图（hb-bar／hb-line／hb-area／hb-biaxial），环图、条形图、漏斗不能代替，浮层里的不算。{trim}")
         for label, ms in (("单指标", {"hb-stats", "hb-multistats"}), ("筛选", {"hb-filters"}), ("明细（透视表或表格列表）", {"hb-pivot", "hb-list"})):
             if not have & ms:
                 warn(f"数据看板底图里没有{label}：骨架是 横幅 → 筛选 → 单指标 → 图表行 → 明细，宫格式纯图表型才可以不放单指标和明细。{trim}")
@@ -2527,7 +2528,7 @@ def m_page(a, body):
         raise ExpandError('<hb-page canvas> 只能是 marketing（营销类，一张图）或 product（产品设计类，照着搭）')
     size = a.get("size", "full")
     if size not in ("full", "slide"):
-        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1300 宽、高 867 以内，底图按完整一页画）')
+        raise ExpandError('<hb-page size> 只能是 full（默认，整页全貌）或 slide（演示尺寸：放进 PPT 等窄位置，窗口 1300 宽、高 930 以内，版式和必有组件按页面原则出齐）')
     if size == "slide" and (canvas != "marketing" or kind in ("screen", "mobile")):
         raise ExpandError('<hb-page size="slide"> 只用在营销类的电脑端页面：大屏、手机端和产品设计类画布不用演示尺寸')
     parts = _top_level(a.get("_raw", body))
@@ -2762,7 +2763,7 @@ GROUPS = [
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
-size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 722～867，也就是底图比 1.5～1.8；超过 867 报 Medium、超过 930 报 High（`slide-height`），低于 722 报 Medium、低于 666 报 High（`slide-flat`）；底图按完整一页画，必有组件和整页一样不能少，超高了减明细行数、压图表高度，太扁了把这些行数补回去，都不删骨架组件；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
+size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置，窗口 1300 宽、窗口高 722～930，也就是底图比 1.4～1.8；超过 930 报 Medium、超过 1040 报 High（`slide-height`），低于 722 报 Medium、低于 666 报 High（`slide-flat`）；版式和必有组件按页面原则出齐、顺序不改，放不下宁可偏高；超高了减明细行数、压图表高度，太扁了把这些行数补回去；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
 体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。

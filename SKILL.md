@@ -53,7 +53,7 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 ```
 
 - 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏。
-- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组件、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float w="…">`，固定在底图右下角，体内用 hb-row／hb-col 排一块小画面，体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
+- 并排用 `<hb-row spans="16|8">`，矮组件（按钮组件、多项统计）别单独占一栏，用 `<hb-col>` 在同一栏叠两个；营销浮层用 `<hb-float w="…">`，固定在底图右下角，体内用 hb-row／hb-col 排一块小画面，体内放底层没有的 PC 组件（hb-list／hb-fields／hb-multistats），或只放一个 hb-phone 手机单屏，规则见 [references/canvas/marketing.md](references/canvas/marketing.md)。
 - 外壳、画布高度、浮层定位、栅格都由宏产出；片段里只有 hb-page 和它体内的宏与内容。
 - 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
