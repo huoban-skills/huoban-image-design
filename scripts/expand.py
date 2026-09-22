@@ -1744,7 +1744,8 @@ def m_ptop(a, body):
     if who is True:
         raise ExpandError('<hb-ptop> 的 user 要写登录人姓名，如 user="周敏"')
     right = f'<span class="pav">{esc(who[:1])}</span>' if who else f'<span class="pbtn">{esc(a.get("login", "登录"))}</span>'
-    return f'<div class="p-top"><span class="plogo"></span><span class="pname">{esc(name)}</span><span class="sp"></span>{right}</div>'
+    logo = '<span class="plogo"></span>' if "logo" in a else ""
+    return f'<div class="p-top">{logo}<span class="pname">{esc(name)}</span><span class="sp"></span>{right}</div>'
 
 
 def m_pnav(a, body):
@@ -2600,7 +2601,7 @@ MACROS = {
     "hb-taskbar": (m_taskbar, "任务办理区：属性 who、sub；体内按钮名 | 按钮名"),
     "hb-ptasks": (m_ptasks, "流程任务列表：属性 tabs、count、dot、app；每行「发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮」"),
     "hb-wpage": (m_wpage, "手机工作台：# 页面名；sc: 名:图标 | …；tabs: *页签 | 页签；sub: 子区名 | 全部 | *待执行 | 已完成"),
-    "hb-ptop": (m_ptop, "门户顶栏：属性 name（门户名）、user（登录人姓名，出头像）、login（未登录时的按钮名）"),
+    "hb-ptop": (m_ptop, "门户顶栏：属性 name（门户名）、user（登录人姓名，出头像）、login（未登录时的按钮名）、logo（出 logo 占位，默认不出）"),
     "hb-pnav": (m_pnav, "门户导航条：一级页签，* 前缀＝当前，名后缀 :g ＝分组页签；属性 fill、scroll"),
     "hb-pmenu": (m_pmenu, "门户分组菜单：分组页签展开的面板＋蒙层；每行 名称:图标"),
     "hb-plogin": (m_plogin, "门户登录页：属性 name、wechat、plain、logo、phone、captcha、code、submit"),
@@ -3086,7 +3087,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 @昨天 17:06
 ! 本周配货已确认
 8 家门店的配货申请已由库管确认，合计 76 件。""",
-"hb-ptop": """门户顶栏 44，替代 hb-phone 自带的返回顶栏（外层写 <hb-phone nobar>）。属性 name（门户名，必填）、user（登录人姓名，右侧出 24 圆头像）、login（未登录时右侧按钮名，默认「登录」）。自闭合写法。
+"hb-ptop": """门户顶栏 44，替代 hb-phone 自带的返回顶栏（外层写 <hb-phone nobar>）。属性 name（门户名，必填）、user（登录人姓名，右侧出 24 圆头像）、login（未登录时右侧按钮名，默认「登录」）、logo（门户名左侧出 32 见方 logo 占位；默认不出，示意图里占位色块比没有更假）。自闭合写法。
 未登录出登录按钮，登录后出头像；两者不同时出现。
 例：
 <hb-ptop name="伙伴生态合作" user="周敏"/>
