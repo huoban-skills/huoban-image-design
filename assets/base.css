@@ -370,13 +370,16 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* 行内快捷按钮（24 高） */
 .op-btn {
   height: 24px; display: inline-flex; align-items: center; gap: 4px;
-  padding: 0 8px; border-radius: 6px; color: #fff; font-size: 12px;
+  padding: 0 8px; border-radius: 6px; color: #fff; font-size: 12px; background: var(--primary);
   white-space: nowrap; margin-right: 6px;
 }
 .op-btn svg { width: 12px; height: 12px; }
 .op-btn.teal { background: var(--c-teal); }
 .op-btn.blue { background: var(--primary); }
 .op-btn.green { background: var(--c-green); }
+.op-btn.orange { background: var(--c-orange); }
+.op-btn.red { background: var(--c-red); }
+.op-btn.purple { background: var(--c-purple); }
 .op-btn.dis { opacity: .45; }
 .op-more { color: var(--ink-45); }
 
@@ -1340,6 +1343,9 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .phone .m-workbench .w-row[class*="stats-"] { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: none; box-shadow: none; padding: 0; border: 0; }
 .phone .m-workbench .w-row[class*="stats-"] .chart_single { border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); }
 .phone .m-workbench .w-card.chart { border-radius: 9px; box-shadow: 0 20px 40px rgba(0,0,0,.08); }
+/* 手机卡只有 280 来宽：图表区不用 PC 的固定 240 高，按 svg 的 viewBox 比例撑，免得环图、柱图上下留一大块白 */
+.phone .chart .wc-bd { height: auto; }
+.phone .chart .wc-bd svg { height: auto; }
 .phone .wcard.wlist, .phone .wcard .wtb { padding: 12px; }
 .phone .wcard .wtabs:has(+ .wtb) { border-bottom: none; }   /* 页签下面直接接卡片：不留那条底线，选中页签的下划线就是分界 */
 .phone .wcard.wlist .m-cards, .phone .wcard .wtb .m-cards { flex: none; background: none; padding: 0; border: none; }

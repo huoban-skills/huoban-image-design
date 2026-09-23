@@ -102,12 +102,17 @@ def user(name):
     return f'<span class="user"><span class="av">{esc(name[:1])}</span>{esc(name)}</span>'
 
 
+OP_BTN_COLORS = ("blue", "teal", "green", "orange", "red", "purple")
+
+
 def op_btn(spec, tagname):
     # 下载:download:teal
     parts = [p.strip() for p in spec.split(":")]
     label = parts[0]
     icon = parts[1] if len(parts) > 1 and parts[1] else "arrow-right"
     color = parts[2] if len(parts) > 2 else ""
+    if color and color not in OP_BTN_COLORS:
+        raise ExpandError(f"{tagname}按钮「{label}」的颜色 {color} 不存在，可用：{'／'.join(OP_BTN_COLORS)}（不写默认主色）")
     cls = "op-btn" + (f" {color}" if color else "")
     return f'<span class="{cls}">{ico(icon, tag=tagname)}{esc(label)}</span>'
 
@@ -2875,7 +2880,7 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 属性 search 搜索框占位文字、new 新建按钮文字（nodd 去掉分裂箭头）。放在 <div class="view-box"> 里、hb-grid 之前。
 例：
 <hb-tools search="搜索品名或编号" new="新建物资">字段 | 筛选:1 | 排序 | 导入 | 打印二维码:print</hb-tools>""",
-"hb-grid": """首行表头，列名后可接类型 :tag（彩色选项）:tags（多值，值用 / 分）:user（人员，多人用 / 分）:ops（行内按钮，名:图标:颜色，多个用 / 分）；统计 :sum=值 :avg= :max= :min= :count=。
+"hb-grid": """首行表头，列名后可接类型 :tag（彩色选项）:tags（多值，值用 / 分）:user（人员，多人用 / 分）:ops（行内按钮，名:图标:颜色，多个用 / 分；颜色 blue／teal／green／orange／red／purple，不写为主色）；统计 :sum=值 :avg= :max= :min= :count=。
 其后每行一条记录，列数必须与表头一致。# 分组值:颜色 插分组行；! 前缀＝选中行。
 属性 total="1,217条" 出底部合计行（有统计列时自动出）；nock 去勾选列、noidx 去行号列；bare 只出 .grid（放进 w-card、浮层、标签页内时用），默认带 .table-view.view-grid 和横向滚动条。
 例：
