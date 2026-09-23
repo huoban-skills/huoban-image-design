@@ -92,6 +92,19 @@ def split_color(v):
     return v, None
 
 
+OPTION_NOT_VALUE = re.compile(r"\d[\d,]*\.\d|\d\s*%|万元|\d\s*元|¥|\d{4}-\d{1,2}-\d{1,2}|\d{1,2}:\d{2}")
+
+
+def check_option(text, tagname=""):
+    """带颜色的值必须是选项字段的预设值：数字、金额、百分比、日期不是选项，长句多半是计算结果或自由文本。"""
+    if OPTION_NOT_VALUE.search(text):
+        raise ExpandError(f"{tagname}「{text}」带了颜色，但它是数值、金额、百分比或日期，不是选项：只有选项字段的预设值才上色，"
+                          "数值和计算结果直接写、不带颜色；要醒目就另设一个选项字段（如 校验结果 | 超额:red），见 component-guide.md「字段按类型写」")
+    if len(text) > 10 or re.search(r"[·（(，,；;]", text):
+        warn(f"{tagname}「{text}」带了颜色但不像预设选项（太长或带说明）：选项值是字段里固定的几个短名词，同一字段所有记录都从中选；"
+             "带说明的句子是文本或计算结果，去掉颜色，或拆成「选项 + 说明字段」")
+
+
 def tag(text, color=None):
     text = esc(text)
     return f'<span class="tag c-{color}">{text}</span>' if color and color != "gray" else f'<span class="tag">{text}</span>'
@@ -110,9 +123,11 @@ def op_btn(spec, tagname):
     parts = [p.strip() for p in spec.split(":")]
     label = parts[0]
     icon = parts[1] if len(parts) > 1 and parts[1] else "arrow-right"
-    color = parts[2] if len(parts) > 2 else ""
-    if color and color not in OP_BTN_COLORS:
-        raise ExpandError(f"{tagname}按钮「{label}」的颜色 {color} 不存在，可用：{'／'.join(OP_BTN_COLORS)}（不写默认主色）")
+    mods = " ".join(parts[2:]).split()          # 颜色，可再跟 dis 置灰：去巡检:check:blue dis
+    for m in mods:
+        if m != "dis" and m not in OP_BTN_COLORS:
+            raise ExpandError(f"{tagname}按钮「{label}」的颜色 {m} 不存在，可用：{'／'.join(OP_BTN_COLORS)}，可再加 dis 置灰（不写默认主色）")
+    color = " ".join(mods)
     cls = "op-btn" + (f" {color}" if color else "")
     return f'<span class="{cls}">{ico(icon, tag=tagname)}{esc(label)}</span>'
 
@@ -128,11 +143,17 @@ def render_val(v, typ="text", tagname=""):
     if typ == "user":
         return " ".join(user(n) for n in v.split("/") if n.strip())
     if typ == "tags":
-        return '<span class="tags">' + "".join(tag(*split_color(t)) for t in v.split("/") if t.strip()) + "</span>"
+        parts = [split_color(t) for t in v.split("/") if t.strip()]
+        for t, c in parts:
+            if c:
+                check_option(t, tagname)
+        return '<span class="tags">' + "".join(tag(t, c) for t, c in parts) + "</span>"
     if typ == "ops":
         return " ".join(op_btn(o, tagname) for o in v.split("/") if o.strip())
     text, color = split_color(v)
     if typ == "tag" or color:
+        if color:
+            check_option(text, tagname)
         return tag(text, color)
     return esc(text)
 
