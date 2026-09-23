@@ -1566,7 +1566,7 @@ def m_phone(a, body):
     if "nobar" not in a:
         dots = "" if "nodots" in a else "···"
         bar = f'<div class="m-topbar"><span class="bk">{ico("prev")}</span><span class="tt">{esc(a.get("title", ""))}</span><span class="dots">{dots}</span></div>'
-    cls = "phone" + (" h-fix" if "fix" in a else "")
+    cls = "phone h-fix"   # 手机壳一律固定 812 高；浮层里的手机由 .mk-float-phone 的样式改回按内容撑
     return f'<div class="{cls}">{bar}{body.strip()}</div>'
 
 
@@ -2361,7 +2361,7 @@ WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
         allowed={"hb-phone", "hb-screens", "hb-cover"},
         required=[],
         order=["hb-cover", "hb-phone", "hb-screens"],
-        doc="只看一个页面：放一个 hb-phone（画布 520 宽）。讲一段流程：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）。不套 .window。\n门户页（登录页、门户导航、个人中心）也在这里画：hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav，再放页面内容。",
+        doc="手机图一律是流程壳：放一个 hb-screens，体内 hb-phone 与 hb-conn 交替，一步一屏，2～3 屏（画布 1100／1640 宽）；需求只提到一个界面时补出它的上一步或下一步。不套 .window。\n门户页（登录页、门户导航、个人中心）也在这里画：hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav，再放页面内容。",
         example="""<hb-page kind="mobile">
 <hb-screens>
 <hb-phone title="待办">
@@ -2418,8 +2418,6 @@ def m_float(a, body):
             raise ExpandError("<hb-float> 里的手机只放单屏：一个 <hb-phone>，不放 <hb-screens> 流程壳；要讲多屏流程另出一张手机图")
         if n_cards or re.sub(r"\s+", "", body).find('<divclass="phone') != 0:
             raise ExpandError("<hb-float> 里手机单屏和 PC 组件二选一，不混放：要么一个 <hb-phone>，要么用 <hb-row>／<hb-col> 排 PC 组件")
-        if "h-fix" in body.split(">", 1)[0]:
-            raise ExpandError("<hb-float> 里的 <hb-phone> 不写 fix：浮层里的手机按内容撑高，内容控制在 600 以内，固定 812 会把整图拉成竖条")
         if "w" in a:
             raise ExpandError("<hb-float> 放手机单屏时不写 w：手机壳按 0.8 倍显示，宽度固定 300")
         return f'<div class="mk-float mk-float-phone" style="--float-w:300px">{body.strip()}</div>'
@@ -2592,6 +2590,8 @@ def m_page(a, body):
             loose = re.search(_mob, re.sub(r"<hb-phone\b.*?</hb-phone>", "", fl, flags=re.S))
             if loose:
                 raise ExpandError(f"<hb-float> 里的 <{loose.group(1)}> 要包在 <hb-phone> 里：手机宏的样式只在手机壳里生效，散放会变成裸文字")
+    if kind == "mobile" and "hb-phone" in names:
+        raise ExpandError("手机图不出单屏：<hb-page kind=\"mobile\"> 体内一律是 <hb-screens>，2～3 屏；需求只提到一个界面时，补出它的上一步（消息、列表、工作台）或下一步（结果态），见 references/principles/mobile.md「画几屏」")
     # 演示尺寸和整页一样按完整一页画，必有组件不放宽；超高了减行、压图表高度，不删骨架组件
     _check_slots(kind, spec, names, deep, first_screen)
     floats, main_parts, nav_html = [], [], ""
@@ -2743,7 +2743,7 @@ MACROS = {
     "hb-scard": (m_scard, "大屏组件卡：属性 title、span（默认 6）、rs（默认 16）；体内放 hb-area/line/bar/donut 的 bare 输出、hb-sbars 或 hb-list"),
     "hb-sbars": (m_sbars, "大屏进度条：每行「名称 | 百分比」，条底色蓝/橙/绿/红轮转"),
     "hb-svisual": (m_svisual, "大屏中央视觉位：属性 span（默认 12）、rs（默认 38）、title、img=客户图片路径、map=网点阵占位；空则线框地球"),
-    "hb-phone": (m_phone, "手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容"),
+    "hb-phone": (m_phone, "手机壳＋顶栏，固定 812 高：属性 title、nobar、nodots；体内放页面内容"),
     "hb-mhome": (m_mhome, "工作区首页：属性 tabs=表格|*流程…；每行一个分组，- 前缀为展开的表"),
     "hb-vbar": (m_vbar, "列表页视图条：属性 view、count、icon、nosearch"),
     "hb-ocards": (m_ocards, "三槽卡片列表：标题 | 副标题 | 字段=值; 字段=值; 字段=值 | 按钮:图标 | img；属性 fab、pager、bare"),
@@ -2846,7 +2846,7 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 </hb-line>
 </hb-row>
 </hb-float>""",
-"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。每一屏要是不同类型的界面，两屏同类会报错（类型表见 references/principles/mobile.md）。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。""",
+"hb-screens": """手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。每一屏要是不同类型的界面，两屏同类会报错（类型表见 references/principles/mobile.md）。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。""",
 "hb-shell": """属性：ws 工作区名（必填）、logo（默认取 ws 首字）、page 顶栏当前页名、nav 图标行高亮项 home/table/doc/flow（默认 table）、me 头像字、theme band/side/full/light（默认 band）、bottom（默认 管理|成员）。
 体内先写 <hb-nav>，其后是放进 .main 的页面内容（视图页签、view-box、.page 等）。
 .stage、has-float、.mk-float 浮层、补充样式仍由你写；hb-shell 只产出 .window 到 .main 顶栏为止的壳。
@@ -3176,16 +3176,14 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 例：
 <hb-svisual map span="12" rs="38"/>
 <hb-svisual span="12" rs="38" title="厂区实时状态" img="素材/厂区3D.png"/>""",
-"hb-phone": """手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-screens 里必加）、nobar（不要顶栏，门户页用，顶栏改放 hb-ptop）、nodots（顶栏右侧不出 ···，个人中心这类系统页用）。体内按页面形态放手机端其他宏。
-.stage 宽度由 hb-page 按屏数给（单屏 520、两屏 1100、三屏 1640）。
+"hb-phone": """手机壳＋顶栏 44。固定 812 高，内容超出由壳底自然切断（放进浮层时自动改成按内容撑）。属性 title（顶栏标题：表名/流程名/企业名·应用名）、nobar（不要顶栏，门户页用，顶栏改放 hb-ptop）、nodots（顶栏右侧不出 ···，个人中心这类系统页用）。体内按页面形态放手机端其他宏。
+手机图一律 2～3 屏，写在 hb-screens 里；.stage 宽度由 hb-page 按屏数给（两屏 1100、三屏 1640）。
 例：
-<div class="stage">
-  <div class="duo">
+<hb-screens>
 <hb-phone title="纳承国际 · 存货管理"><hb-wxapp>…</hb-wxapp></hb-phone>
 <hb-conn>…</hb-conn>
-<hb-phone title="客户存货单" fix><hb-vbar view="未取完" count="12"/><hb-ocards fab>…</hb-ocards><hb-mtool/></hb-phone>
-  </div>
-</div>""",
+<hb-phone title="客户存货单"><hb-vbar view="未取完" count="12"/><hb-ocards fab>…</hb-ocards><hb-mtool/></hb-phone>
+</hb-screens>""",
 "hb-mhome": """工作区首页＝页签行＋搜索＋分组列表。属性 tabs="*表格|流程|页面|动态|库管工作台"（* 当前）、search 占位、head（默认「全部表格」）；每行一个分组名如 产品库存(3)，- 前缀是展开后的表名。
 例：
 <hb-mhome tabs="*表格|流程|页面|动态|库管工作台">
@@ -3254,11 +3252,11 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 @昨天 17:06
 ! 本周配货已确认
 8 家门店的配货申请已由库管确认，合计 76 件。""",
-"hb-scan": """扫码页：企业微信「扫一扫」那一屏，讲「现场对着标签扫一下」怎么进系统。整屏灰底当取景画面，顶栏左 ✕ 右空、标题居中，中间一张白底二维码示意（伪码，扫不出内容），一条扫描光线横过，底部「相册」「轻触照亮」两个圆钮。外层写 <hb-phone nobar fix>。
+"hb-scan": """扫码页：企业微信「扫一扫」那一屏，讲「现场对着标签扫一下」怎么进系统。整屏灰底当取景画面，顶栏左 ✕ 右空、标题居中，中间一张白底二维码示意（伪码，扫不出内容），一条扫描光线横过，底部「相册」「轻触照亮」两个圆钮。外层写 <hb-phone nobar>。
 属性 title（默认「扫一扫」）、label（二维码下方的标签文字，如物资编号）、tip（码下面的一句提示，如「对准物资标签上的二维码」）。自闭合写法。
 扫码页之后接记录详情页或新建／编辑页，讲扫到的是哪条记录、扫完填什么。
 例：
-<hb-phone nobar fix><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>""",
+<hb-phone nobar><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>""",
 "hb-ptop": """门户顶栏 44，替代 hb-phone 自带的返回顶栏（外层写 <hb-phone nobar>）。属性 name（门户名，必填）、user（登录人姓名，右侧出 24 圆头像）、login（未登录时右侧按钮名，默认「登录」）、logo（门户名左侧出 32 见方 logo 占位；默认不出，示意图里占位色块比没有更假）。自闭合写法。
 未登录出登录按钮，登录后出头像；两者不同时出现。
 例：
@@ -3281,11 +3279,11 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 "hb-plogin": """门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、plain（白底；默认铺极淡的主色纯色底，客户有品牌底图时导出后另换）、logo（卡头门户名左侧出 logo 占位；默认只有门户名）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
 登录按钮画成未填写的浅色态，卡底固定带 Powered by 伙伴云 ｜ 免责声明 ｜ 投诉。
 例：
-<hb-phone nobar fix><hb-plogin name="伙伴生态合作" wechat/></hb-phone>""",
+<hb-phone nobar><hb-plogin name="伙伴生态合作" wechat/></hb-phone>""",
 "hb-pme": """个人中心（点门户顶栏头像进，是独立页不是浮层）。外层写 <hb-phone title="个人中心" nodots>。属性 who（登录人姓名，必填）、out（底部按钮名，默认「退出登录」）。
 体内每行「字段名 | 值 | 右侧操作(可选)」，-- 单起一行表示另起一张卡。
 例：
-<hb-phone title="个人中心" nodots fix>
+<hb-phone title="个人中心" nodots>
 <hb-pme who="周敏">
 手机号 | 138****6021 | 更换
 微信 | 周敏

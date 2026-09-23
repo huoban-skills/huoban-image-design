@@ -98,7 +98,7 @@ hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统
 手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏，每屏界面类型不同
 
 ```
-手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；每个 hb-phone 加 fix。hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。每一屏要是不同类型的界面，两屏同类会报错（类型表见 references/principles/mobile.md）。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。
+手机流程壳：体内 hb-phone、hb-conn、hb-phone（、hb-conn、hb-phone）交替，一步一屏，2～3 屏；hb-page kind=mobile 按屏数把画布设成 1100／1640 宽；超过 3 步拆成两张图。每一屏要是不同类型的界面，两屏同类会报错（类型表见 references/principles/mobile.md）。企微那一屏放在第一个 hb-phone 里：应用推给本人的用 hb-wxapp，发进群的用 hb-wxgroup。
 ```
 
 
@@ -691,19 +691,17 @@ img 客户图片路径（地图、3D 厂区图、产品图；本地文件 build.
 ## 手机端（2026-09-03 H5 实测结构，壳 375 宽）
 
 ### hb-phone
-手机壳＋顶栏：属性 title、fix、nobar；体内放页面内容
+手机壳＋顶栏，固定 812 高：属性 title、nobar、nodots；体内放页面内容
 
 ```
-手机壳＋顶栏 44。属性 title（顶栏标题：表名/流程名/企业名·应用名）、fix（固定 812 高，hb-screens 里必加）、nobar（不要顶栏，门户页用，顶栏改放 hb-ptop）、nodots（顶栏右侧不出 ···，个人中心这类系统页用）。体内按页面形态放手机端其他宏。
-.stage 宽度由 hb-page 按屏数给（单屏 520、两屏 1100、三屏 1640）。
+手机壳＋顶栏 44。固定 812 高，内容超出由壳底自然切断（放进浮层时自动改成按内容撑）。属性 title（顶栏标题：表名/流程名/企业名·应用名）、nobar（不要顶栏，门户页用，顶栏改放 hb-ptop）、nodots（顶栏右侧不出 ···，个人中心这类系统页用）。体内按页面形态放手机端其他宏。
+手机图一律 2～3 屏，写在 hb-screens 里；.stage 宽度由 hb-page 按屏数给（两屏 1100、三屏 1640）。
 例：
-<div class="stage">
-  <div class="duo">
+<hb-screens>
 <hb-phone title="纳承国际 · 存货管理"><hb-wxapp>…</hb-wxapp></hb-phone>
 <hb-conn>…</hb-conn>
-<hb-phone title="客户存货单" fix><hb-vbar view="未取完" count="12"/><hb-ocards fab>…</hb-ocards><hb-mtool/></hb-phone>
-  </div>
-</div>
+<hb-phone title="客户存货单"><hb-vbar view="未取完" count="12"/><hb-ocards fab>…</hb-ocards><hb-mtool/></hb-phone>
+</hb-screens>
 ```
 
 ### hb-mhome
@@ -927,7 +925,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 门户登录页，整屏一块，外层写 <hb-phone nobar>。属性 name（门户名，必填）、wechat（出微信登录按钮，可给文案）、plain（白底；默认铺极淡的主色纯色底，客户有品牌底图时导出后另换）、logo（卡头门户名左侧出 logo 占位；默认只有门户名）、phone／captcha（两个输入框的占位，默认「手机号」「验证码」）、code（默认「获取验证码」）、submit（默认「登录」）。
 登录按钮画成未填写的浅色态，卡底固定带 Powered by 伙伴云 ｜ 免责声明 ｜ 投诉。
 例：
-<hb-phone nobar fix><hb-plogin name="伙伴生态合作" wechat/></hb-phone>
+<hb-phone nobar><hb-plogin name="伙伴生态合作" wechat/></hb-phone>
 ```
 
 ### hb-pme
@@ -937,7 +935,7 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 个人中心（点门户顶栏头像进，是独立页不是浮层）。外层写 <hb-phone title="个人中心" nodots>。属性 who（登录人姓名，必填）、out（底部按钮名，默认「退出登录」）。
 体内每行「字段名 | 值 | 右侧操作(可选)」，-- 单起一行表示另起一张卡。
 例：
-<hb-phone title="个人中心" nodots fix>
+<hb-phone title="个人中心" nodots>
 <hb-pme who="周敏">
 手机号 | 138****6021 | 更换
 微信 | 周敏
@@ -957,11 +955,11 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 扫码页（企业微信扫一扫）：属性 title、label（码下方的标签文字）、tip（提示一句）；整屏灰底＋二维码示意
 
 ```
-扫码页：企业微信「扫一扫」那一屏，讲「现场对着标签扫一下」怎么进系统。整屏灰底当取景画面，顶栏左 ✕ 右空、标题居中，中间一张白底二维码示意（伪码，扫不出内容），一条扫描光线横过，底部「相册」「轻触照亮」两个圆钮。外层写 <hb-phone nobar fix>。
+扫码页：企业微信「扫一扫」那一屏，讲「现场对着标签扫一下」怎么进系统。整屏灰底当取景画面，顶栏左 ✕ 右空、标题居中，中间一张白底二维码示意（伪码，扫不出内容），一条扫描光线横过，底部「相册」「轻触照亮」两个圆钮。外层写 <hb-phone nobar>。
 属性 title（默认「扫一扫」）、label（二维码下方的标签文字，如物资编号）、tip（码下面的一句提示，如「对准物资标签上的二维码」）。自闭合写法。
 扫码页之后接记录详情页或新建／编辑页，讲扫到的是哪条记录、扫完填什么。
 例：
-<hb-phone nobar fix><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>
+<hb-phone nobar><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>
 ```
 
 ### hb-qr
