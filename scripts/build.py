@@ -2,10 +2,10 @@
 """确定性组装单文件 HTML：固定拼接顺序，模型只写内容片段和本图补充样式。
 
 用法：
-    python3 scripts/build.py \
+    python3 <skill>/scripts/build.py \
         --skin dawn-blue \
-        --content /tmp/stage.html \
-        --extra-style /tmp/page.css \
+        --content stage.html \
+        --extra-style page.css \
         --output "{客户或项目名}/01-图名.html" \
         [--fullbleed] [--title "图名"]
 
@@ -14,7 +14,7 @@
   片段里的 <hb-*> 宏（壳层、表格行、卡片、图表等重复块，见 references/macros.md）先由 expand.py 展开。
 - --extra-style：本图补充样式，可省略。自动加“/* ── 本图布局 ── */”分隔头供 check.py 识别。
 - --fullbleed：产品设计类加此开关（body 加 class="fullbleed"）；用 <hb-page canvas="product"> 时自动加，不用传。
-- --png：拼装后顺带出 2x PNG（转调 export.py，找不到 Chrome 只提示不报错）。默认只出 HTML。
+- --png：拼装后顺带出 2x PNG（转调 export.py）。默认只出 HTML。
 
 拼接顺序固定：宏展开 → 皮肤 css → base.css → 本图补充样式 → icons.svg（body 开头）→ 内容 → fit.js（body 末尾）。
 改过 base.css 或皮肤后重跑本脚本即可重拼既有图（图里嵌的是拼装时的快照）。

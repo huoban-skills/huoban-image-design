@@ -21,7 +21,7 @@
 给这个方案配一张订单列表页的图，营销版
 ```
 
-交付物落在 `{客户或项目名}/01-图名.html`；要图片时 `python3 scripts/export.py 图.html --png`（要 Chrome）。
+交付物落在 `{客户或项目名}/01-图名.html`；要图片时 `python3 <skill>/scripts/export.py 图.html --png`（要 Chrome）。
 
 ## 架构
 
@@ -38,7 +38,7 @@
 宏      scripts/expand.py          <hb-page> 页面骨架 ＋ 60 余个组件宏；模型只填内容，外壳与栅格由脚本产出
 ```
 
-配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（纯标准库静态检查；有浏览器时自动加渲染检查，`--no-render` 关；`--acceptance` 起草验收表）、`export.py`（PNG／渲染探针，不自动下载 Chrome）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
+配套脚本：`build.py`（组装单文件 HTML，自动展开宏、自动全屏、打印规模提示）、`check.py`（静态检查＋渲染检查，`--no-render` 只做静态；`--acceptance` 起草验收表）、`export.py`（PNG／渲染探针，多张图一次导出时只起一次浏览器）、`registry.py`（登记表校验与查询）、`extract_templates.py`（宏没覆盖的组件按名提取模板）。
 
 ## 皮肤
 
@@ -50,9 +50,9 @@
 - **尺寸是实测的**：顶栏 56、侧栏 248、行高 35、标签 20 来自真实产品。
 - **颜色不写死**：一律走皮肤 token，`check.py` 把写死色值列为 Blocker。
 
-## 云端沙箱
+## 运行环境
 
-只有 Python 标准库、没有 Chrome 也能跑完整流程：build → check（静态）→ 验收表 → 交付 HTML。渲染类检查与 PNG 明确标为"未执行"，不下载、不报错。
+Python 3 加一个浏览器（Chrome，或 Playwright 的 Chromium）。渲染检查和 PNG 导出都要浏览器；装了 playwright（`pip install playwright`）时批量导出只起一次浏览器。浏览器不在常见位置时用 `CHROME_BIN` 指过去。
 
 ## 文档
 

@@ -5,25 +5,19 @@
 ## PNG
 
 ```bash
-python3 scripts/export.py "{客户或项目名}/图名.html" --png      # 同目录出 图名@2x.png
-python3 scripts/export.py "{客户或项目名}/图名.html" --png --out figures/图名@2x.png
+python3 <skill>/scripts/export.py "{客户或项目名}/图名.html" --png      # 同目录出 图名@2x.png
+python3 <skill>/scripts/export.py "{客户或项目名}/图名.html" --png --out figures/图名@2x.png
+python3 <skill>/scripts/export.py "{客户或项目名}/"*.html --png         # 批量，每张出在各自同目录；--out 只能配一张
 ```
 
 - 脚本自己量画布高度（渲染探针），营销类透明底、`1704×(高+96)`，产品设计类边到边 `1640×高`，都是 2 倍图。
-- Chrome 探测顺序：`CHROME_BIN` → macOS 本机 Chrome → `~/chrome-headless-shell-linux64/` → Playwright 装的 Chromium（`PLAYWRIGHT_BROWSERS_PATH` 或默认缓存目录）→ PATH 里的 chrome-headless-shell / google-chrome / chromium。找不到就退出码 2 并打印手动命令，**不自动下载**；沙箱里没有 Chrome 就交 HTML。
-- 手动获取（Linux 可联网时，约 120MB，版本固定 152.0.7977.54）：
-
-```bash
-curl -sL -o /tmp/chs.zip "https://registry.npmmirror.com/-/binary/chrome-for-testing/152.0.7977.54/linux64/chrome-headless-shell-linux64.zip"
-unzip -q -o /tmp/chs.zip -d ~ && chmod +x ~/chrome-headless-shell-linux64/chrome-headless-shell
-```
-
-  路径必须带完整 `/-/binary/chrome-for-testing/`，裸域名会 302 限速。运行时报 dbus 错误属正常。
+- 装了 Playwright 时，批量和单张导出都用 Playwright 起浏览器，整批只起一次；它自带的 Chromium 起不来就改用下面探测到的浏览器。没装 Playwright 时逐张走 Chrome 命令行。
+- 浏览器探测顺序：`CHROME_BIN` → Playwright 自己报告的 Chromium 路径 → Playwright 缓存目录（`PLAYWRIGHT_BROWSERS_PATH` 或默认位置，新旧两种目录结构都认）→ PATH 里的 chromium / chromium-browser / google-chrome / chrome / chrome-headless-shell → macOS 本机 Chrome。找不到就报错退出，设 `CHROME_BIN` 后重跑。
 
 ## 渲染探针（check.py 的渲染检查用）
 
 ```bash
-python3 scripts/export.py "{客户或项目名}/图名.html" --probe   # JSON：画布尺寸、空隙、裁切、浮层出界、并排不齐
+python3 <skill>/scripts/export.py "{客户或项目名}/图名.html" --probe   # JSON：画布尺寸、空隙、裁切、浮层出界、并排不齐
 ```
 
-`check.py` 找到浏览器就自动调它，`--no-render` 关；没有 Chrome 时 check.py 会明说"渲染检查未执行"，静态检查照常给结论。
+`check.py` 默认调它，`--no-render` 关；探针没跑出结果时 check.py 报 Blocker `render-failed`。

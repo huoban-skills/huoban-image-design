@@ -2,12 +2,12 @@
 """从结构文件（assets/c1～c5）按名精确提取 <template>，实现按需读取，不整读文件。
 
 用法：
-    python3 scripts/extract_templates.py --list                      # 全部结构文件的架构/组件目录
-    python3 scripts/extract_templates.py assets/c3-page-detail.html \
+    python3 <skill>/scripts/extract_templates.py --list                      # 全部结构文件的架构/组件目录
+    python3 <skill>/scripts/extract_templates.py <skill>/assets/c3-page-detail.html \
         --architecture "独立自定义详情页" \
         --component "记录功能区" --component "标题卡片"              # 精确提取，写入临时文件并打印路径
     ... --group "统计"                                               # 按 data-group 取一组
-    ... --out /tmp/tpl.html                                          # 指定输出文件
+    ... --out tpl.html                                          # 指定输出文件
 
 规则：
 - 按 data-architecture / data-component / data-group 的值精确匹配，不做模糊匹配；

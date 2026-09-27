@@ -2,11 +2,11 @@
 """把内容片段里的 <hb-*> 宏展开成真实组件 HTML。build.py 组装前自动调用，也可单独跑。
 
 用法：
-    python3 scripts/expand.py stage.html                 # 展开后的 HTML 打到标准输出
-    python3 scripts/expand.py stage.html --out /tmp/x.html
-    python3 scripts/expand.py --list                     # 通用写法＋宏目录（一宏一行）
-    python3 scripts/expand.py --doc hb-shell hb-grid     # 只取要用的宏的详细语法
-    python3 scripts/expand.py --doc all > references/macros.md   # 生成人看的全文
+    python3 <skill>/scripts/expand.py stage.html                 # 展开后的 HTML 打到标准输出
+    python3 <skill>/scripts/expand.py stage.html --out x.html
+    python3 <skill>/scripts/expand.py --list                     # 通用写法＋宏目录（一宏一行）
+    python3 <skill>/scripts/expand.py --doc hb-shell hb-grid     # 只取要用的宏的详细语法
+    python3 <skill>/scripts/expand.py --doc all > <skill>/references/macros.md   # 生成人看的全文
 
 宏只消灭机械重复（壳层、表格行、卡片、图表坐标），不做设计决策：用哪个视图、放不放浮层、
 字段怎么排，仍由写片段的人定。每个宏对应 assets/c1～c4 里的一个已收录组件，输出的类名与
@@ -2716,7 +2716,7 @@ def render_page(kind):
               "顶层可用宏：" + "、".join(f"<{n}>" for n in sorted(spec["allowed"])),
               "hb-page 通用属性：canvas=marketing|product（默认 marketing）、ws/page/nav/me/theme/logo/bottom（产品壳，同 hb-shell）、level=flat|card（页面底色，默认 flat）、cut=高度px（窗口截到主要内容为止，默认按内容撑高）",
               "", "最小示例：", spec["example"], "",
-              "各宏语法：python3 scripts/expand.py --doc " + " ".join(sorted(spec["allowed"]))]
+              "各宏语法：python3 <skill>/scripts/expand.py --doc " + " ".join(sorted(spec["allowed"]))]
     return "\n".join(lines_)
 
 
@@ -2797,7 +2797,7 @@ COMMON = """通用写法
 - 值前缀 ~ 做成次要灰字（空值、备注）；值前缀 = 表示后面是写好的 HTML 原样放入；含 < 的值也按 HTML 原样放。
 - 宏可嵌套，内层先展开。列数不对、图标名不存在、工具名没图标都会报错并指出行，改完重跑。
 - 宏只消灭机械重复，不替你做设计决策：用哪种视图、放不放浮层、字段怎么排、数据编成什么样，仍按 SKILL.md 和设计原则定。
-- 没有对应宏的组件：`python3 scripts/registry.py --list 页面类型` 里「宏」一列是 — 的那些，按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
+- 没有对应宏的组件：`python3 <skill>/scripts/registry.py --list 页面类型` 里「宏」一列是 — 的那些，按 SKILL.md 路由表用 extract_templates.py 提取模板手写。"""
 
 GROUPS = [
     ("页面骨架（先写它，外壳由它产出）", ["hb-page", "hb-row", "hb-col", "hb-float", "hb-screens"]),
@@ -2817,7 +2817,7 @@ GROUPS = [
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
 size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置；整图、底图宽度、高度阈值和数据量下限上限都以 references/canvas/marketing.md 第 1、2 节为准，这里不重复；版式和必有组件按页面原则出齐，放不下宁可偏高；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
-体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。""",
+体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 <skill>/scripts/expand.py --page kind 看槽位表与最小示例。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
 例：
@@ -3164,7 +3164,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色）；背景由主题自带的网格纹理和顶部光带产出。
 大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
 体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
-例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。""",
+例：见 python3 <skill>/scripts/expand.py --page screen 的最小示例（可直接 build）。""",
 "hb-scol": """大屏主体分栏。属性 span 列宽（默认 6）、rs 列高行数（默认 38）。体内竖着放 hb-skpi、hb-scard，
 列内各组件的 rs 之和要等于本列的 rs，三列才等高（左 6＝6＋16＋16，右 6＝6＋12＋20，中 12＝38；左右两列顶部都放大屏指标框或都不放）。
 例：
@@ -3362,7 +3362,7 @@ def render_docs(names):
 
 
 def render_all():
-    parts = ["# 宏语法\n\n本文件由 `python3 scripts/expand.py --doc all` 生成，改语法请改 expand.py 的 DOCS，不要手改这里。\n出图时不整读本文件：先 `--list` 看目录，再 `--doc 宏名…` 只取要用的几条。\n", COMMON]
+    parts = ["# 宏语法\n\n本文件由 `python3 <skill>/scripts/expand.py --doc all` 生成，改语法请改 expand.py 的 DOCS，不要手改这里。\n出图时不整读本文件：先 `--list` 看目录，再 `--doc 宏名…` 只取要用的几条。\n", COMMON]
     for title, names in GROUPS:
         parts.append(f"\n## {title}\n")
         for n in names:
@@ -3381,7 +3381,7 @@ def expand(text):
     def repl(m):
         name, raw_attrs, body = m.group(1), m.group(2), m.group(3) or ""
         if name not in MACROS:
-            raise ExpandError(f"不认识的宏 <{name}>。可用：{'、'.join(MACROS)}（python3 scripts/expand.py --list 看说明）")
+            raise ExpandError(f"不认识的宏 <{name}>。可用：{'、'.join(MACROS)}（python3 <skill>/scripts/expand.py --list 看说明）")
         attrs = attrs_of(raw_attrs)
         if name in ("hb-page", "hb-row", "hb-col"):
             attrs["_raw"] = body
@@ -3411,7 +3411,7 @@ def main():
             print(f"[{title}]")
             for n in names:
                 print(f"  <{n}>  {MACROS[n][1]}")
-        print("\n详细语法：python3 scripts/expand.py --doc 宏名 宏名…")
+        print("\n详细语法：python3 <skill>/scripts/expand.py --doc 宏名 宏名…")
         return 0
     if a.page:
         try:

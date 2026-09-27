@@ -2,10 +2,10 @@
 """登记表 assets/registry.json 的校验与查询。
 
 用法：
-    python3 scripts/registry.py --check            # 三向核对：登记表 ↔ 结构文件 ↔ base.css
-    python3 scripts/registry.py --list [页面类型]   # 按页面类型列可用组件（id、官方名、宏）
-    python3 scripts/registry.py --find 关键词       # 按 id / 官方 type / 中文名 / 别名 / 旧类名查
-    python3 scripts/registry.py --coverage         # 各页面允许的官方组件是否都在页面原则或组件辞典里提到
+    python3 <skill>/scripts/registry.py --check            # 三向核对：登记表 ↔ 结构文件 ↔ base.css
+    python3 <skill>/scripts/registry.py --list [页面类型]   # 按页面类型列可用组件（id、官方名、宏）
+    python3 <skill>/scripts/registry.py --find 关键词       # 按 id / 官方 type / 中文名 / 别名 / 旧类名查
+    python3 <skill>/scripts/registry.py --coverage         # 各页面允许的官方组件是否都在页面原则或组件辞典里提到
 
 --check 报四类问题：
   1. 结构文件里有 data-component/data-architecture 但登记表没有

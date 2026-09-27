@@ -1,6 +1,6 @@
 # 宏语法
 
-本文件由 `python3 scripts/expand.py --doc all` 生成，改语法请改 expand.py 的 DOCS，不要手改这里。
+本文件由 `python3 <skill>/scripts/expand.py --doc all` 生成，改语法请改 expand.py 的 DOCS，不要手改这里。
 出图时不整读本文件：先 `--list` 看目录，再 `--doc 宏名…` 只取要用的几条。
 
 通用写法
@@ -9,7 +9,7 @@
 - 值前缀 ~ 做成次要灰字（空值、备注）；值前缀 = 表示后面是写好的 HTML 原样放入；含 < 的值也按 HTML 原样放。
 - 宏可嵌套，内层先展开。列数不对、图标名不存在、工具名没图标都会报错并指出行，改完重跑。
 - 宏只消灭机械重复，不替你做设计决策：用哪种视图、放不放浮层、字段怎么排、数据编成什么样，仍按 SKILL.md 和设计原则定。
-- 没有对应宏的组件：`python3 scripts/registry.py --list 页面类型` 里「宏」一列是 — 的那些，按 SKILL.md 路由表用 extract_templates.py 提取模板手写。
+- 没有对应宏的组件：`python3 <skill>/scripts/registry.py --list 页面类型` 里「宏」一列是 — 的那些，按 SKILL.md 路由表用 extract_templates.py 提取模板手写。
 
 ## 页面骨架（先写它，外壳由它产出）
 
@@ -19,7 +19,7 @@
 ```
 整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
 size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置；整图、底图宽度、高度阈值和数据量下限上限都以 references/canvas/marketing.md 第 1、2 节为准，这里不重复；版式和必有组件按页面原则出齐，放不下宁可偏高；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
-体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 scripts/expand.py --page kind 看槽位表与最小示例。
+体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 <skill>/scripts/expand.py --page kind 看槽位表与最小示例。
 ```
 
 ### hb-row
@@ -617,7 +617,7 @@ sys:自动化 | 1 小时前 | 订单总额：修改为 941 | 待回款金额：�
 theme 配色 cyan 深青未来（默认）/blue 蓝色科技/gold 黑金金融/red 红色党建/light 青色自然（浅色）；背景由主题自带的网格纹理和顶部光带产出。
 大屏就是普通的 24 栅格页面，不缩放：列宽、行高、20 间距与其他页面一致，h 行的组件高 20h−20。画布 1640 宽，官方骨架排下来 1440 高。
 体内按官方骨架放：标题行和分隔条由本宏自动产出，其后依次是左列 hb-scol（6）、中间 hb-svisual（12）、右列 hb-scol（6），最后底部两张 hb-scard（12＋12）。
-例：见 python3 scripts/expand.py --page screen 的最小示例（可直接 build）。
+例：见 python3 <skill>/scripts/expand.py --page screen 的最小示例（可直接 build）。
 ```
 
 ### hb-scol

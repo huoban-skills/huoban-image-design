@@ -4,8 +4,8 @@
 末尾再比对 expand.py --doc all 的输出与 references/macros.md 是否一致。
 
 用法：
-    python3 scripts/regress.py            # 比对
-    python3 scripts/regress.py --update   # 用当前输出覆盖基线、并重生成 macros.md（改了公共资产并确认无误后）
+    python3 <skill>/scripts/regress.py            # 比对
+    python3 <skill>/scripts/regress.py --update   # 用当前输出覆盖基线、并重生成 macros.md（改了公共资产并确认无误后）
 
 规范化：去掉空白差异、class 记号按字母序；不依赖 Chrome。有 Chrome 时可再手动 export.py --png 目检。
 """
@@ -42,7 +42,7 @@ def build(frag, out):
 def main():
     args = [a for a in sys.argv[1:]]
     if "--help" in args or "-h" in args or any(a not in ("--update",) for a in args):
-        print(__doc__.strip() if __doc__ else "用法：python3 scripts/regress.py [--update]"); return 0 if ("--help" in args or "-h" in args) else 2
+        print(__doc__.strip() if __doc__ else "用法：python3 <skill>/scripts/regress.py [--update]"); return 0 if ("--help" in args or "-h" in args) else 2
     update = "--update" in args
     if not FRAGS.is_dir() or not any(FRAGS.glob("*.frag.html")):
         print(f"✗ 回归集不存在或没有片段：{FRAGS}（放回 huoban-image-design-tests/，或用 HB_TESTS_DIR 指到它）")

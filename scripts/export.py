@@ -2,13 +2,13 @@
 """可选导出：PNG（要 Chrome）、渲染探针（给 check.py 的渲染检查用）。
 
 用法：
-    python3 scripts/export.py 图.html --png                 # 出 图@2x.png（同目录）；找不到 Chrome 退出码 2 并给手动命令
-    python3 scripts/export.py 图.html --png --out 路径.png
-    python3 scripts/export.py 图.html --probe               # 渲染探针 JSON（空隙、裁切、浮层出界、并排不齐）
+    python3 <skill>/scripts/export.py 图.html --png                 # 出 图@2x.png（同目录）
+    python3 <skill>/scripts/export.py 图.html --png --out 路径.png
+    python3 <skill>/scripts/export.py 配图/*.html --png             # 批量：装了 Playwright 时整批只起一次浏览器
+    python3 <skill>/scripts/export.py 图.html --probe               # 渲染探针 JSON（空隙、裁切、浮层出界、并排不齐）
 
 默认交付物是 HTML，本脚本只在用户或报告明确要 PNG 时用。
-Chrome 探测顺序：CHROME_BIN → macOS 本机 Chrome → ~/chrome-headless-shell-linux64 → Playwright 装的 Chromium → PATH 里的 chrome-headless-shell/google-chrome/chromium。
-不自动下载；沙箱里没有 Chrome 就跳过 PNG，交 HTML。
+浏览器探测顺序：CHROME_BIN → Playwright 自报的 Chromium 路径 → Playwright 缓存目录 → PATH 里的 chromium/chrome → macOS 本机 Chrome；找不到就报错退出。
 """
 import argparse
 import glob
@@ -21,33 +21,56 @@ import sys
 import tempfile
 from pathlib import Path
 
-MANUAL = """未找到 Chrome，PNG 未导出。HTML 已是可交付的源文件；确需 PNG 时任选：
-  1. 本机装了 Chrome：CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" python3 scripts/export.py 图.html --png
-  2. Linux 沙箱可联网：下载 chrome-headless-shell（约 120MB）到 ~/chrome-headless-shell-linux64/ 后重跑：
-     curl -sL -o /tmp/chs.zip "https://registry.npmmirror.com/-/binary/chrome-for-testing/152.0.7977.54/linux64/chrome-headless-shell-linux64.zip" && unzip -q -o /tmp/chs.zip -d ~ && chmod +x ~/chrome-headless-shell-linux64/chrome-headless-shell"""
+NO_BROWSER = "找不到浏览器：设 CHROME_BIN 指向 Chromium 或 Chrome 的可执行文件后重跑"
+
+
+def _playwright_path():
+    """Playwright 自己报告的 Chromium 路径：不依赖缓存目录的命名，升级 Playwright 也不会失效。"""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return None
+    try:
+        with sync_playwright() as p:
+            path = p.chromium.executable_path
+        return path if path and os.path.exists(path) else None
+    except Exception:
+        return None
 
 
 def find_chrome():
-    if os.environ.get("HB_NO_CHROME"):      # 沙箱模拟：强制当作没有 Chrome
-        return None
-    cands = [os.environ.get("CHROME_BIN"),
-             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-             os.path.expanduser("~/chrome-headless-shell-linux64/chrome-headless-shell")]
-    for c in cands:
-        if c and os.path.exists(c):
-            return c
+    c = os.environ.get("CHROME_BIN")
+    if c and os.path.exists(c):
+        return c
+    c = _playwright_path()
+    if c:
+        return c
     pw = os.environ.get("PLAYWRIGHT_BROWSERS_PATH") or os.path.expanduser(
         "~/Library/Caches/ms-playwright" if sys.platform == "darwin" else "~/.cache/ms-playwright")
-    for pat in ("chromium_headless_shell-*/chrome-*/headless_shell", "chromium-*/chrome-linux*/chrome",
-                "chromium-*/chrome-mac*/Chromium.app/Contents/MacOS/Chromium"):
+    for pat in ("chromium_headless_shell-*/chrome-headless-shell-*/chrome-headless-shell",   # Playwright 1.5x
+                "chromium_headless_shell-*/chrome-*/headless_shell",                         # 旧版
+                "chromium-*/chrome-linux*/chrome",
+                "chromium-*/chrome-mac*/*.app/Contents/MacOS/*"):
         hits = sorted(glob.glob(os.path.join(pw, pat)))
         if hits:
             return hits[-1]
-    for name in ("chrome-headless-shell", "google-chrome", "chromium", "chromium-browser"):
+    for name in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable", "chrome", "chrome-headless-shell"):
         p = shutil.which(name)
         if p:
             return p
-    return None
+    c = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    return c if os.path.exists(c) else None
+
+
+def launch(p):
+    """用 Playwright 起 Chromium：自带的浏览器起不来（没装、版本对不上）就用 find_chrome 找到的那个。"""
+    try:
+        return p.chromium.launch()
+    except Exception:
+        chrome = find_chrome()
+        if not chrome:
+            raise
+        return p.chromium.launch(executable_path=chrome)
 
 
 PROBE = r"""
@@ -137,7 +160,7 @@ PROBE = r"""
 
 
 def probe(path, chrome=None):
-    """渲染探针：返回 dict；没有 Chrome 返回 None。"""
+    """渲染探针：返回 dict；找不到浏览器或探针没跑出结果返回 None。"""
     chrome = chrome or find_chrome()
     if not chrome:
         return None
@@ -158,24 +181,28 @@ def probe(path, chrome=None):
         os.unlink(tmp.name)
 
 
-def export_png(path, out=None):
-    chrome = find_chrome()
-    if not chrome:
-        sys.stderr.write(MANUAL + "\n")
-        return 2
-    text = Path(path).read_text(encoding="utf-8")
+def _png_size(text, info):
     full = 'class="fullbleed"' in text
-    info = probe(path, chrome) or {}
     st = info.get("stage") or {}
     h = st.get("h") or 1000
     w = st.get("w") or 1640
-    if full:
-        size = f"{w},{h}"
-        bg = []
-    else:
-        size = f"{w + 64},{h + 96}"       # body 左右 padding 32×2、上下留白
-        bg = ["--default-background-color=00000000"]
-    out = out or str(Path(path).with_name(Path(path).stem + "@2x.png"))
+    return full, ((w, h) if full else (w + 64, h + 96))   # 画布模式：body 左右 padding 32×2、上下留白
+
+
+def _out_path(path, out=None):
+    return out or str(Path(path).with_name(Path(path).stem + "@2x.png"))
+
+
+def export_png(path, out=None):
+    chrome = find_chrome()
+    if not chrome:
+        sys.stderr.write(NO_BROWSER + "\n")
+        return 2
+    text = Path(path).read_text(encoding="utf-8")
+    full, (w, h) = _png_size(text, probe(path, chrome) or {})
+    size = f"{w},{h}"
+    bg = [] if full else ["--default-background-color=00000000"]
+    out = _out_path(path, out)
     cmd = [chrome, "--headless", f"--screenshot={out}", f"--window-size={size}", "--force-device-scale-factor=2",
            "--hide-scrollbars", "--virtual-time-budget=3000", *bg, f"file://{os.path.abspath(path)}"]
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
@@ -186,22 +213,66 @@ def export_png(path, out=None):
     return 0
 
 
+def _load(pg, path):
+    pg.goto(Path(path).resolve().as_uri(), wait_until="load")
+    pg.evaluate("document.fonts ? document.fonts.ready.then(() => 1) : 1")
+    pg.wait_for_timeout(150)
+
+
+def export_batch(paths):
+    """整批只起一次浏览器：每张图先量画布（同一段探针），再按量出的尺寸截 2x 图。没装 Playwright 时逐张走命令行。"""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return max((export_png(x) for x in paths), default=0)
+    js = PROBE.strip().removeprefix("<script>").removesuffix("</script>")
+    rc = 0
+    with sync_playwright() as p:
+        try:
+            b = launch(p)
+        except Exception as e:
+            sys.stderr.write(f"浏览器起不来：{str(e)[:300]}\n{NO_BROWSER}\n")
+            return 2
+        for path in paths:
+            text = Path(path).read_text(encoding="utf-8")
+            pg = b.new_page(viewport={"width": 1704, "height": 1200})
+            _load(pg, path)
+            pg.add_script_tag(content=js)
+            m = re.match(r"PROBE(.*)", pg.title(), re.S)
+            pg.close()
+            full, (w, h) = _png_size(text, json.loads(m.group(1)) if m else {})
+            out = _out_path(path)
+            pg = b.new_page(viewport={"width": w, "height": h}, device_scale_factor=2)
+            _load(pg, path)
+            pg.screenshot(path=out, omit_background=not full)
+            pg.close()
+            if os.path.exists(out):
+                sys.stderr.write(f"已导出：{out}（{w},{h} ×2）\n")
+            else:
+                sys.stderr.write(f"PNG 未生成：{path}\n")
+                rc = 1
+        b.close()
+    return rc
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("file")
+    ap.add_argument("files", nargs="+")
     ap.add_argument("--png", action="store_true")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--out")
     a = ap.parse_args()
+    if a.out and len(a.files) > 1:
+        ap.error("--out 只能配一张图")
     if a.probe:
-        r = probe(a.file)
+        r = probe(a.files[0])
         if r is None:
-            sys.stderr.write("渲染探针未执行：未找到 Chrome\n")
+            sys.stderr.write("渲染探针没跑出结果：" + (NO_BROWSER if not find_chrome() else "页面加载失败") + "\n")
             return 2
         print(json.dumps(r, ensure_ascii=False))
         return 0
     if a.png:
-        return export_png(a.file, a.out)
+        return export_png(a.files[0], a.out) if a.out else export_batch(a.files)
     ap.print_help()
     return 2
 

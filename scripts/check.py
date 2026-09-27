@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""界面示意图产出物检查。纯标准库；本机找得到 Chrome（含 Playwright 装的 Chromium）就自动加渲染检查。
+"""界面示意图产出物检查：静态检查＋渲染检查（要浏览器：Chrome 或 Playwright 的 Chromium）。
 
 用法：
-    python3 scripts/check.py 图.html               # 静态检查；有浏览器时自动加渲染检查（空隙、裁切、浮层出界与遮挡、并排不齐）
-    python3 scripts/check.py 图.html --no-render   # 只做静态检查
-    python3 scripts/check.py 图.html --json
-    python3 scripts/check.py 图.html --allow-local # 本图补充样式里定义的新类降为 Nit（默认 High）
-    python3 scripts/check.py 图.html --acceptance  # 起草十条人工验收表，机器能答的先填
+    python3 <skill>/scripts/check.py 图.html               # 静态检查＋渲染检查（空隙、裁切、浮层出界与遮挡、并排不齐）
+    python3 <skill>/scripts/check.py 图.html --no-render   # 只做静态检查
+    python3 <skill>/scripts/check.py 图.html --json
+    python3 <skill>/scripts/check.py 图.html --allow-local # 本图补充样式里定义的新类降为 Nit（默认 High）
+    python3 <skill>/scripts/check.py 图.html --acceptance  # 起草十条人工验收表，机器能答的先填
 
 检查的是"该由机器判定、肉眼容易漏"的项：色值有没有写死、有没有用不存在的组件类或 token、
-规模是否超出出图约束、几条踩过坑的结构禁令、列丢了行容器、待办竖叠、并排不等高（按实测行高静态估算）。有浏览器时空隙、并排不齐、浮层遮挡改用实测值。
+规模是否超出出图约束、几条踩过坑的结构禁令、列丢了行容器、待办竖叠、并排不等高（按实测行高静态估算）。渲染检查时空隙、并排不齐、浮层遮挡改用实测值。
 
 退出码：有 Blocker 返回 1，其余返回 0。
 """
@@ -644,12 +644,13 @@ def check(path, render=False, allow_local=False):
                     add("High", "banner-person-name", f'横幅写成具体某个人「{hit.group()}」：工作台服务的是角色（律师、库管、店长），改成「库管工作台」这类角色名', line_of(body, bm.start()))
                     break
 
-    # ── 渲染检查（有浏览器就做，--no-render 关掉）───────────────────
+    # ── 渲染检查（默认做，--no-render 关掉）───────────────────────
     if render:
         import export
         r = export.probe(path)
         if r is None:
-            note = "渲染检查未执行：没找到 Chrome 或 Playwright 的 Chromium（空隙、裁切、浮层出界、并排不齐按静态估算）"
+            note = None
+            add("Blocker", "render-failed", "渲染检查没跑出结果：找不到浏览器（设 CHROME_BIN 指向 Chromium 或 Chrome），或页面加载失败；修好后重跑")
         else:
             note = None
             for e in r.get("extra", []):

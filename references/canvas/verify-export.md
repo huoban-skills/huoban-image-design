@@ -3,9 +3,9 @@
 ## A. 机检
 
 ```bash
-python3 scripts/check.py 图.html               # 静态检查；有浏览器时自动加渲染检查
-python3 scripts/check.py 图.html --no-render   # 只做静态检查
-python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
+python3 <skill>/scripts/check.py 图.html               # 静态检查＋渲染检查
+python3 <skill>/scripts/check.py 图.html --no-render   # 只做静态检查
+python3 <skill>/scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 ```
 
 **Blocker 必须清零**，High 逐条处理，Medium 逐条判断。几条容易误读的：
@@ -35,7 +35,7 @@ python3 scripts/check.py 图.html --acceptance  # 起草 B 节的十条
 - `column-short`：同一行里短栏比长栏矮 100px 以上（按 base.css 实测行高估算，不用 Chrome）；单张卡会被拉到等高不算，栏里是单指标行或多张卡才报。只补短的那一栏，先补组件、差 100px 以内才加数据行，不给长栏删内容。
 - `empty-gap`（渲染检查）只看布局层——组件之间、组件到画布边缘不许有大片空白；组件内部留白由数据量决定，属产品原样。
 - `column-uneven`（渲染检查）：同一行两栏底部落差超过 24px；修法是给短的那栏补数据行或调 `hb-row spans`，不用固定高度硬撑。
-- 浏览器认 Chrome，也认 Playwright 装的 Chromium。有浏览器时 `column-short`、`float-cover`、`height-unknown` 这几条静态估算换成实测：并排不齐报 `column-uneven`，浮层遮挡按实测面积报。没有浏览器时打印"渲染检查未执行"，这几项按静态估算。
+- 浏览器认 Chrome，也认 Playwright 装的 Chromium。渲染检查时 `column-short`、`float-cover`、`height-unknown` 这几条静态估算换成实测：并排不齐报 `column-uneven`，浮层遮挡按实测面积报。加 `--no-render` 时这几项按静态估算；渲染检查没跑出结果报 Blocker `render-failed`。
 
 ## B. 人工验收表
 

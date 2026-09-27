@@ -7,6 +7,8 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 ## 目标、输入、输出、边界
 
+路径约定：`<skill>` 指本 SKILL.md 所在的目录。下文命令里的脚本和资产都写成 `<skill>/scripts/…`、`<skill>/assets/…`，执行时拼上这个目录的实际位置，不依赖当前工作目录；产出文件的路径相对当前工作目录（客户或项目目录）。
+
 - 目标：产出"长得像伙伴云产品"的界面示意图，用骨架宏拼装真实产品实测组件，不自由发挥。
 - 输入：用户的出图需求，或 huoban-solution-report 给出的图需求单。
 - 输出：单文件 HTML（`{客户或项目名}/图名.html`，离线可开、自适应）；PNG 只在用户或报告明确要时另出。
@@ -48,8 +50,8 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 - 看槽位表，只取要用的宏的语法：
 
 ```bash
-python3 scripts/expand.py --page workbench            # 该页面类型的槽位表、可用宏、最小示例
-python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # 只取要用的宏
+python3 <skill>/scripts/expand.py --page workbench            # 该页面类型的槽位表、可用宏、最小示例
+python3 <skill>/scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # 只取要用的宏
 ```
 
 - 把片段写到 scratchpad 的 `stage.html`：最外层是 `<hb-page kind="…" canvas="…" ws="…" page="…">`，体内按槽位顺序写宏。
@@ -58,20 +60,27 @@ python3 scripts/expand.py --doc hb-nav hb-stats hb-row hb-tasks hb-tabcard   # �
 - 没有宏的组件（`registry.py --list <kind>` 里宏一列为空的，如日历、快捷表单、甘特／日历／任务／透视视图）按名提取模板后手写在对应槽位；c 文件只通过这条命令按名取，不整读：
 
 ```bash
-python3 scripts/extract_templates.py assets/c2-table-form.html --list
-python3 scripts/extract_templates.py assets/c2-table-form.html --component "甘特视图"
+python3 <skill>/scripts/extract_templates.py <skill>/assets/c2-table-form.html --list
+python3 <skill>/scripts/extract_templates.py <skill>/assets/c2-table-form.html --component "甘特视图"
 ```
 
 - 组件选取与数量按页面原则文档；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。
 - 图表写 `hb-bar`／`hb-line`／`hb-donut`／`hb-area`／`hb-hbar`／`hb-biaxial`／`hb-funnel`／`hb-scatter`／`hb-map`，坐标由脚本算；地图不画国界，用网点阵占位或客户提供的地图图片。
 - 表单编辑页和弹窗详情走手写外壳：片段最外层是 c1 的 `.stage`，`.stage` 必须写死 height；本图补充样式另写 `page.css`，步骤 3 用 `--extra-style` 传入。
-- 完成标准：每张图一个片段；`python3 scripts/expand.py stage.html` 没有报错、提示都处理过。
+- **出图前必查**：下面几条是展开时最常报错、导致整张返工的，写片段时就照做：
+  - 图标名先对 `assets/icons.svg`（`grep -o 'id="i-[^"]*"' <skill>/assets/icons.svg` 列出全部），不在里面的名字会报错。
+  - `<hb-tools>` 里只有内置工具（字段、分组、筛选、排序、冻结等，报错信息会列全）有默认图标；其余写成「名:图标名」。
+  - `size="slide"` 只用于营销类的电脑端页面；手机端、大屏和产品设计类画布不写。
+  - 手机组件只放在 `kind="mobile"` 的页面或 `<hb-phone>` 里；PC 页用 PC 组件。
+  - 讲点里有动作（审批、巡检、出库、接单、派单、处理…）而画面是列表时，表头最后一列写 `操作:ops`，格里写 `去巡检:check:blue`；手机卡片把按钮写在每行第四段。
+  - 组件按 `expand.py --page <kind>` 给的槽位和顺序放：必有的组件不能少（如看板的单指标、详情页的页头卡片和字段组），图表宏放在槽位表允许的容器里（如详情页只能在 hb-row 或 hb-tabcard 体内）。
+- 完成标准：每张图一个片段；`python3 <skill>/scripts/expand.py stage.html` 没有报错、提示都处理过。
 
 ### 3. 拼装
 
 ```bash
-python3 scripts/build.py --skin dawn-blue --content stage.html --output "味捷餐饮巡店督导方案图/01-督导工作台.html" --title "督导工作台"
-python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style page.css --output "{客户或项目名}/图名.html" --title "图名"   # 手写外壳时
+python3 <skill>/scripts/build.py --skin dawn-blue --content stage.html --output "味捷餐饮巡店督导方案图/01-督导工作台.html" --title "督导工作台"
+python3 <skill>/scripts/build.py --skin dawn-blue --content stage.html --extra-style page.css --output "{客户或项目名}/图名.html" --title "图名"   # 手写外壳时
 ```
 
 - 脚本按固定顺序拼皮肤、base.css、icons.svg、内容、fit.js；`canvas="product"` 自动全屏。
@@ -88,8 +97,8 @@ python3 scripts/build.py --skin dawn-blue --content stage.html --extra-style pag
 ### 5. 检查与验收
 
 ```bash
-python3 scripts/check.py "{客户或项目名}/图名.html"             # 静态检查；有浏览器时自动加渲染检查，没有会明说"渲染检查未执行"
-python3 scripts/check.py "{客户或项目名}/图名.html" --acceptance # 起草十条人工验收表
+python3 <skill>/scripts/check.py "{客户或项目名}/图名.html"             # 静态检查＋渲染检查
+python3 <skill>/scripts/check.py "{客户或项目名}/图名.html" --acceptance # 起草十条人工验收表
 ```
 
 - Blocker 必须清零，High 逐条处理；各规则的判断细节见 [references/canvas/verify-export.md](references/canvas/verify-export.md)。
@@ -104,10 +113,11 @@ python3 scripts/check.py "{客户或项目名}/图名.html" --acceptance # 起�
 - 用户或报告明确要 PNG 时：
 
 ```bash
-python3 scripts/export.py "{客户或项目名}/图名.html" --png     # 2x PNG；找不到 Chrome 会给手动命令，不下载
+python3 <skill>/scripts/export.py "{客户或项目名}/图名.html" --png     # 2x PNG
+python3 <skill>/scripts/export.py "{客户或项目名}/"*.html --png        # 一批图一次导出：装了 Playwright 时整批只起一次浏览器
 ```
 
-- 导出细节与沙箱降级见 [references/canvas/export.md](references/canvas/export.md)。
+- 导出细节见 [references/canvas/export.md](references/canvas/export.md)。
 - 完成标准：这批图都在同一个客户或项目文件夹里，没有散落在上一级；回复正文每张图一行交付说明，注明皮肤与仿写项。
 
 ## 输出物模板
