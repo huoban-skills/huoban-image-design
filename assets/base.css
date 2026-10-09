@@ -1020,6 +1020,10 @@ b.pill.purple { background: var(--c-purple); } b.pill.gray { background: var(--t
 .fg-field { padding: 6px 6px 7px; min-width: 0; }   /* 标签 24 ＋ 值框 32 ＋ 上 6 下 7 ＝ 实测行高 69 */
 .fg-field.full, .fg-field.span-all { grid-column: 1 / -1; }
 .fg-value.item-tiles { height: 32px; padding: 0 8px; border-radius: 6px; }   /* 平铺选项放在字段值框里，框高照常 32 */
+/* 进度条字段（display_type=progress_bar，2026-10-09 实测）：条 8 高圆角 6，已完成段与轨道用硬分界渐变，轨道 rgba(0,0,0,.08)；数值在条右侧，间距 8 */
+.fg-value.item-progress { display: flex; align-items: center; gap: 8px; }
+.fg-value.item-progress i { flex: 1; min-width: 0; height: 8px; border-radius: 6px; background: linear-gradient(to right, var(--pg, var(--primary)) var(--p, 0%), rgba(0,0,0,.08) var(--p, 0%)); }
+.fg-value.item-progress span { flex: none; }
 .fg-label { height: 24px; padding: 4px 8px; font-size: 14px; line-height: 16px; color: var(--ink-65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fg-value {
   height: 32px; padding: 5px 8px; border-radius: 6px; background: var(--field-bg);

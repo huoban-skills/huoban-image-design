@@ -1060,7 +1060,7 @@ def span_wrap(a, html_):
     return f'<div class="span-{a["span"]}">{html_}</div>' if "span" in a else html_
 
 
-FIELD_TYPES = ("text", "tag", "tags", "user", "multi", "file", "image", "tiles")
+FIELD_TYPES = ("text", "tag", "tags", "user", "multi", "file", "image", "tiles", "progress")
 FULL_ROW_TYPES = ("multi", "file", "image")
 MS_COLORS = ["orange", "green", "red", "yellow", "purple", "blue"]
 PG_COLORS = ["blue", "green", "yellow", "purple", "orange", "teal"]
@@ -1097,6 +1097,15 @@ def m_fields(a, body):
                 tiles.append(f'<span class="tile{" on" if i == cur else ""}"{style}>{esc(name)}</span>')
             out.append(f'<div class="fg-field span-all"><div class="fg-label">{esc(c[0])}</div>'
                        f'<div class="fg-value item-tiles">{"".join(tiles)}</div></div>')
+            continue
+        if typ == "progress":   # 进度条字段（数值字段 display_type=progress_bar，2026-10-09 实测）：条 8 高圆角 6，数值在条右侧
+            raw, color = split_color(c[1].strip())
+            m = re.fullmatch(r"(\d+(?:\.\d+)?)\s*%?", raw.strip())
+            if not m or float(m.group(1)) > 100:
+                raise ExpandError(f"<hb-fields> progress 字段的值写 0～100 的数字，可带颜色后缀，如「75」「62.5:green」：{ln}")
+            style = f"--p:{m.group(1)}%" + (f";--pg:{ctok(color)}" if color else "")
+            out.append(f'<div class="fg-field"><div class="fg-label">{esc(c[0])}</div>'
+                       f'<div class="fg-value item-progress"><i style="{style}"></i><span>{m.group(1)} %</span></div></div>')
             continue
         full = typ in FULL_ROW_TYPES
         val = render_val(c[1], "text" if full else typ, "hb-fields")
@@ -3016,6 +3025,7 @@ SO-2026-0812 | 客户=上海博远; 金额=¥7,650.00""",
 体内：# 分组名 开一组（分组标题行 40 高，三种浅色底轮转）；其余每行 字段名 | 值 | 类型。
 类型：缺省文本；user 人员（多人用 / 分）、tag 彩色选项、tags 多选项（/ 分）；multi 多行文本、file 附件、image 图片是不定高类型，自动独占一行；
 tiles 选项字段平铺，值写「选项 / *当前:颜色 / 选项」，独占一行、行高照常 69，放在分组的首行或末行，免得上一行空半格。选项字段平铺只能这样写在字段组里，不能单独成一块。
+progress 进度条字段（数值字段按进度条显示），值写 0～100 的数字，可带颜色后缀（75、62.5:green），缺省用主色；值框里左边是条、右边是「75 %」，条 8 高圆角 6（2026-10-09 实测）。
 字段行 69 高＝标签 24 ＋ 值框 32 ＋ 上下内距（2026-09-14 实测）。
 例：
 <hb-fields title="订单详情" cols="2" tint="blue">
