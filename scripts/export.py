@@ -87,6 +87,7 @@ PROBE = r"""
     var cls = typeof e.className === 'string' ? e.className : '';
     if (e === document.body || e === document.documentElement || SKIP.test(cls) || !e.children.length) return;
     if (e.closest('.phone')) return;         // 手机屏固定 812 高，内容短时下方留白是真实样子，不算空隙
+    if (e.closest('.dlg, .dlg-print')) return;   // 交互界面跟着窗口高，表格和纸张下方留白是真实样子
     var s = getComputedStyle(e);
     if (s.display === 'none' || s.position === 'absolute') return;
     var r = e.getBoundingClientRect();

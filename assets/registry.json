@@ -3256,6 +3256,164 @@
         "phone"
       ],
       "note": "按 2026-09-22 H5 详情页截图仿写"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-pick",
+      "type_key": null,
+      "cn": "数据选择页",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "数据选择页",
+      "group": "交互界面",
+      "macro": "hb-pick",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「打开数据选择页」；single＝单选：无只看已选、无表头勾选框、无底栏"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-batch",
+      "type_key": null,
+      "cn": "数据批量增删改页面",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "数据批量增删改页面",
+      "group": "交互界面",
+      "macro": "hb-batch",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「打开数据批量增删改页面」；noadd＝只改不增"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-confirm",
+      "type_key": null,
+      "cn": "确认弹窗",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "确认弹窗",
+      "group": "交互界面",
+      "macro": "hb-confirm",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「打开确认弹窗」；icon=warning、体内提示内容可选"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-params",
+      "type_key": null,
+      "cn": "参数填写页",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "参数填写页",
+      "group": "交互界面",
+      "macro": "hb-params",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「打开参数填写页」"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-scan",
+      "type_key": null,
+      "cn": "扫码器",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "扫码器",
+      "group": "交互界面",
+      "macro": "hb-scanbox",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「打开扫码器」的电脑端形态；手机端用扫码页 hb-scan"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-print",
+      "type_key": null,
+      "cn": "打印数据",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "打印数据",
+      "group": "交互界面",
+      "macro": "hb-print",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「打印数据」与详情页打印共用的整屏预览"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-embed",
+      "type_key": null,
+      "cn": "嵌入的网页",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "嵌入的网页",
+      "group": "交互界面",
+      "macro": "hb-embed",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench"
+      ],
+      "note": "自动化「查看嵌入的网页」；网页区放客户截图或用组件代替，不手画第三方网站"
+    },
+    {
+      "kind": "component",
+      "id": "dlg-tip",
+      "type_key": null,
+      "cn": "提示条",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "表单提示条",
+      "group": "表单",
+      "macro": null,
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:detail"
+      ],
+      "note": "快捷按钮打开的数据创建页／编辑页标题栏下的提示；手写表单时用"
     }
   ]
 }

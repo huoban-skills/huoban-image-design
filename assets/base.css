@@ -575,6 +575,117 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .field-explain { display: flex; align-items: center; font-weight: 600; padding: 6px 0 12px; }
 .field-explain .fold { margin-left: auto; color: var(--ink-45); }
 
+/* ── 八之二 交互界面（快捷按钮点开的那一屏；2026-10-12 app.huoban.com 1455×695 视口实测） ──
+   遮罩 rgba(34,34,34,.45) 盖住整个窗口（含顶栏与导航）；弹窗白底圆角 6，阴影 0 0 0 1px 4% 黑 ＋ 0 20px 40px 8% 黑。
+   大弹窗（数据选择页、批量增删改）四周各留 48；小弹窗水平垂直居中：确认弹窗 384、扫码器 416、参数填写页 520。
+   标题栏 48 高下边线、标题 16 号粗体居中；底栏 49 高上边线、按钮右对齐 76×32 间距 8，取消＝4% 黑底，主按钮主色实底 */
+.stage.auto .item-page { position: relative; }
+.dlg-mask { position: absolute; inset: 0; z-index: 20; background: rgba(34,34,34,.45); }
+.dlg {
+  position: absolute; z-index: 21; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--card-bg); border-radius: 6px; color: var(--ink-65);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.04), 0 20px 40px rgba(0,0,0,.08);
+}
+.dlg-pick, .dlg-batch { inset: 48px; }   /* 两种大弹窗，都带 .wide */
+.dlg.mid { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+/* 大弹窗、打印数据、嵌入的网页占掉大半个窗口，窗口高由它们定：900 高时两档画布的整图比例都落在 1.45–1.85；小弹窗的窗口高仍由底图内容定 */
+.window:has(> .dlg.wide), .item-page:has(> .dlg.wide),
+.window:has(> .dlg-print), .item-page:has(> .dlg-print) { min-height: 900px; }
+.window:has(> .dlg.mid), .item-page:has(> .dlg.mid) { min-height: 460px; }
+.dlg-hd {
+  height: 48px; flex: none; position: relative; display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid rgba(0,0,0,.08); font-size: 16px; font-weight: 700; color: var(--ink-85);
+}
+.dlg-hd .x { position: absolute; right: 16px; top: 12px; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-65); }
+.dlg-hd .x svg, .dlg-print .x svg { width: 16px; height: 16px; }
+.dlg-ft { height: 49px; flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 16px; border-top: 1px solid rgba(0,0,0,.08); }
+.dlg .b { min-width: 76px; justify-content: center; padding: 0 11px; }
+.dlg .b.sec { background: rgba(0,0,0,.04); color: var(--ink-65); }
+.dlg .b.solid.dis { opacity: .4; }
+.dlg-bd { flex: 1; min-height: 0; overflow: hidden; }
+/* 提示条：32 高、12 号 45% 灰、左侧信息图标。数据选择页里是橙色 8% 底、圆角 6、左右各缩 16；数据创建／编辑页里是 2% 黑底通栏 */
+.dlg-tip { flex: none; height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 16px; font-size: 12px; color: var(--ink-45); background: rgba(0,0,0,.02); }
+.dlg-tip svg { width: 13px; height: 13px; }
+.dlg-tip.warn { margin: 8px 16px 0; border-radius: 6px; background: rgba(245,127,23,.08); }
+/* 数据选择页工具栏：左「已选 N 条｜只看已选 开关」，右 筛选／排序／冻结／行高＋搜索框 180 */
+.dlg-tools { flex: none; color: var(--ink-85); gap: 0; }
+.dlg-tools .picked em { font-style: normal; color: var(--primary); margin: 0 2px; }
+.dlg .sep { width: 1px; height: 14px; background: rgba(0,0,0,.12); margin: 0 16px; flex: none; }
+.dlg-tools .sw { width: 24px; height: 16px; border-radius: 100px; background: rgba(0,0,0,.25); margin-left: 8px; position: relative; flex: none; }
+.dlg-tools .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+.dlg-tools .search { width: 180px; margin-left: 4px; }
+.dlg .grid th.pick, .dlg .grid td.pick { width: 75px; text-align: center; padding: 0; color: var(--ink-45); border-right: 2px solid rgba(0,0,0,.08); }
+.dlg .grid th .req { margin-left: auto; float: right; }
+.dlg .grid .cb.on { background: var(--primary); border-color: var(--primary); position: relative; }
+.dlg .grid .cb.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.dlg .grid tr.sel td { background: rgba(0,0,0,.04); }
+.dlg .grid tr.ghost td { background: rgba(0,0,0,.02); }
+.dlg-count { flex: none; height: 40px; display: flex; align-items: center; border-top: 1px solid rgba(0,0,0,.08); font-size: 12px; color: var(--ink-45); }
+.dlg-count span { width: 75px; text-align: center; align-self: stretch; display: inline-flex; align-items: center; justify-content: center; border-right: 2px solid rgba(0,0,0,.08); }
+.dlg .view-pager { flex: none; height: 49px; padding: 0 8px; border-top: 1px solid rgba(0,0,0,.08); color: var(--ink-65); }
+.dlg .view-pager .per { margin-left: 8px; color: var(--ink-85); }
+/* 批量增删改信息行：47 高，12 号 45% 灰，表名主色，右侧 24 的 ⊕ */
+.dlg-info { flex: none; height: 47px; display: flex; align-items: center; padding: 0 16px; font-size: 12px; color: var(--ink-45); border-bottom: 1px solid rgba(0,0,0,.08); }
+.dlg-info em { font-style: normal; color: var(--primary); margin: 0 4px; }
+.dlg-info .add { margin-left: auto; color: var(--primary); display: inline-flex; }
+.dlg-info .add svg { width: 18px; height: 18px; }
+/* 确认弹窗：384 宽、内距 24；标题 16 号 500 粗；按钮行距标题 24、右对齐、间距 8、底距 16 */
+.dlg-confirm { width: 384px; padding: 24px 24px 16px; overflow: visible; }
+.dlg-confirm .t { font-size: 16px; font-weight: 500; line-height: 24px; color: var(--ink-85); }
+.dlg-confirm .ops { margin-top: 24px; display: flex; justify-content: flex-end; gap: 8px; }
+/* 带图标：标题左侧 24 的橙色实心感叹号 rgb(245,127,23)，标题与提示内容左缩 32；提示内容 15 号行高 20、65% 黑，距标题 8、距按钮 24 */
+.dlg-confirm.has-ic { padding-left: 48px; }
+.dlg-confirm .ic { position: absolute; left: 16px; top: 24px; width: 24px; height: 24px; color: #F57F17; }
+.dlg-confirm .ic svg { width: 24px; height: 24px; }
+.dlg-confirm .c { margin-top: 8px; font-size: 15px; line-height: 20px; color: var(--ink-65); }
+.dlg-confirm .b { min-width: 0; }
+/* 参数填写页：520 宽；参数一行一个，行距 69（标签 24＋输入框 32＋间距），输入框白底 1px 边圆角 6 */
+.dlg-params { width: 520px; }
+.dlg-form { padding: 16px 17px 24px; display: flex; flex-direction: column; gap: 13px; }
+.dlg-form .f-label .req { margin-left: 2px; }
+.dlg-form .f-box { height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border: 1px solid rgba(0,0,0,.12); border-radius: 6px; background: var(--card-bg); color: var(--ink-85); }
+.dlg-form .f-box.num { justify-content: flex-end; }
+.dlg-form .f-box .cal, .dlg-form .f-box .dd { margin-left: auto; color: var(--ink-45); font-size: 10px; display: inline-flex; }
+.dlg-form .f-box svg { width: 14px; height: 14px; }
+/* 扫码器（电脑端）：416 宽；标题 16 号 500 粗 65% 灰、无下边线；输入框 400×32、主色描边（聚焦态），右侧扫码图标 */
+.dlg-scan { width: 416px; padding-bottom: 8px; }
+.dlg-scan .dlg-hd { border-bottom: 0; font-weight: 500; color: var(--ink-65); }
+.scan-in { margin: 8px 8px 0; height: 32px; display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--primary); border-radius: 6px; color: var(--ink-85); box-shadow: 0 0 0 2px var(--primary-08); }
+.scan-in .ph { color: var(--ink-25); }
+.scan-in svg { width: 16px; height: 16px; margin-left: auto; color: var(--ink-45); }
+/* 嵌入的网页：800 宽居中；标题栏 48 带关闭叉，提示条 32（2% 黑底通栏），网页区 800×600，无底栏 */
+.dlg-embed { width: 800px; }
+.embed-page { height: 600px; overflow: hidden; background: var(--card-bg); }
+.embed-page > img { width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block; }
+.embed-page > .wc-bd { height: 100%; padding: 0; }
+.embed-page svg { width: 100%; height: 100%; }
+.window:has(> .dlg.dlg-embed), .item-page:has(> .dlg.dlg-embed) { min-height: 900px; }
+/* 打印数据：整屏。左栏 248 白底内距 16、右侧 1px 4% 黑分隔；右侧纸张区内距 36，A4 纸 794 宽白底、阴影 0 20px 40px 8% 黑、页边距 20mm≈76 */
+.dlg-print { position: absolute; inset: 0; z-index: 21; display: flex; overflow: hidden; background: #F5F6F8; color: var(--ink-65); }
+.pv-side { width: 248px; flex: none; background: #fff; padding: 16px; box-shadow: 1px 0 0 rgba(0,0,0,.04); }
+.pv-side > b { display: block; font-weight: 500; color: var(--ink-85); margin-bottom: 8px; }
+.pv-side p { line-height: 22px; margin-bottom: 6px; }
+.pv-side .tip { font-size: 12px; line-height: 19px; color: var(--ink-45); margin: 16px 0; }
+.pv-side .b { width: 100%; justify-content: center; }
+.pv-box { position: relative; width: 171px; height: 216px; margin: 12px auto 0; border-radius: 6px; background: rgba(0,0,0,.04); font-size: 12px; }
+.pv-box span { position: absolute; inset: 32px; background: #fff; border: 1px solid rgba(0,0,0,.06); }
+.pv-box i { position: absolute; font-style: normal; }
+.pv-box .t { top: 7px; left: 0; right: 0; text-align: center; }
+.pv-box .b2 { bottom: 7px; left: 0; right: 0; text-align: center; }
+.pv-box .l { left: 9px; top: 50%; margin-top: -9px; }
+.pv-box .r { right: 9px; top: 50%; margin-top: -9px; }
+.pv-main { flex: 1; min-width: 0; position: relative; padding: 36px; overflow: hidden; }
+.pv-main .x { position: absolute; right: 12px; top: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+.pv-paper { width: 794px; min-height: 1123px; margin: 0 auto; background: #fff; padding: 76px; box-shadow: 0 20px 40px rgba(0,0,0,.08); color: #000; font-size: 14px; line-height: 24px; }
+.pv-paper h1 { font-size: 30px; font-weight: 700; text-align: center; margin: 24px 0 40px; }
+.pv-paper .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; margin-bottom: 4px; }
+.pv-paper .kv div { color: rgba(0,0,0,.55); }
+.pv-paper .kv b { color: #000; font-weight: 600; }
+.pv-paper p { margin: 18px 0 8px; }
+.pv-paper table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
+.pv-paper th { height: 24px; background: rgba(0,0,0,.08); text-align: left; font-weight: 500; padding: 0 8px; }
+.pv-paper td { height: 24px; padding: 0 8px; }
+
 /* ── 九 卡片视图 ── */
 .view-cards.ops { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 16px; }
 .ci { background: var(--card-bg); border-radius: 6px; box-shadow: var(--shadow-card); padding: 12px 12px 10px; overflow: hidden; }

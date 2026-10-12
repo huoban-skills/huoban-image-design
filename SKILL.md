@@ -1,6 +1,6 @@
 ---
 name: huoban-image-design
-description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实产品组件。当用户要画伙伴云界面示意图/mockup（列表页、详情页、表单、工作台、数据看板、大屏、手机端），给报告/方案配系统图，或 huoban-solution-report 给出图需求单时，必须使用本 skill。不用于：海报/朋友圈营销图、流程图（hb-flowchart）、ER 图（hb-er-draw）、网站（hb-website-creator）。
+description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实产品组件。当用户要画伙伴云界面示意图/mockup（列表页、详情页、表单、工作台、数据看板、大屏、手机端、点按钮后的选择页／确认弹窗这类交互界面），给报告/方案配系统图，或 huoban-solution-report 给出图需求单时，必须使用本 skill。不用于：海报/朋友圈营销图、流程图（hb-flowchart）、ER 图（hb-er-draw）、网站（hb-website-creator）。
 ---
 
 # 伙伴云系统界面示意图
@@ -25,6 +25,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；记录详情弹窗仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组件与待办 → 标签页 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
+| 点了按钮之后的交互界面（数据选择页、批量增删改、确认弹窗、参数填写页、扫码器、打印数据、嵌入的网页） | 按钮所在页面的 kind：list／detail／workbench | interaction；底图另读它自己那篇 | 底图照常写，体内最后放一个交互界面宏；一张图一步，与浮层二选一 |
 | 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端（上面任一页面的手机版、企业微信消息） | mobile | mobile；手机版工作台、详情页的内容取舍另读对应页面篇 | 一律 2～3 屏流程，每屏界面类型不同；不套产品壳，用手机宏 |
 | 门户（登录页、门户导航、个人中心） | mobile | mobile | hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav；登录页和个人中心各占一屏 |
@@ -140,7 +141,7 @@ python3 <skill>/scripts/export.py "{客户或项目名}/"*.html --png        # �
 
 片段与探针中间产物放 scratchpad，不留在交付目录。报告配图的目录结构由 huoban-solution-report 定义（PNG 放 `figures/`、HTML 源稿放 `figures/源文件/`），本表只是指针。
 
-## 写作规则
+## 出图约束
 
 横幅、页签、页面底色这类自定义页面通用规则在 visual-four-principles，页头卡片这类页面级规则在各页面原则，浮层与标注气泡在 references/canvas/marketing.md；这里只列跨页面的硬约束。
 

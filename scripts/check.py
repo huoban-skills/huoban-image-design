@@ -537,7 +537,8 @@ def check(path, render=False, allow_local=False):
     _stage_txt = re.sub(r"<[^>]+>", " ", body)
     _verb = re.search(r"审批|审核|办理|处理|巡检|点检|保养|出库|入库|领用|领取|接单|派单|派工|报修|维修|确认|核对|登记|打卡|回访|签收|发货|收货|盘点|复核|催办|跟进|分配|回收|结算|核销|退回|驳回|报备|补录|派发|受理|验收|开单|录入", _stage_txt)
     if _verb:
-        if "<table" in body and "op-btn" not in body:
+        _base = body.split('<div class="dlg-mask">')[0].split('<div class="dlg-print">')[0]   # 交互界面里的表格不算底图的列表
+        if "<table" in _base and "op-btn" not in _base:
             add("Medium", "list-no-action", f"这张图讲的是「{_verb.group()}」这类操作，表格却没有按钮：讲点有动作、画面是列表，列表就要带按钮；表头最后一列加 操作:ops，格里写下一步动作（去巡检:check:blue）")
         elif 'class="ocard"' in body and 'class="obtn"' not in body:
             add("Medium", "list-no-action", f"这张图讲的是「{_verb.group()}」这类操作，手机卡片却没有按钮：讲点有动作、画面是列表，列表就要带按钮；hb-ocards 每行第四段写 按钮名:图标")

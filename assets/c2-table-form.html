@@ -269,6 +269,95 @@
   <div class="row"><!-- 按列数追加 cols-2、cols-3 或 cols-4；列宽等分行宽；内部放字段组件 --></div>
 </template>
 
+<!-- ══════════ 八之二、交互界面（快捷按钮点开的那一屏） ══════════
+     2026-10-12 app.huoban.com 1455×695 视口实测，对应自动化「页面交互」节点。盖在列表页、详情页或工作台上，一张图一个。
+     各节点打开什么：
+       打开数据创建页／打开数据编辑页 → 创建或编辑表单（上一节），标题下可带一条提示条
+       打开数据查看页 → 记录详情弹窗（c3）
+       打开数据选择页（单选／多选）→ 数据选择页；打开数据批量增删改页面 → 数据批量增删改页面
+       打开确认弹窗 → 确认弹窗；打开参数填写页 → 参数填写页；打开扫码器 → 扫码器；打印数据 → 打印数据；查看嵌入的网页 → 嵌入的网页
+       跳转到／复制内容到剪贴板／跳转浏览器下载 → 没有自己的界面（复制成功不出提示，下载直接由浏览器开始），不画
+     只采集了电脑端；手机端点开这些节点的样子未采集 -->
+<template data-component="数据选择页" data-cn="数据选择页" data-group="交互界面" data-layer="overlay"
+          data-measured="遮罩 rgba(34,34,34,.45)；弹窗四周各留 48（1359×599），白底圆角 6，阴影 0 0 0 1px 4% 黑＋0 20 40 8% 黑；标题栏 48 下边线，标题 16/700 居中；提示条（可选）32 高、橙 rgba(245,127,23,.08) 底圆角 6、上 8 左右 16、12 号 45% 灰带信息图标；工具栏 48 下边线：左「已选 N 条」（数字主色）＋竖线＋「只看已选」＋开关 24×16，右 筛选／排序／冻结／行高 各 72×32 ＋搜索框 180；表格同网格视图（表头 32、行 35），首列 75 宽：未勾选显示行号、勾选后显示主色勾，勾选行底 4% 黑；条数行 40（12 号 45% 灰）；分页 49 高上边线（页码 32×32、20 行/页）；底栏 49 上边线，取消 76×32（4% 黑底）、确定主色实底，间距 8 右距 16；一行未选时确定置灰。单选节点是同一个界面少三样：没有「只看已选」和开关、表头没有勾选框、没有底栏——鼠标停在行上行号变成空勾选框，点一行就选定并继续，Esc 关不掉">
+  <div class="dlg-mask"></div>
+  <div class="dlg wide dlg-pick">
+    <div class="dlg-hd"><!-- 节点上配的标题 --></div>
+    <div class="dlg-tip warn"><svg class="ico"><use href="#i-info"/></svg><!-- 提示文字（可选） --></div>
+    <div class="view-tools dlg-tools"><!-- 已选 N 条｜只看已选 开关；右侧 筛选 排序 冻结 行高 搜索 --></div>
+    <div class="dlg-bd"><div class="grid"><!-- table：首列 th.pick / td.pick --></div></div>
+    <div class="dlg-count"><span><!-- N条 --></span></div>
+    <div class="view-pager"><!-- ‹ 1 › 20 行/页 --></div>
+    <div class="dlg-ft"><span class="b sec">取消</span><span class="b solid">确定</span></div>
+  </div>
+</template>
+
+<template data-component="数据批量增删改页面" data-cn="数据批量增删改页面" data-group="交互界面" data-layer="overlay"
+          data-measured="外框、标题栏、底栏同数据选择页，主按钮是「保存」；信息行 47 高下边线：「来自 表名 的数据」12 号 45% 灰、表名主色，竖线后「共 N 条」，右侧 24 的主色 ⊕（允许新增时）；表格首列 75 宽行号，hover 行号位变成复制、删除两个图标；表头必填列右端红星；允许新增时末尾多一行 2% 黑底的空行（带默认值的格显示半透明默认值）。节点可只开增、改、删中的几项：只改不增时没有 ⊕ 和末尾空行">
+  <div class="dlg-mask"></div>
+  <div class="dlg wide dlg-batch">
+    <div class="dlg-hd"><!-- 节点上配的标题 --></div>
+    <div class="dlg-info">来自 <em><!-- 表名 --></em> 的数据<i class="sep"></i>共 <!-- N --> 条<span class="add"><svg class="ico"><use href="#i-plus-circle"/></svg></span></div>
+    <div class="dlg-bd"><div class="grid"><!-- table：首列 th.pick / td.pick 行号；末行 tr.ghost --></div></div>
+    <div class="dlg-ft"><span class="b sec">取消</span><span class="b solid">保存</span></div>
+  </div>
+</template>
+
+<template data-component="确认弹窗" data-cn="确认弹窗" data-group="交互界面" data-layer="overlay"
+          data-measured="384 宽，水平垂直居中，内距 24/24/16；只有一句标题 16/500 85% 黑（行高 24）和按钮行：按钮距标题 24、右对齐、32 高圆角 6 内距 11、间距 8，都是主色实底，按钮名与个数由节点配置（1 个或多个，每个走一条分支）；没有关闭叉，Esc 关不掉。节点配了图标（warning）时标题左侧出 24 的橙色实心感叹号 rgb(245,127,23)，标题和内容左缩 32；配了提示内容时排在标题下 8，15 号行高 20、65% 黑">
+  <div class="dlg-mask"></div>
+  <div class="dlg mid dlg-confirm">
+    <div class="t"><!-- 那句话 --></div>
+    <div class="ops"><span class="b solid"><!-- 按钮名 --></span></div>
+  </div>
+</template>
+
+<template data-component="参数填写页" data-cn="参数填写页" data-group="交互界面" data-layer="overlay"
+          data-measured="520 宽，水平垂直居中；标题栏 48（16/700 居中）；参数一行一个：标签 24 高 14 号 65% 灰、必填红星在名后，输入框 486×32 白底 1px 边圆角 6，日期型右端日历图标；行距 69；底栏 49，取消（4% 黑底）＋提交（主色，按钮名可配，如「下一步」）。节点配了提示时标题栏下通栏一条 32 高 2% 黑底提示条">
+  <div class="dlg-mask"></div>
+  <div class="dlg mid dlg-params">
+    <div class="dlg-hd"><!-- 节点上配的标题 --></div>
+    <div class="dlg-form">
+      <div class="field"><div class="f-label"><!-- 参数名 --><i class="req">*</i></div><div class="f-box"><!-- 值 --></div></div>
+    </div>
+    <div class="dlg-ft"><span class="b sec">取消</span><span class="b solid">提交</span></div>
+  </div>
+</template>
+
+<template data-component="扫码器" data-cn="扫码器" data-group="交互界面" data-layer="overlay"
+          data-measured="电脑端：416 宽，水平垂直居中；标题「扫一扫」16/500 65% 灰居中、48 高无下边线，右上 24 关闭叉；输入框 400×32 圆角 6 主色描边（自动聚焦），占位「手动输入后敲击回车提交」，右端扫码图标；下留 8。接扫码枪或手输回车。手机端是企业微信扫一扫（c4 扫码页）">
+  <div class="dlg-mask"></div>
+  <div class="dlg mid dlg-scan">
+    <div class="dlg-hd">扫一扫<span class="x"><svg class="ico"><use href="#i-close"/></svg></span></div>
+    <div class="scan-in"><span class="ph">手动输入后敲击回车提交</span><svg class="ico"><use href="#i-scan"/></svg></div>
+  </div>
+</template>
+
+<template data-component="嵌入的网页" data-cn="嵌入的网页" data-group="交互界面" data-layer="overlay"
+          data-measured="800 宽，水平垂直居中，白底圆角 6；标题栏 48 下边线，标题 16/700 居中，右上 24 关闭叉；提示条（可选）32 高 2% 黑底通栏、信息图标＋12 号 45% 灰；网页区 800×600 是一个 iframe，内容是节点里配的网址；无底栏。实测的是节点「窗口大小」第 2 档">
+  <div class="dlg-mask"></div>
+  <div class="dlg mid dlg-embed">
+    <div class="dlg-hd"><!-- 节点上配的标题 --><span class="x"><svg class="ico"><use href="#i-close"/></svg></span></div>
+    <div class="dlg-tip"><svg class="ico"><use href="#i-info"/></svg><!-- 提示文字（可选） --></div>
+    <div class="embed-page"><!-- 网页截图 img，或当作嵌入页面的组件 --></div>
+  </div>
+</template>
+
+<template data-component="打印数据" data-cn="打印数据" data-group="交互界面" data-layer="overlay"
+          data-measured="铺满整个视口，无遮罩。左栏 248 白底内距 16、右缘 1px 4% 黑：标题「打印信息」14/500，纸张／背景／边距三行 14 号 65% 灰行高 22，边距示意 171×216 灰 4% 底圆角 6（四边写毫米数、中间白纸），提示 12 号 45% 灰，打印按钮 216×32 主色；右侧纸张区内距 36，A4 纸 794×1123 白底、阴影 0 20 40 8% 黑、页边距 20mm≈76，多页纵向排；右上 32 关闭叉。纸上内容是客户配的打印模板">
+  <div class="dlg-print">
+    <div class="pv-side"><!-- 打印信息、纸张、背景、边距示意 .pv-box、提示、打印按钮 --></div>
+    <div class="pv-main"><span class="x"><svg class="ico"><use href="#i-close"/></svg></span>
+      <div class="pv-paper"><!-- 打印模板内容：h1 标题、.kv 两栏字段、table、p --></div>
+    </div>
+  </div>
+</template>
+
+<template data-component="表单提示条" data-cn="提示条" data-group="表单"
+          data-measured="快捷按钮打开的数据创建页／编辑页，标题栏下通栏一条：32 高、2% 黑底、内距 6/16，信息图标＋12 号 45% 灰文字（节点上配的提示）">
+  <div class="dlg-tip"><svg class="ico"><use href="#i-info"/></svg><!-- 提示文字 --></div>
+</template>
+
 <!-- ══════════ 九、卡片视图 ══════════ -->
 <template data-component="卡片视图" data-cn="卡片视图" data-group="业务视图">
   <div class="table-view view-cards">

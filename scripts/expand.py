@@ -2127,6 +2127,205 @@ def m_conn(a, body):
     return '<div class="conn">' + arrow.join(steps) + "</div>"
 
 
+# ── 快捷按钮点开的交互界面（2026-10-12 app.huoban.com 实测，结构见 c2-table-form.html「交互界面」） ──
+# 自动化「页面交互」节点各自打开的界面；盖在列表页、详情页或工作台上，一张图一个。
+DIALOG_MACROS = {"hb-pick", "hb-batch", "hb-confirm", "hb-params", "hb-scanbox", "hb-print", "hb-embed"}
+DIALOG_KINDS = ("list", "detail", "workbench")
+
+
+def _dlg(cls, title, inner, foot="", close=False):
+    x = f'<span class="x">{ico("close")}</span>' if close else ""
+    ft = f'<div class="dlg-ft">{foot}</div>' if foot else ""
+    return (f'<div class="dlg-mask"></div><div class="dlg {cls}">'
+            f'<div class="dlg-hd">{esc(title)}{x}</div>{inner}{ft}</div>')
+
+
+def _dlg_title(a, tagname, hint):
+    if not a.get("title") or a["title"] is True:
+        raise ExpandError(f"<{tagname}> 缺 title：{hint}")
+    return a["title"]
+
+
+def _dlg_table(body, tagname):
+    ls = lines(body)
+    if len(ls) < 2:
+        raise ExpandError(f"<{tagname}> 体内首行表头，其后至少一行数据")
+    heads = []
+    for c in cells(ls[0]):
+        req = c.rstrip().endswith("*")
+        heads.append((c.rstrip().rstrip("*").strip(), req))
+    header = parse_header([h for h, _ in heads])
+    if any(c["type"] == "ops" or c["stat"] for c in header):
+        raise ExpandError(f"<{tagname}> 的表头不写 :ops 和统计：弹窗里的表格没有行内按钮和合计")
+    return header, [r for _, r in heads], ls[1:]
+
+
+def m_pick(a, body):
+    title = _dlg_title(a, "hb-pick", "写节点上配的页面标题，如「请选择你要核销的应收明细」")
+    header, _, rows_ = _dlg_table(body, "hb-pick")
+    single = "single" in a
+    ths = f'<th class="pick">{"" if single else "<span class=\"cb\"></span>"}</th>' + "".join(f"<th>{esc(c['name'])}</th>" for c in header)
+    trs, n, picked = [], 0, 0
+    for ln in rows_:
+        sel = ln.startswith("!")
+        if sel:
+            ln = ln[1:].strip()
+            picked += 1
+        vals = cells(ln)
+        n += 1
+        if len(vals) != len(header):
+            raise ExpandError(f"<hb-pick> 第 {n} 行有 {len(vals)} 列，表头是 {len(header)} 列：{ln}")
+        first = ('<span class="cb"></span>' if single else '<span class="cb on"></span>') if sel else str(n)
+        tds = "".join(f"<td>{render_val(v, c['type'], 'hb-pick')}</td>" for c, v in zip(header, vals))
+        trs.append(f'<tr{" class=\"sel\"" if sel else ""}><td class="pick">{first}</td>{tds}</tr>')
+    if not 5 <= n <= 12:
+        warn(f"<hb-pick> 有 {n} 行：数据选择页放 5～12 行、多选标 1～3 行、单选标 1 行，读者要看得出是在一批里挑；弹窗跟着窗口高，行太少下半截是空的")
+    if picked == 0:
+        warn("<hb-pick> 没有标出要选的行：行前加 ! ，画面才看得出在选哪几条；多选一行都不选时「确定」是置灰的")
+    if single and picked > 1:
+        raise ExpandError(f"<hb-pick single> 标了 {picked} 行：单选的数据选择页点一行就选定并继续，只标一行，或去掉 single 按多选画")
+    if n and picked == n:
+        warn("<hb-pick> 每一行都勾上了：留几行不勾，读者才看得出是在一批里挑")
+    tip = f'<div class="dlg-tip warn">{ico("info")}{esc(a["tip"])}</div>' if a.get("tip") and a["tip"] is not True else ""
+    tools = "".join(f'<span class="tool">{ico(i)}{t}</span>' for t, i in (("筛选", "filter"), ("排序", "sort"), ("冻结", "freeze"), ("行高", "rowheight")))
+    only = "" if single else '<i class="sep"></i><span>只看已选</span><i class="sw"></i>'
+    bar = (f'<div class="view-tools dlg-tools"><span class="picked">已选 <em>{0 if single else picked}</em> 条</span>{only}'
+           f'<div class="right">{tools}'
+           f'<span class="search"><span class="ph">搜索</span>{ico("search")}</span></div></div>')
+    count = esc(str(a.get("count", f"{n}条")))
+    inner = (f'{tip}{bar}<div class="dlg-bd"><div class="grid"><table><tr>{ths}</tr>{"".join(trs)}</table></div></div>'
+             f'<div class="dlg-count"><span>{count}</span></div>'
+             '<div class="view-pager"><span class="pg">‹</span><span class="pg on">1</span><span class="pg">›</span><span class="per">20 行/页 ▾</span></div>')
+    foot = "" if single else f'<span class="b sec">取消</span><span class="b solid{"" if picked else " dis"}">确定</span>'
+    return _dlg("wide dlg-pick", title, inner, foot)
+
+
+def m_batch(a, body):
+    title = _dlg_title(a, "hb-batch", "写节点上配的页面标题，如「派工确认」")
+    if not a.get("from") or a["from"] is True:
+        raise ExpandError('<hb-batch> 缺 from：这批数据所在的表名，出在左上角「来自 工序任务 的数据」')
+    header, reqs, rows_ = _dlg_table(body, "hb-batch")
+    add = "noadd" not in a
+    ths = '<th class="pick"></th>' + "".join(
+        f'<th>{esc(c["name"])}{"<i class=\"req\">*</i>" if r else ""}</th>' for c, r in zip(header, reqs))
+    trs, n = [], 0
+    for ln in rows_:
+        vals = cells(ln)
+        n += 1
+        if len(vals) != len(header):
+            raise ExpandError(f"<hb-batch> 第 {n} 行有 {len(vals)} 列，表头是 {len(header)} 列：{ln}")
+        tds = "".join(f"<td>{render_val(v, c['type'], 'hb-batch')}</td>" for c, v in zip(header, vals))
+        trs.append(f'<tr><td class="pick">{n}</td>{tds}</tr>')
+    if not 3 <= n <= 10:
+        warn(f"<hb-batch> 有 {n} 行：批量增删改页面放 3～10 行；弹窗跟着窗口高，行太少下半截是空的")
+    if add:
+        trs.append('<tr class="ghost"><td class="pick"></td>' + "<td></td>" * len(header) + "</tr>")
+    plus = f'<span class="add">{ico("plus-circle")}</span>' if add else ""
+    bar = (f'<div class="dlg-info">来自 <em>{esc(a["from"])}</em> 的数据<i class="sep"></i>共 {n} 条{plus}</div>')
+    inner = f'{bar}<div class="dlg-bd"><div class="grid"><table><tr>{ths}</tr>{"".join(trs)}</table></div></div>'
+    return _dlg("wide dlg-batch", title, inner, '<span class="b sec">取消</span><span class="b solid">保存</span>')
+
+
+def m_confirm(a, body):
+    title = _dlg_title(a, "hb-confirm", "写弹窗里那句话，如「将自动生成核销明细并按顺序核销，是否继续」")
+    btns = [b for b in cells(a["btns"])] if a.get("btns") and a["btns"] is not True else []
+    if not 1 <= len(btns) <= 3:
+        raise ExpandError('<hb-confirm> 缺 btns：写 1～3 个按钮名，用 | 分开，如 btns="跳转订单|跳转订单明细"；每个按钮对应自动化里的一条分支')
+    icon = a.get("icon", "")
+    if icon not in ("", "warning"):
+        raise ExpandError(f'<hb-confirm icon="{icon}"> 不认识：只有 icon="warning"（橙色感叹号），不写就没有图标')
+    text = " ".join(lines(body))
+    if len(title) > 28:
+        warn(f"<hb-confirm> 的标题有 {len(title)} 个字：确认弹窗只有 384 宽，超过两行就不像一句确认了，压到 28 字以内；细节写进体内的提示内容")
+    if len(text) > 60:
+        warn(f"<hb-confirm> 的提示内容有 {len(text)} 个字：压到 60 字以内，三行说完")
+    ic = f'<span class="ic">{ico("warn-s")}</span>' if icon else ""
+    ct = f'<div class="c">{esc(text)}</div>' if text else ""
+    foot = "".join(f'<span class="b solid">{esc(b)}</span>' for b in btns)
+    return (f'<div class="dlg-mask"></div><div class="dlg mid dlg-confirm{" has-ic" if icon else ""}">'
+            f'{ic}<div class="t">{esc(title)}</div>{ct}<div class="ops">{foot}</div></div>')
+
+
+PARAM_TYPES = ("text", "date", "sel", "num", "user")
+
+
+def m_params(a, body):
+    title = _dlg_title(a, "hb-params", "写节点上配的页面标题，如「选择账期」")
+    rows = []
+    for ln in lines(body):
+        c = cells(ln)
+        name = c[0]
+        req = name.endswith("*")
+        name = name.rstrip("*").strip()
+        val = c[1] if len(c) > 1 else ""
+        typ = c[2] if len(c) > 2 and c[2] else "text"
+        if typ not in PARAM_TYPES:
+            raise ExpandError(f"<hb-params> 参数「{name}」的类型 {typ} 不认识：可用 {'/'.join(PARAM_TYPES)}")
+        tail = {"date": f'<span class="cal">{ico("f-date")}</span>', "sel": '<span class="dd">▾</span>'}.get(typ, "")
+        shown = user(val) if typ == "user" and val else esc(val)
+        rows.append(f'<div class="field"><div class="f-label">{esc(name)}{"<i class=\"req\">*</i>" if req else ""}</div>'
+                    f'<div class="f-box{" num" if typ == "num" else ""}">{shown}{tail}</div></div>')
+    if not 1 <= len(rows) <= 6:
+        raise ExpandError(f"<hb-params> 有 {len(rows)} 个参数：参数填写页放 1～6 个，每行「参数名* | 值 | 类型」；更多字段该用数据创建页")
+    tip = f'<div class="dlg-tip">{ico("info")}{esc(a["tip"])}</div>' if a.get("tip") and a["tip"] is not True else ""
+    foot = f'<span class="b sec">取消</span><span class="b solid">{esc(a.get("submit", "提交"))}</span>'
+    return _dlg("mid dlg-params", title, f'{tip}<div class="dlg-form">{"".join(rows)}</div>', foot)
+
+
+def m_embed(a, body):
+    title = _dlg_title(a, "hb-embed", "写节点上配的页面标题，如「查看客户位置地图」")
+    tip = f'<div class="dlg-tip">{ico("info")}{esc(a["tip"])}</div>' if a.get("tip") and a["tip"] is not True else ""
+    if a.get("img") and isinstance(a["img"], str):
+        page = f'<img src="{a["img"]}" alt="">'
+    elif body.strip():
+        page = body.strip()
+    else:
+        raise ExpandError('<hb-embed> 没有网页内容：用 img="路径" 放客户提供的网页截图，或在体内放一个宏当作嵌入的页面（如 <hb-map bare>、图表宏的 bare 输出）')
+    return _dlg("mid dlg-embed", title, f'{tip}<div class="embed-page">{page}</div>', close=True)
+
+
+def m_scanbox(a, body):
+    val = a.get("value") if a.get("value") is not True else ""
+    inp = (f'<div class="scan-in"><span class="{"" if val else "ph"}">{esc(val) if val else "手动输入后敲击回车提交"}</span>'
+           f'{ico("scan")}</div>')
+    return _dlg("mid dlg-scan", a.get("title", "扫一扫") if a.get("title") is not True else "扫一扫", inp, close=True)
+
+
+def m_print(a, body):
+    paper = a.get("paper", "A4(210mm × 297mm)")
+    out, table = [], []
+
+    def flush():
+        if table:
+            head = "".join(f"<th>{esc(c)}</th>" for c in table[0])
+            trs = "".join("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>" for r in table[1:])
+            out.append(f"<table><tr>{head}</tr>{trs}</table>")
+            table.clear()
+
+    for ln in lines(body):
+        if ln.startswith("|"):
+            table.append(cells(ln.strip("|").strip()))
+            continue
+        flush()
+        if ln.startswith("#"):
+            out.append(f"<h1>{esc(ln[1:].strip())}</h1>")
+        elif " = " in ln:
+            kv = "".join(f'<div><b>{esc(k.strip())}：</b>{esc(v.strip())}</div>'
+                         for k, v in (seg.split(" = ", 1) for seg in cells(ln) if " = " in seg))
+            out.append(f'<div class="kv">{kv}</div>')
+        else:
+            out.append(f"<p>{esc(ln)}</p>")
+    flush()
+    if not any(o.startswith("<h1>") for o in out):
+        raise ExpandError("<hb-print> 体内缺标题：第一行写「# 销售合同」这样的打印模板标题，其后「字段 = 值 | 字段 = 值」、「| 列 | 列 |」表格行或正文")
+    side = (f'<div class="pv-side"><b>打印信息</b><p>纸张：{esc(paper)}</p><p>背景：不打印</p><p>边距：单位 mm</p>'
+            '<div class="pv-box"><i class="t">20</i><i class="l">20</i><i class="r">20</i><i class="b2">20</i><span></span></div>'
+            '<p class="tip">如未能调起打印机，或无法打印出页眉页脚，请尝试复制当前页面链接到其他浏览器中进行打印，推荐 Chrome/Edge 。</p>'
+            '<span class="b solid">打印</span></div>')
+    return (f'<div class="dlg-print">{side}<div class="pv-main"><span class="x">{ico("close")}</span>'
+            f'<div class="pv-paper">{"".join(out)}</div></div></div>')
+
+
 # ── 页面骨架：hb-page / hb-row / hb-float ─────────────────────
 # 模型只填槽位内容，外壳（.stage、.window、.page、详情页画布）由这里产出；
 # 槽位表来自 references/principles/ 五篇页面原则里的"固定顺序"。
@@ -2418,6 +2617,9 @@ WZ-CY-0331 | 安溪铁观音 500g | 高新库 | 83 | 40 | 正常:green
 </hb-page>"""),
 }
 
+for _k in DIALOG_KINDS:
+    PAGE_SLOTS[_k]["allowed"] = set(PAGE_SLOTS[_k]["allowed"]) | DIALOG_MACROS
+
 SHELL_ATTRS = ("ws", "logo", "page", "nav", "me", "theme", "bottom")
 
 
@@ -2456,6 +2658,7 @@ def m_float(a, body):
         if "w" in a:
             raise ExpandError("<hb-float> 放手机单屏时不写 w：手机壳按 0.8 倍显示，宽度固定 300")
         return f'<div class="mk-float mk-float-phone" style="--float-w:300px">{body.strip()}</div>'
+    if n_cards < 2:
         raise ExpandError(f'<hb-float> 里只有 {n_cards} 块组件：浮层是一块小画面，至少放两块，用 <hb-row>／<hb-col> 排，比如明细表配一张汇总图；推荐三四块排两行')
     return (f'<div class="mk-float" style="--float-w:{w}px">'
             f'<div class="float-screen">{body.strip()}</div></div>')
@@ -2538,6 +2741,10 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
     for n in names:
         if n == "hb-float" and kind == "screen":
             raise ExpandError("数据大屏不放浮层：大屏本身就是一整块画面，要讲的都画在屏里；去掉 <hb-float>")
+        if n in DIALOG_MACROS:
+            if kind not in DIALOG_KINDS:
+                raise ExpandError(f"<{n}> 是快捷按钮点开的交互界面，只盖在列表页、详情页或工作台上（kind=list/detail/workbench）；{spec['cn']}不放")
+            continue
         if n not in allowed:
             raise ExpandError(f"<hb-page kind=\"{kind}\"> 顶层不能放 <{n}>；{spec['cn']}顶层可用：{'、'.join(sorted(allowed))}。"
                               f"{'图表与筛选请放进 <hb-tabcard> 或页面末尾。' if n in spec.get('first_screen_ban', set()) else ''}")
@@ -2562,7 +2769,7 @@ def _check_slots(kind, spec, names, deep, first_screen=None):
     free = spec.get("order_free", set())
     last = -1
     for n in names:
-        if n in free:
+        if n in free or n in DIALOG_MACROS:
             continue
         r = rank.get(n if n not in VIEW_MACROS else "视图", rank.get(n, -1))
         if r == -1:
@@ -2629,7 +2836,7 @@ def m_page(a, body):
         raise ExpandError("手机图不出单屏：<hb-page kind=\"mobile\"> 体内一律是 <hb-screens>，2～3 屏；需求只提到一个界面时，补出它的上一步（消息、列表、工作台）或下一步（结果态），见 references/principles/mobile.md「画几屏」")
     # 演示尺寸和整页一样按完整一页画，必有组件不放宽；超高了减行、压图表高度，不删骨架组件
     _check_slots(kind, spec, names, deep, first_screen)
-    floats, main_parts, nav_html = [], [], ""
+    floats, dialogs, main_parts, nav_html = [], [], [], ""
     for name, raw in parts:
         if name == "hb-nav":
             mm = TAG_RE.match(raw)
@@ -2644,8 +2851,17 @@ def m_page(a, body):
             if floats:
                 raise ExpandError("一张图只放一个浮层：两个浮层都贴在右下角会叠在一起；要讲两件事就拆成两张图")
             floats.append(html_)
+        elif name in DIALOG_MACROS:
+            dialogs.append((name, html_))
         else:
             main_parts.append((name, html_))
+    for n_, h_ in main_parts:
+        if 'class="dlg-mask"' in h_ or 'class="dlg-print"' in h_:
+            raise ExpandError(f"交互界面（hb-pick／hb-batch／hb-confirm／hb-params／hb-scanbox／hb-print／hb-embed）写在 <hb-page> 顶层的最后，不放进 <{n_}> 里：它盖在整张底图上")
+    if len(dialogs) > 1:
+        raise ExpandError(f"一张图只放一个交互界面（现在有 {'、'.join('<' + n + '>' for n, _ in dialogs)}）：一步一张图，要讲先选再填就拆成两张")
+    if dialogs and floats:
+        raise ExpandError(f"<{dialogs[0][0]}> 和 <hb-float> 二选一：弹窗已经是点开后的那一屏，再放浮层会两层叠在一起")
     stage_cls = ["stage", "auto"]
     if floats:
         stage_cls.append("has-float")
@@ -2703,13 +2919,17 @@ def m_page(a, body):
         body_html = "".join(h for _, h in main_parts)
         screens = max([int(m) for _, h in main_parts for m in re.findall(r'data-screens="(\d)"', h)] or [1])
         stage_style = {1: "width:520px", 2: "width:1100px", 3: "width:1640px"}[screens]
+    if dialogs:                # 弹窗盖在整个窗口上（含顶栏和导航），和真实产品一样
+        tail = "</main>" if kind == "detail" else "</div>"
+        body_html = body_html.rstrip()
+        body_html = body_html[:-len(tail)] + dialogs[0][1] + tail
     if kind in ("list", "workbench", "dashboard") and cut:
         body_html = body_html.replace('<div class="window ', f'<div class="window cut" style="height:{cut}px" ', 1)
     st = f' style="{stage_style}"' if stage_style else ""
     if floats:                 # 浮层和底图装进同一个定位框：浮层按底图尺寸落在右下象限
         body_html = f'<div class="stage-body">{body_html}{"".join(floats)}</div>'
         floats = []
-    _kind, _verb = _list_needs_action(body_html)
+    _kind, _verb = _list_needs_action(body_html.replace(dialogs[0][1], "") if dialogs else body_html)
     if _kind:
         warn(f"这张图讲的是「{_verb}」这类操作，画面里的{_kind}却没有按钮：讲点有动作、画面是列表，列表就要带按钮——"
              f"{'表头最后一列写 操作:ops，格里写 去巡检:check:blue' if _kind == '表格' else '卡片每行第四段写 按钮名:图标'}，按钮名就是那个动作")
@@ -2789,6 +3009,13 @@ MACROS = {
     "hb-ptasks": (m_ptasks, "流程任务列表：属性 tabs、count、dot、app；每行「发起人 | 时间 | 流程名 · 记录标题 | 节点名 | 按钮」"),
     "hb-wpage": (m_wpage, "手机工作台：# 页面名；sc: 名:图标 | …；tabs: *页签 | 页签；sub: 子区名 | 全部 | *待执行 | 已完成"),
     "hb-scan": (m_scan, "扫码页（企业微信扫一扫）：属性 title、label（码下方的标签文字）、tip（提示一句）；整屏灰底＋二维码示意"),
+    "hb-pick": (m_pick, "数据选择页（多选；single＝单选）：属性 title、tip、count、single；体内同 hb-grid（首行表头），! 前缀＝要选的行"),
+    "hb-batch": (m_batch, "数据批量增删改页面：属性 title、from（数据所在的表）、noadd；体内首行表头（列名后 * ＝必填），其后每行一条"),
+    "hb-confirm": (m_confirm, "确认弹窗：属性 title、btns=按钮|按钮（1～3 个，每个对应一条分支）、icon=warning；体内可写一段提示内容"),
+    "hb-params": (m_params, "参数填写页：属性 title、tip、submit；每行「参数名* | 值 | 类型(text/date/sel/num/user)」"),
+    "hb-scanbox": (m_scanbox, "扫码器（电脑端）：属性 title（默认「扫一扫」）、value（已扫到的内容）；自闭合"),
+    "hb-print": (m_print, "打印数据：左侧打印信息栏＋右侧纸张预览；体内 # 标题、字段 = 值 | 字段 = 值、| 列 | 列 | 表格行、正文；属性 paper"),
+    "hb-embed": (m_embed, "嵌入的网页：属性 title、tip、img（网页截图）；或体内放一个宏当作嵌入的页面"),
     "hb-ptop": (m_ptop, "门户顶栏：属性 name（门户名）、user（登录人姓名，出头像）、login（未登录时的按钮名）、logo（出 logo 占位，默认不出）"),
     "hb-pnav": (m_pnav, "门户导航条：一级页签，* 前缀＝当前，名后缀 :g ＝分组页签；属性 fill、scroll"),
     "hb-pmenu": (m_pmenu, "门户分组菜单：分组页签展开的面板＋蒙层；每行 名称:图标"),
@@ -2821,12 +3048,15 @@ GROUPS = [
     ("手机端（2026-09-03 H5 实测结构，壳 375 宽）", ["hb-phone", "hb-mhome", "hb-vbar", "hb-ocards", "hb-mtool", "hb-rec", "hb-fbar", "hb-taskbar", "hb-ptasks", "hb-wpage", "hb-wxapp", "hb-wxgroup", "hb-conn"]),
     ("手机端 · 门户（2026-09-21 实测）", ["hb-ptop", "hb-pnav", "hb-pmenu", "hb-plogin", "hb-pme"]),
     ("扫码与二维码（hb-scan 手机端扫码，hb-qr 是 PC 端出码，成对）", ["hb-scan", "hb-qr"]),
+    ("交互界面（2026-10-12 实测；快捷按钮点开后的那一屏，盖在列表页／详情页／工作台上，一张图一个）",
+     ["hb-pick", "hb-batch", "hb-confirm", "hb-params", "hb-scanbox", "hb-print", "hb-embed"]),
 ]
 
 DOCS = {
 "hb-page": """整页骨架。属性 kind（必填）list/workbench/dashboard/detail/screen/mobile；canvas=marketing（默认，一张图，可放 hb-float）/product（照着搭，全屏无浮层）；产品壳属性 ws（PC 页必填）/page/nav/me/theme/logo/bottom 同 hb-shell；level=flat（默认）/card；cut=高度 px（把窗口截到主要内容为止）。
 size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄位置；整图、底图宽度、高度阈值和数据量下限上限都以 references/canvas/marketing.md 第 1、2 节为准，这里不重复；版式和必有组件按页面原则出齐，放不下宁可偏高；浮层宽 400～700 且不缩小；看板视图各列均分宽度；只用于营销类电脑端页面）。选 full 还是 slide 看载体，整图比例两档通用，都见 references/canvas/marketing.md「先按载体选画布尺寸」「整图比例：一屏原则」。
-体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 <skill>/scripts/expand.py --page kind 看槽位表与最小示例。""",
+体内直接写各槽位的宏，不再写 .stage/.window/.page/.item-page；先 python3 <skill>/scripts/expand.py --page kind 看槽位表与最小示例。
+要画点了按钮之后的那一屏（数据选择页、确认弹窗等），在 list／detail／workbench 体内最后加一个交互界面宏（hb-pick／hb-batch／hb-confirm／hb-params／hb-scanbox／hb-print／hb-embed），遮罩和定位自动产出；一张图一个，不与 hb-float 同用。""",
 "hb-col": """一栏里竖叠组件。只放在 hb-row 的某一段里，体内按上下顺序放 2～3 个组件宏，算 hb-row 的一个组件。
 并排时同一行各栏会被拉到等高：一栏只有一张矮卡（按钮组件 3～6 个、多项统计 3 行、进度条）而邻栏是长列表或字段组时，矮卡会被拉高、卡里空一大块。这时用 hb-col 把矮组件叠在一起，或叠一个待办／统计在下面。
 例：
@@ -3293,6 +3523,75 @@ sub: 出库审批 | 全部 | *待执行 | 已完成
 扫码页之后接记录详情页或新建／编辑页，讲扫到的是哪条记录、扫完填什么。
 例：
 <hb-phone nobar><hb-scan label="WZ-JS-0106" tip="对准货架标签上的二维码"/></hb-phone>""",
+"hb-pick": """数据选择页：自动化「打开数据选择页」节点点开的那一屏，讲「从一批记录里勾出要处理的那条或那几条」。写在 hb-page（kind=list/detail/workbench）体内最后，自动加遮罩盖在底图上，四周各留 48。
+自上而下：标题栏 48（标题居中）→ 提示条（可选）→ 工具栏 48（已选 N 条、只看已选开关；筛选、排序、冻结、行高、搜索）→ 表格（首列未勾选显示行号、勾选后显示勾）→ 条数行 → 分页 → 底栏（取消、确定）。
+属性 title（必填，节点上配的标题）、tip（标题下的橙色提示条）、count（条数行文字，默认按行数出「N条」）、single（单选节点时写）。
+体内同 hb-grid：首行表头（列名:tag／:tags／:user），其后每行一条；行前 ! ＝要选的行，多选画成已勾选，「已选 N 条」跟着数，一行都不标时「确定」置灰。数量见 references/principles/interaction.md 第 3 节。
+单选（single）和多选是同一个界面，少三样：没有「只看已选」开关、表头没有勾选框、没有底栏按钮，点一行就选定并继续。这时 ! 只标一行，画成鼠标停在这一行（行底变灰、行号变成空勾选框），「已选」仍是 0 条。
+例：
+<hb-pick title="请选择你要核销的应收明细" tip="只能选择同一客户的应收">
+发生日期 | 业务类型:tag | 产品 | 应收总额 | 待收总额
+2026-10-18 | 销售退货 | CP25032709 太阳镜 | -1,000 元 | -1,000
+! 2026-10-18 | 销售发货 | CP25032709 太阳镜 | 10,000 元 | 10,000
+! 2026-10-18 | 销售发货 | CP25032711 镜盒 | 9,800 元 | 9,800
+2026-10-13 | 销售退货 | CP25032709 太阳镜 | 0 元 | -3,000
+2026-10-09 | 销售发货 | CP25032713 镜布 | 1,260 元 | 1,260
+</hb-pick>""",
+"hb-batch": """数据批量增删改页面：自动化「打开数据批量增删改页面」节点点开的那一屏，讲「一次改一批、补一批」。写在 hb-page 体内最后，尺寸同 hb-pick（四周各留 48）。
+自上而下：标题栏 48 → 信息行（来自 表名 的数据｜共 N 条，右侧 ⊕ 新增）→ 可编辑表格（首列行号，末尾一行浅灰空行等着填）→ 底栏（取消、保存）。
+属性 title（必填）、from（必填，这批数据所在的表名）、noadd（节点只允许改、不允许新增时写：去掉 ⊕ 和末尾空行）。
+体内首行表头，列名后加 * ＝必填（表头右侧出红星）；其后每行一条。带颜色的值只用于选项字段。数量见 references/principles/interaction.md 第 3 节。
+例：
+<hb-batch title="派工确认" from="工序任务">
+工序状态:tag | 生产工单* | 工序号 | 执行工序 | 工序执行人 | 计划生产数量 | 计划完工日期
+未开始:blue | SC260618003 | 1 | GX018-组装 | YG005-陈昱松 | 100 | 2026-10-20
+未开始:blue | SC260618003 | 2 | GX037-清洗 | YG003-周敏 | 100 | 2026-10-20
+未开始:blue | SC260618003 | 3 | GX038-贴标 | YG003-周敏 | 100 | 2026-10-20
+</hb-batch>""",
+"hb-confirm": """确认弹窗：自动化「打开确认弹窗」节点，讲「系统停下来问一句，点哪个按钮走哪条路」。384 宽，居中盖在底图上；标题、可选的提示内容、右下角的按钮，没有关闭叉。
+属性 title（必填）、btns（必填，1～3 个按钮名用 | 分开，都是主色实底；每个按钮对应自动化里的一条分支）、icon="warning"（标题左侧出橙色感叹号，不写没有图标）。
+体内可写一段提示内容（灰字排在标题下）：把要改的是哪条、从什么改成什么写清楚；没有就自闭合。数量见 references/principles/interaction.md 第 3 节。
+例：
+<hb-confirm title="确认修改交期" icon="warning" btns="确认修改">订单 DD250916004 的交货日期将由 2026-09-17 改为 2026-10-20，确认后立即生效。</hb-confirm>
+<hb-confirm title="将自动生成核销明细并按顺序核销，是否继续" btns="确定"/>
+<hb-confirm title="请选择要继续执行的操作" btns="跳转订单|跳转订单明细"/>""",
+"hb-params": """参数填写页：自动化「打开参数填写页」节点，讲「执行前先问几个值」（账期起止、数量、原因），填的值不落在任何一张表上。520 宽，居中。
+自上而下：标题栏 48 → 提示条（可选）→ 参数一行一个（参数名在上、白底描边输入框在下）→ 底栏（取消、提交）。
+属性 title（必填）、tip（标题下的浅灰提示条）、submit（主按钮文字，默认「提交」；后面还接着一步时写「下一步」）。
+体内每行「参数名* | 值 | 类型」：名后 * ＝必填；值可空（空输入框）；类型 text（默认）／date（右侧日历图标）／sel（右侧 ▾）／num（右对齐）／user（人员）。数量见 references/principles/interaction.md 第 3 节。
+例：
+<hb-params title="选择账期">
+开始时间* | 2026-09-01 | date
+结束时间* | 2026-09-30 | date
+</hb-params>""",
+"hb-scanbox": """扫码器（电脑端）：自动化「打开扫码器」节点在电脑上点开的小弹窗，接扫码枪，也可以手输后回车。416 宽，居中；标题居中、右上角关闭叉，下面一个带扫码图标的输入框。手机上扫码用 hb-scan。
+属性 title（默认「扫一扫」）、value（已扫到／输入的内容；不写则显示占位「手动输入后敲击回车提交」）。自闭合写法。
+例：
+<hb-scanbox value="CK20260228001"/>""",
+"hb-print": """打印数据：自动化「打印数据」节点（或详情页的打印）点开的整屏预览，讲「一键按模板打出单据」。铺满整个窗口，不留遮罩：左侧 248 白色信息栏（纸张、背景、边距示意、打印按钮），右侧灰底上一张白纸。
+属性 paper（纸张，默认「A4(210mm × 297mm)」）。
+体内写纸上的内容（客户的打印模板），按行：# 开头＝模板标题（必有）；「字段 = 值 | 字段 = 值」＝一行两栏的字段；以 | 开头＝表格行（第一行是表头）；其余＝正文段落。纸张超出窗口高度的部分自然截断。
+例：
+<hb-print>
+# 销售合同
+甲方（买方） = 丽华快餐 | 乙方（卖方） = 深圳市云图贸易有限公司
+单位地址 = 北京市朝阳区望京街 8 号 | 税号 = 91440300708461136T
+兹经买卖双方同意，由买方购进、卖方售出下列货物，并按下列条款签订本合同：
+| 产品名称 | 规格型号 | 单价 | 下单数量 | 订单金额
+| 电脑 | 16 寸 | 200 元 | 3 | 600 元
+1. 本合同于 2026-02-20 签订。
+</hb-print>""",
+"hb-embed": """嵌入的网页：自动化「查看嵌入的网页」节点点开的弹窗，讲「不离开系统就能看到外部页面」（地图、物流轨迹、BI 报表、外部系统的单据）。800 宽，居中；标题栏 48（标题居中、右上关闭叉）→ 提示条（可选）→ 600 高的网页区，没有底栏。
+属性 title（必填）、tip（标题下的浅灰提示条）、img（客户提供的网页截图路径，铺满网页区）。
+没有截图时在体内放一个宏当作嵌入的页面：地图用 <hb-map bare>，报表用图表宏的 bare 输出；不手画第三方网站的界面。
+例：
+<hb-embed title="查看客户位置地图" tip="客户地址在地图上的位置">
+<hb-map bare>
+深圳南山 | 12
+广州天河 | 8
+东莞松山湖 | 5
+</hb-map>
+</hb-embed>""",
 "hb-ptop": """门户顶栏 44，替代 hb-phone 自带的返回顶栏（外层写 <hb-phone nobar>）。属性 name（门户名，必填）、user（登录人姓名，右侧出 24 圆头像）、login（未登录时右侧按钮名，默认「登录」）、logo（门户名左侧出 32 见方 logo 占位；默认不出，示意图里占位色块比没有更假）。自闭合写法。
 未登录出登录按钮，登录后出头像；两者不同时出现。
 例：
