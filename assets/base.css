@@ -80,8 +80,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .item-page-scroll { overflow: visible; }
 /* 营销图里的自定义详情页没有产品壳，浅灰页底会和画布背景融成一片：加灰色外框把页面框出来（全屏产品图不加） */
 .stage.auto:not(.product) .item-page { border: 1px solid #D9DCE3; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); }
-.stage.auto.has-float { padding-right: 200px; padding-bottom: 240px; }   /* 右边留出浮层探出的 200；底部先留 240，fit.js 按浮层实际高度改 */
-.stage.auto.has-float { width: 1640px; }
+.stage.auto.has-float { padding-bottom: 240px; width: 1640px; }   /* 底部先留 240，fit.js 按浮层实际高度改 */
+.stage.auto.float-r { padding-right: 200px; }   /* 右下浮层：右边留出探出的 200 */
+.stage.auto.float-l { padding-left: 60px; }     /* 左下浮层：左边留出探出的 60 */
 .stage-body { position: relative; }
 /* 画面浮层：一块小画面，套圆角窗口框，内容缩到 0.8 倍，一看就是另一屏 */
 .stage.auto .float-screen {                               /* 窗口框只留一道细边：6 像素内边距 */
@@ -91,10 +92,15 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto .float-screen > * { zoom: .8; }   /* 浮层内容缩 0.8：字落在 7.5px 的浮层底线上，比底图小一档，一看就是另一屏 */
 .stage.auto .float-screen > * + * { margin-top: 8px; }
 .stage.auto.has-float .window,
-.stage.auto.has-float .item-page { width: 1440px; margin: 0; }
-.stage.auto .mk-float {                                   /* 以底图中心为原点，浮层只待在右下象限：顶端在底图半高、右缘探出 200 */
-  position: absolute; z-index: 3; top: calc(50% + 16px); right: -200px; width: var(--float-w, 640px); margin: 0;
+.stage.auto.has-float .item-page { margin: 0; }
+.stage.auto.float-r .window, .stage.auto.float-r .item-page { width: 1440px; }
+.stage.auto.float-l .window, .stage.auto.float-l .item-page { width: 1580px; }
+.stage.auto.float-l.float-r .window, .stage.auto.float-l.float-r .item-page { width: 1380px; }
+.stage.auto .mk-float {                                   /* 以底图中心为原点，浮层只待在下半截：右下的右缘探出 200，左下的左缘探出 60 */
+  position: absolute; z-index: 3; top: 42%; right: -200px; width: var(--float-w, 640px); margin: 0;
+  rotate: var(--float-tilt, 0deg);                        /* tilt 属性：微微斜放，像随手摆在底图上 */
 }
+.stage.auto .mk-float.at-l { right: auto; left: -60px; }
 
 /* 浮层放手机单屏：手机壳自己就是框，不套窗口框；两档尺寸都按 0.8 倍显示（300 宽），高度按内容撑 */
 .stage.auto .mk-float-phone .phone { zoom: .8; margin: 0; height: auto; box-shadow: 0 14px 36px rgba(0, 0, 0, .16); }
@@ -105,7 +111,9 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .stage.auto.slide { width: 1600px; }
 .stage.auto.slide .window, .stage.auto.slide .item-page { width: 1600px; }
 .stage.auto.slide.has-float { width: 1600px; }
-.stage.auto.slide.has-float .window, .stage.auto.slide.has-float .item-page { width: 1400px; }
+.stage.auto.slide.float-r .window, .stage.auto.slide.float-r .item-page { width: 1400px; }
+.stage.auto.slide.float-l .window, .stage.auto.slide.float-l .item-page { width: 1540px; }
+.stage.auto.slide.float-l.float-r .window, .stage.auto.slide.float-l.float-r .item-page { width: 1340px; }
 .stage.auto.slide .item-page-canvas { padding: 32px 48px; }
 .stage.auto.slide .float-screen > * { zoom: 1; }   /* 演示尺寸窗口更窄，再缩 0.8 只剩 6.9px，低于浮层底线，所以不缩 */
 .stage.auto.slide .kanban-columns { gap: 16px; }          /* 演示尺寸：看板各列均分宽度，全部列都露出来 */

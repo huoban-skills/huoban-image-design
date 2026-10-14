@@ -2638,14 +2638,29 @@ def _top_level(raw):
     return parts
 
 
+FLOAT_TILT = 6   # 浮层倾斜角度上限（度）
+
+
 def m_float(a, body):
-    if "pos" in a or "at" in a or "align" in a or "top" in a:
-        raise ExpandError('<hb-float> 位置固定在整张底图的右下角，没有位置属性：去掉 pos／at／align／top')
+    if "pos" in a or "align" in a or "top" in a:
+        raise ExpandError('<hb-float> 只用 at 定左右（right 右下，默认；left 左下），高度由画布自动定：去掉 pos／align／top')
     if "side" in a:
-        raise ExpandError('<hb-float> 固定在底图右下，没有 side 属性：PC 页面左边是导航（详情页左边是页头与字段），浮层放左会盖住它们；去掉 side')
-    w = str(a.get("w", "640")).rstrip("px")
+        raise ExpandError('<hb-float> 用 at 定左右：at="left" 放左下，不写放右下；去掉 side')
+    at = str(a.get("at", "right"))
+    if at not in ("right", "left"):
+        raise ExpandError(f'<hb-float at="{at}"> 只能写 right（右下，默认）或 left（左下）')
+    tilt = str(a.get("tilt", "0")).replace("deg", "").replace("°", "").strip()
+    try:
+        tv = float(tilt)
+    except ValueError:
+        raise ExpandError(f'<hb-float tilt="{tilt}"> 写角度数字，-{FLOAT_TILT}～{FLOAT_TILT}，负数逆时针')
+    if not -FLOAT_TILT <= tv <= FLOAT_TILT:
+        raise ExpandError(f'<hb-float tilt="{tilt}"> 写 -{FLOAT_TILT}～{FLOAT_TILT}：斜得太多像贴歪了，一般 2～4 度')
+    cls = "mk-float" + (" at-l" if at == "left" else "")
+    tilt_css = f";--float-tilt:{tv:g}deg" if tv else ""
+    w = str(a.get("w", "640" if at == "right" else "560")).rstrip("px")
     if not w.isdigit() or not 400 <= int(w) <= 920:
-        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～920（默认 640；演示尺寸 400～700）：浮层是一块小画面，右缘探出画布 200')
+        raise ExpandError(f'<hb-float w="{w}"> 宽度写 480～920（默认 640；演示尺寸 400～700；左下浮层到 640 为止）：浮层是一块小画面')
     if "title" in a:
         raise ExpandError('<hb-float> 不带浮层标题：去掉 title 属性，要说明的话写在体内组件卡片自己的 title 上')
     n_cards = len(re.findall(r'class="w-card', body))
@@ -2657,10 +2672,10 @@ def m_float(a, body):
             raise ExpandError("<hb-float> 里手机单屏和 PC 组件二选一，不混放：要么一个 <hb-phone>，要么用 <hb-row>／<hb-col> 排 PC 组件")
         if "w" in a:
             raise ExpandError("<hb-float> 放手机单屏时不写 w：手机壳按 0.8 倍显示，宽度固定 300")
-        return f'<div class="mk-float mk-float-phone" style="--float-w:300px">{body.strip()}</div>'
+        return f'<div class="{cls} mk-float-phone" style="--float-w:300px{tilt_css}">{body.strip()}</div>'
     if n_cards < 2:
         raise ExpandError(f'<hb-float> 里只有 {n_cards} 块组件：浮层是一块小画面，至少放两块，用 <hb-row>／<hb-col> 排，比如明细表配一张汇总图；推荐三四块排两行')
-    return (f'<div class="mk-float" style="--float-w:{w}px">'
+    return (f'<div class="{cls}" style="--float-w:{w}px{tilt_css}">'
             f'<div class="float-screen">{body.strip()}</div></div>')
 
 
@@ -2848,8 +2863,10 @@ def m_page(a, body):
         if name == "hb-float":
             if canvas == "product":
                 raise ExpandError("产品设计类画布不放浮层：去掉 <hb-float>，或改 canvas=\"marketing\"")
-            if floats:
-                raise ExpandError("一张图只放一个浮层：两个浮层都贴在右下角会叠在一起；要讲两件事就拆成两张图")
+            if len(floats) == 2:
+                raise ExpandError("一张图最多两个浮层，左下、右下各一个；要讲更多就拆成两张图")
+            if floats and ("at-l" in floats[0]) == ("at-l" in html_):
+                raise ExpandError('两个浮层要一左一右：一个写 at="left" 放左下，另一个不写放右下；同一侧两个会叠在一起')
             floats.append(html_)
         elif name in DIALOG_MACROS:
             dialogs.append((name, html_))
@@ -2863,8 +2880,10 @@ def m_page(a, body):
     if dialogs and floats:
         raise ExpandError(f"<{dialogs[0][0]}> 和 <hb-float> 二选一：弹窗已经是点开后的那一屏，再放浮层会两层叠在一起")
     stage_cls = ["stage", "auto"]
-    if floats:
+    if floats:                 # float-r：右下浮层，窗口让出右侧 200；float-l：左下浮层，窗口让出左侧 60
         stage_cls.append("has-float")
+        stage_cls += [c for c, on in (("float-l", any("at-l" in h for h in floats)),
+                                      ("float-r", any("at-l" not in h for h in floats))) if on]
     if canvas == "product":
         stage_cls.append("product")
     if size == "slide":
@@ -2873,15 +2892,18 @@ def m_page(a, body):
             fw = re.search(r"--float-w:(\d+)px", h)
             if "mk-float-phone" in h:
                 continue              # 手机单屏宽度固定 300，不走宽度区间
-            if fw and not 400 <= int(fw.group(1)) <= 700:
-                raise ExpandError(f'演示尺寸下 <hb-float w> 写 400～700（现在 {fw.group(1)}）：窗口只有 1400 宽')
+            hi = 560 if "at-l" in h else 700
+            if fw and not 400 <= int(fw.group(1)) <= hi:
+                raise ExpandError(f'演示尺寸下 <hb-float w> 写 400～{hi}（现在 {fw.group(1)}）：窗口只有 1400 宽'
+                                  + ('，左下浮层会盖住导航，宽度到 560 为止' if "at-l" in h else ''))
     else:
         for h in floats:
             fw = re.search(r"--float-w:(\d+)px", h)
             if "mk-float-phone" in h:
                 continue
-            if fw and not 480 <= int(fw.group(1)) <= 920:
-                raise ExpandError(f'<hb-float w="{fw.group(1)}"> 宽度写 480～920（默认 640）：浮层左边不能越过底图中线；400 起只在演示尺寸 size="slide" 下可用')
+            hi = 640 if "at-l" in h else 920
+            if fw and not 480 <= int(fw.group(1)) <= hi:
+                raise ExpandError(f'<hb-float w="{fw.group(1)}"> 宽度写 480～{hi}（默认 {560 if "at-l" in h else 640}）：浮层不能越过底图中线；400 起只在演示尺寸 size="slide" 下可用')
     stage_style = ""
     cut = str(a.get("cut", "")).rstrip("px")
 
@@ -2926,7 +2948,7 @@ def m_page(a, body):
     if kind in ("list", "workbench", "dashboard") and cut:
         body_html = body_html.replace('<div class="window ', f'<div class="window cut" style="height:{cut}px" ', 1)
     st = f' style="{stage_style}"' if stage_style else ""
-    if floats:                 # 浮层和底图装进同一个定位框：浮层按底图尺寸落在右下象限
+    if floats:                 # 浮层和底图装进同一个定位框：浮层按底图尺寸落在左下或右下象限
         body_html = f'<div class="stage-body">{body_html}{"".join(floats)}</div>'
         floats = []
     _kind, _verb = _list_needs_action(body_html.replace(dialogs[0][1], "") if dialogs else body_html)
@@ -2953,7 +2975,7 @@ MACROS = {
     "hb-page": (m_page, "页面骨架：kind=list|workbench|dashboard|detail|screen|mobile；产出画布与外壳，体内按槽位放宏；--page kind 看槽位表"),
     "hb-row": (m_row, "24 栅格一行：属性 spans=16|8（加起来 24）；体内并排放组件宏，最多 4 个"),
     "hb-col": (m_col, "hb-row 某一段里竖叠 2～3 个组件：矮组件（按钮组件、多项统计、进度条）别单独占一栏被拉高"),
-    "hb-float": (m_float, "营销浮层（一张图一个，固定在底图右下角）：属性 w=480～920（无标题）；体内用 hb-row／hb-col 排至少两块 PC 组件，或只放一个 hb-phone 手机单屏"),
+    "hb-float": (m_float, "营销浮层（一张图最多两个，左下、右下各一）：属性 at=right|left、w=480～920、tilt=-6～6（无标题）；体内用 hb-row／hb-col 排至少两块 PC 组件，或只放一个 hb-phone 手机单屏"),
     "hb-screens": (m_screens, "手机流程壳（2～3 屏）：体内 hb-phone 与 hb-conn 交替，一步一屏，每屏界面类型不同"),
     "hb-shell": (m_shell, "PC 产品壳：左侧导航＋一级顶栏，体内先写 <hb-nav>，其后是 .main 里的页面内容"),
     "hb-nav": (m_nav, "左侧导航树：# 分组；名称 | 图标 | 颜色，* 前缀＝当前页；> 文件夹，- 子项"),
@@ -3081,11 +3103,12 @@ size=full（默认，整页全貌）/slide（演示尺寸：放进 PPT 这类窄
 <hb-line title="趋势" labels="1|2|3">出库 | 1,2,3 | blue</hb-line>
 <hb-donut title="构成">酒品 | 60 | red</hb-donut>
 </hb-row>""",
-"hb-float": """营销浮层，一张图只放一个，固定在整张底图的右下角，右边缘探出画布 200，没有位置属性。属性 w（宽 480～920，默认 640；演示尺寸 400～700）；不带浮层标题，要说明的话写在体内组件卡片的 title 上。
-浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，至少两块组件，推荐三四块排两行；外面自动套一道细窗口框，内容按 0.8 倍显示。盖住底图的面积不超过四分之一（check.py `float-cover`）。不复制底层已有内容。
+"hb-float": """营销浮层，一张图最多两个：右下一个（默认，右边缘探出画布 200）、左下一个（at="left"，左边缘探出 60，会盖住导航的下半截）；高度由画布自动定，没有 top 这类位置属性。属性 at（right 右下，默认；left 左下）；w（宽，右下 480～920、默认 640，左下 480～640、默认 560；演示尺寸右下 400～700、左下 400～560）；tilt（倾斜角度，-6～6 度，负数逆时针，默认 0）。不带浮层标题，要说明的话写在体内组件卡片的 title 上。
+放两个时一左一右、内容各讲一件事，常见搭配是左下手机单屏＋右下 PC 组件；倾斜只给其中一个、2～4 度，另一个摆正，左下往逆时针（负数）、右下往顺时针（正数）斜，像随手放在底图上。
+浮层是一块小画面：体内和页面一样用 hb-row／hb-col 排版，放另一个页面的完整画面或一块局部，至少两块组件，推荐三四块排两行；外面自动套一道细窗口框，内容按 0.8 倍显示。盖住底图的面积一个浮层不超过四分之一、两个合计不超过三分之一（check.py `float-cover`）。不复制底层已有内容。
 体内两种写法二选一，不混放：PC 组件（上面这种），或一个手机单屏——讲「同一件事在手机上怎么办」时，体内只写一个 <hb-phone>（不写 fix、不放 hb-screens，浮层不写 w）。手机壳自己就是框，不再套窗口框，按 0.8 倍显示（300 宽）、高度按内容撑，内容控制在 600 以内。手机宏要包在 hb-phone 里，散放会报错。
-例（手机单屏）：
-<hb-float>
+例（手机单屏，放左下、逆时针斜 3 度）：
+<hb-float at="left" tilt="-3">
 <hb-phone title="任务办理">
 <hb-rec title="CK-0037 领用出库" noqr>
 物资 | 茅台飞天 53° | text

@@ -140,17 +140,21 @@ PROBE = r"""
   if (win && win.scrollHeight > win.clientHeight + 4) out.extra.push({ kind: 'clipped', over: win.scrollHeight - win.clientHeight });
   if (st) {
     var sr = st.getBoundingClientRect();
+    out.floatBoxes = []; out.floatCover = 0;
     document.querySelectorAll('.mk-float').forEach(function (fl) {
+      // 浮层本身的宽高（斜放不算外接框）；出界和遮挡按外接框量
       var fr = fl.getBoundingClientRect();
-      out.floatBox = { w: Math.round(fr.width), h: Math.round(fr.height) };
+      out.floatBoxes.push({ w: fl.offsetWidth, h: fl.offsetHeight, phone: fl.classList.contains('mk-float-phone') });
       if (fr.bottom > sr.bottom + 2) out.extra.push({ kind: 'float-out', over: Math.round(fr.bottom - sr.bottom) });
       if (fr.top < sr.top - 2) out.extra.push({ kind: 'float-out', over: Math.round(sr.top - fr.top) });
+      if (fr.right > sr.right + 2) out.extra.push({ kind: 'float-out', over: Math.round(fr.right - sr.right) });
+      if (fr.left < sr.left - 2) out.extra.push({ kind: 'float-out', over: Math.round(sr.left - fr.left) });
       var base = st.querySelector('.window, .item-page');
       if (base) {
         var br = base.getBoundingClientRect();
         var ox = Math.max(0, Math.min(br.right, fr.right) - Math.max(br.left, fr.left));
         var oy = Math.max(0, Math.min(br.bottom, fr.bottom) - Math.max(br.top, fr.top));
-        out.floatCover = Math.round(ox * oy / (br.width * br.height) * 100) / 100;
+        out.floatCover = Math.round((out.floatCover + ox * oy / (br.width * br.height)) * 100) / 100;   // 两个浮层合计
       }
     });
   }
