@@ -803,7 +803,7 @@
       "old_class": "modal-mask",
       "file": "c2-table-form.html",
       "name": "创建或编辑表单",
-      "macro": null,
+      "macro": "hb-form",
       "variants": [
         "fm"
       ],
@@ -3414,6 +3414,64 @@
         "page:detail"
       ],
       "note": "快捷按钮打开的数据创建页／编辑页标题栏下的提示；手写表单时用"
+    },
+    {
+      "kind": "component",
+      "id": "sub-editor",
+      "type_key": null,
+      "cn": "子表",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "表单子表",
+      "group": "表单",
+      "macro": "hb-subtable",
+      "grid": null,
+      "variants": [],
+      "measured": "measured",
+      "allowed_in": [
+        "page:list",
+        "page:detail",
+        "page:workbench",
+        "float"
+      ],
+      "note": "表单编辑页里的可编辑子表，只写在 hb-form 体内"
+    },
+    {
+      "kind": "component",
+      "id": "picked-bar",
+      "type_key": null,
+      "cn": "批量操作条",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "批量操作条",
+      "group": "列表页",
+      "macro": "hb-tools",
+      "grid": null,
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "page:list",
+        "float"
+      ],
+      "note": "hb-tools picked＋batch；网格勾选行后工具栏原位换成它"
+    },
+    {
+      "kind": "component",
+      "id": "cell-img",
+      "type_key": null,
+      "cn": "图片列",
+      "old_class": null,
+      "file": "c2-table-form.html",
+      "name": "图片列",
+      "group": "单元格",
+      "macro": "hb-grid",
+      "grid": null,
+      "variants": [],
+      "measured": "imitated",
+      "allowed_in": [
+        "view-grid"
+      ],
+      "note": "表头 :img"
     }
   ]
 }

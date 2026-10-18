@@ -269,6 +269,25 @@
   <div class="row"><!-- 按列数追加 cols-2、cols-3 或 cols-4；列宽等分行宽；内部放字段组件 --></div>
 </template>
 
+<template data-component="表单子表" data-cn="子表" data-group="表单"
+          data-measured="2026-10-12 实测（快捷按钮「计划下发」带出的创建页，与数据批量增删改页面是同一个 sub_table_editor 组件）：外框 1px 细边圆角 6；页签行 40，页签字 12 主色带下划线；信息行 47「来自 表名 的数据｜共 N 条」12 号 45% 灰、表名主色，右端 24 的主色 ⊕；表头 32、行 35，首列 75 行号，其余各列 140 宽从左排；必填列表头右端红星；格子与普通单元格同样式、不画输入框；允许新增时末尾一行 2% 黑底空行，带默认值的格显示半透明默认值">
+  <div class="sub-editor">
+    <div class="sub-tabs"><span class="on"><!-- 子表页签名 --></span></div>
+    <div class="dlg-info">来自 <em><!-- 表名 --></em> 的数据<i class="sep"></i>共 <!-- N --> 条<span class="add"><svg class="ico"><use href="#i-plus-circle"/></svg></span></div>
+    <div class="grid"><!-- table：首列 th.pick / td.pick 行号；末行 tr.ghost --></div>
+  </div>
+</template>
+
+<template data-component="批量操作条" data-cn="批量操作条" data-group="列表页"
+          data-measured="仿写（2026-10-18 进销存方案配图）：网格勾选行后工具栏原位换成这一条，48 高；左侧「已选择 N / 总数 条」、主色「选择全部」，接一个主色实底主按钮和带图标的批量操作（编辑、导出、打印…），右端关闭叉">
+  <div class="view-tools picked-bar"><span class="picked">已选择 <!-- N / 总数 --> 条</span><span class="all">选择全部</span><span class="b solid"><!-- 主操作 --></span><span class="tool"><!-- 图标＋批量操作 --></span><span class="x"><svg class="ico"><use href="#i-close"/></svg></span></div>
+</template>
+
+<template data-component="图片列" data-cn="图片列" data-group="单元格"
+          data-measured="仿写（2026-10-18 进销存方案配图）：网格里的图片字段列，32×26 缩略图圆角 4，无图时灰底占位图标">
+  <span class="cell-img"><img src="" alt=""/></span>
+</template>
+
 <!-- ══════════ 八之二、交互界面（快捷按钮点开的那一屏） ══════════
      2026-10-12 app.huoban.com 1455×695 视口实测，对应自动化「页面交互」节点。盖在列表页、详情页或工作台上，一张图一个。
      各节点打开什么：

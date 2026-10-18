@@ -40,7 +40,7 @@ PERSON_EXCLUDE = ("周报", "月报", "日报", "年报", "简报", "快报", "�
 
 # 规模上限（本 skill 出图约束，几何问题的生成侧规避；超出报 Medium）
 SLIDE_RE = re.compile(r'class="stage auto[^"]*\bslide\b')
-SLIDE_RATIOS = (1.25, 1.4, 1.8, 1.95)   # 演示尺寸底图比：硬上限 / 目标上限 / 目标下限 / 硬下限（整图恒 1600，图片位 1041 宽时主体字 8.5px）
+SLIDE_RATIOS = (1.25, 1.45, 1.8, 1.95)   # 演示尺寸底图比：硬上限 / 目标上限 / 目标下限 / 硬下限（整图恒 1600，图片位 1041 宽时主体字 8.5px）
 
 
 def float_sides(body):
@@ -50,9 +50,8 @@ def float_sides(body):
 
 
 def slide_bounds(body):
-    """演示尺寸的底图宽与四档高度阈值：整图 1600，右下浮层让出 200、左下浮层让出 60，无浮层铺满。"""
-    sides = float_sides(body)
-    w = 1600 - (200 if "r" in sides else 0) - (60 if "l" in sides else 0)
+    """演示尺寸的底图宽与四档高度阈值：整图 1600，底图窗口一律 1520，浮层只决定底图靠左、靠右还是居中。"""
+    w = 1520
     hard_hi, hi, lo, hard_lo = (round(w / r) for r in SLIDE_RATIOS)
     return w, hard_hi, hi, lo, hard_lo
 
@@ -62,6 +61,12 @@ RATIO_HIGH = 1.25      # 硬下限：低于它报 High，图竖得在载体里�
 RATIO_THIN = 1.85      # 高于它报 Medium：画面偏扁、内容偏少
 FLOAT_RATIO_MIN = 1.2  # 浮层自身宽高比下限：低于它就竖成了条，不像另一屏画面
 FLOAT_COVER_MAX = {1: 0.25, 2: 0.34}   # 浮层盖住底图的面积上限：一个四分之一，两个合计三分之一
+FLOAT_COVER_LIST = 0.5                  # 底图是列表页时放宽到一半：列表页主要看视图页签、工具栏、表头和前几行，浮层可以做成完整小页面
+PHONE_FLOAT_MAX_H = 880                 # 浮层手机是完整一屏真机（812×0.98＋边框），超过这个高度说明屏高被改过
+
+
+def cover_cap(body, n):
+    return FLOAT_COVER_LIST if re.search(r'data-kind="list"', body) else FLOAT_COVER_MAX[min(2, n or 1)]
 SLIDE_RATIO_OK, SLIDE_RATIO_HIGH, SLIDE_RATIO_THIN = RATIO_OK, RATIO_HIGH, RATIO_THIN   # 旧名保留
 FLOAT_ZOOM = 0.8        # 默认尺寸的浮层内容缩 0.8（base.css .float-screen）；演示尺寸不缩，见下
 SCALE = {"grid_rows": (6, 14), "stats_per_row": (4, 6), "kanban_cols": (3, 5)}
@@ -566,7 +571,7 @@ def check(path, render=False, allow_local=False):
         rows = len(re.findall(r"<tr(?![^>]*class=\"group\")", m.group(0))) - 1
         lo, hi = SCALE["grid_rows"]
         if SLIDE_RE.search(body):
-            hi = 18          # 演示尺寸窗口只有 1400 宽，表格要多几行才把底图撑到 1.5–1.8 的比例
+            hi = 18          # 演示尺寸表格可以多几行，把底图撑到 1.45–1.8 的比例
         if rows and (rows < lo or rows > hi):
             add("Medium", "scale-limit", f"网格视图 {rows} 行：常态 {lo}～{hi} 行，少了像凑数，多了被窗口裁断也无意义", line_of(body, m.start()))
     for m in re.finditer(r'<div class="w-row[^"]*">', body):
@@ -620,9 +625,9 @@ def check(path, render=False, allow_local=False):
     if _covered:
         sides = float_sides(body)
         win_w = slide_bounds(body)[0] if SLIDE_RE.search(body) else 1640 - (200 if "r" in sides else 0) - (60 if "l" in sides else 0)
-        cap = FLOAT_COVER_MAX[min(2, len(_fl) or 1)]
+        cap = cover_cap(body, len(_fl))
         if _covered > cap * win_w * page_height(body):
-            add("Medium", "float-cover", f"浮层盖住底图约 {_covered / (win_w * page_height(body)):.0%}：一个浮层最多四分之一、两个合计三分之一；只截画面的一块局部，或把宽度收小", _cover_at)
+            add("Medium", "float-cover", f"浮层盖住底图约 {_covered / (win_w * page_height(body)):.0%}：一个浮层最多四分之一、两个合计三分之一，底图是列表页时到一半；只截画面的一块局部，或把宽度收小", _cover_at)
 
     # ── 数据看板底图骨架不全（为了压比例删了筛选、图表或明细，或把它们挪进了浮层）：两档尺寸都查 ──
     if re.search(r'data-kind="dashboard"', body):
@@ -676,7 +681,7 @@ def check(path, render=False, allow_local=False):
             sh = r.get("winH") or (r.get("stage") or {}).get("h")
             _sw, _hard_hi, _hi, _lo, _hard_lo = slide_bounds(body)
             if SLIDE_RE.search(body) and sh and _hi < sh <= _hard_hi:
-                add("Medium", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过目标 {_hi}：底图 {_sw}×{sh} 比 {_sw/sh:.2f}，低于 1.4。先把数据收到下限、再做版式允许的横向重排；版式和骨架组件放不下时让位，在验收表第 8 条写明理由（硬上限 {_hard_hi}）")
+                add("Medium", "slide-height", f"演示尺寸窗口高 {sh}px（实测），超过目标 {_hi}：底图 {_sw}×{sh} 比 {_sw/sh:.2f}，低于 1.45。先把数据收到下限、再做版式允许的横向重排；版式和骨架组件放不下时让位，在验收表第 8 条写明理由（硬上限 {_hard_hi}）")
             if SLIDE_RE.search(body) and sh and _hard_lo < sh < _lo:
                 add("Medium", "slide-flat", f"演示尺寸窗口高 {sh}px（实测），低于目标 {_lo}：底图 {_sw}×{sh} 比 {_sw/sh:.2f}，高于 1.8，内容偏少；有浮层时浮层比底图还高，整图显空。按页面原则把骨架组件的数据补回去（列表页表格 10–14 行、字段组每组 6～8 个字段、明细 5–6 行、图表卡别压太矮），不是加组件")
             if SLIDE_RE.search(body) and sh and sh <= _hard_lo:
@@ -690,24 +695,26 @@ def check(path, render=False, allow_local=False):
                 ratio = st["w"] / st["h"]
                 if ratio < RATIO_HIGH:
                     add("High", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于硬下限 {RATIO_HIGH}：图太竖，在报告或演示稿里一屏放不下。先减数据（明细行数、字段数、图表高度），再横向重排（看板图表行 12+6+6、底部两表并排；详情页字段组 cols=4）；骨架组件不删，仍不行就拆成两张各自完整的图")
-                elif ratio < RATIO_OK:
+                elif ratio < RATIO_OK and not SLIDE_RE.search(body):   # 演示尺寸由底图比例（slide-height）管，整图只守硬下限
                     add("Medium", "figure-ratio", f"整张图 {st['w']}×{st['h']}，宽高比 {ratio:.2f}，低于目标 {RATIO_OK}（区间 {RATIO_OK}–{RATIO_THIN}）：先减数据、再横向重排，骨架组件不删；重排后仍够不到，可让位于信息密度并在验收表第 8 条写明理由")
-                elif ratio > RATIO_THIN:
+                elif ratio > RATIO_THIN and not SLIDE_RE.search(body):   # 演示尺寸偏扁也由底图比例（slide-flat）管
                     add("Medium", "figure-thin", f"整张图宽高比 {ratio:.2f}，高于 {RATIO_THIN}，画面偏扁、内容偏少：底图按完整一页画（看板是筛选、指标、一排图表、明细 4–6 行；列表页表格 8–14 行），或把浮层做足（四块排两行）把整图撑起来")
             for fb in r.get("floatBoxes", []):
                 if not (fb.get("w") and fb.get("h")):
                     continue
                 fr_ = fb["w"] / fb["h"]
+                if fb.get("dlg"):
+                    continue          # 交互界面是实测的固定窗口，宽高比不查
                 if fb.get("phone"):
-                    if fb["h"] > 600:
-                        add("Medium", "float-phone-tall", f"浮层里的手机高 {fb['h']}px（实测），超过 600：整图会被拉竖。减卡片张数或字段数，让这一屏只讲一件事")
+                    if fb["h"] > PHONE_FLOAT_MAX_H:
+                        add("Medium", "float-phone-tall", f"浮层里的手机高 {fb['h']}px（实测），超过一屏真机 {PHONE_FLOAT_MAX_H}：手机屏固定 812 高，别改屏高，内容多了按屏底切断")
                 elif fr_ < FLOAT_RATIO_MIN:
                     add("Medium", "float-ratio", f"浮层 {fb['w']}×{fb['h']}，宽高比 {fr_:.2f}，低于 {FLOAT_RATIO_MIN}：竖成了条，不像另一屏画面。两块组件改左右并排（hb-row spans=\"12|12\"），或把其中一块压矮")
             for sc in r.get("statcut", []):
                 add("High", "stat-cut", f"单指标卡只有 {sc['w']}px 宽，{sc['what']}被截断：左文右图形态一张卡至少要 190px（标签＋28px 数值＋69px 火花线），演示尺寸放不下 5 个以上。改居中大数形态、减一个指标，或把单位收短")
             _n = len(r.get("floatBoxes", [])) or 1
-            if r.get("floatCover", 0) > FLOAT_COVER_MAX[min(2, _n)]:
-                add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：一个浮层最多四分之一、两个合计三分之一；只截画面的一块局部，或把宽度收小")
+            if r.get("floatCover", 0) > cover_cap(body, _n):
+                add("Medium", "float-cover", f"浮层盖住底图 {r['floatCover']:.0%}（实测）：一个浮层最多四分之一、两个合计三分之一，底图是列表页时到一半；只截画面的一块局部，或把宽度收小")
             for u in r.get("uneven", []):
                 add("Medium", "column-uneven", f"并排底部不齐：.{u['short']} 高 {u['shortH']}，.{u['tall']} 高 {u['tallH']}，差 {u['diff']}px；给短栏补数据行或调 spans")
             for g in r.get("gaps", []):

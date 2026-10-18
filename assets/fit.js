@@ -13,6 +13,10 @@
       f.style.top = ''; f.style.translate = '';
       var bh = body.offsetHeight, fh = f.offsetHeight, top = Math.max(bh * 0.42, bh - fh * 0.7);
       if (fs.length > 1 && f.classList.contains('at-l')) top = Math.max(bh * 0.34, bh - fh * 0.8);
+      // 手机浮层是完整一屏真机，比底图矮不了多少：整块上提，大部分压在底图侧边，底边只探出底图下沿约 100
+      if (f.classList.contains('mk-float-phone')) top = Math.max(bh * 0.08, bh - fh + 100);
+      // 确认弹窗、参数填写页这类小窗：整块落在底图下半截里，离底边留 48，不探出底图
+      if (f.classList.contains('mk-float-dlg') && f.classList.contains('mid')) top = Math.max(bh * 0.42, bh - fh - 48);
       f.style.top = Math.round(top) + 'px';
       // 斜放后外接框比浮层本身大，探出的一角可能超出画布：往里收回，导出时不被裁掉
       var fr = f.getBoundingClientRect(), sr = s.getBoundingClientRect(), dx = 0;

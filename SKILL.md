@@ -21,11 +21,11 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 | 用户说的 | `<hb-page kind>` | 必读页面原则（references/principles/） | 说明 |
 | --- | --- | --- | --- |
 | 列表页（网格/看板/卡片/甘特/日历/任务/透视） | list | list-view | 视图页签 → 视图区白卡（工具栏 → 视图）；甘特/日历/任务/透视放在视图位 |
-| 表单编辑页 / 字段录入 | 手写（c1 ＋ c2 模板） | form | 仅用户明确要求时；弹窗随视口减 48 宽减 60 高，字段区一到四列等分 |
+| 表单编辑页 / 字段录入 | 发起它的页面 kind（list／detail／workbench），体内放 hb-form | form；底图另读它自己那篇 | 仅用户明确要求或自动化带出时；用户单独要表单时，底图用这张表的列表页（「新建」按钮所在页）；营销画布放进 hb-float，产品设计类加遮罩盖在底图上 |
 | 详情页 / 详情界面 | detail | item-detail | 记录功能区默认包含；不套壳不套弹窗；记录详情弹窗仅明确要求时用 c3 模板手写 |
 | 工作台 | workbench | workbench | 横幅 → 单指标 → 按钮组件与待办 → 标签页 |
 | 数据看板 | dashboard | dashboard | 横幅 → 筛选 → 单指标 → 图表行 → 明细 |
-| 点了按钮之后的交互界面（数据选择页、批量增删改、确认弹窗、参数填写页、扫码器、打印数据、嵌入的网页） | 按钮所在页面的 kind：list／detail／workbench | interaction；底图另读它自己那篇 | 底图照常写，体内最后放一个交互界面宏；一张图一步，与浮层二选一 |
+| 点了按钮之后的交互界面（数据选择页、批量增删改、确认弹窗、参数填写页、扫码器、打印数据、嵌入的网页） | 按钮所在页面的 kind：list／detail／workbench | interaction；底图另读它自己那篇 | 底图照常写；营销画布把交互界面宏放进 hb-float，产品设计类写在体内最后、加遮罩；一张图一步 |
 | 数据大屏 | screen | screen（组件与数据规则同 dashboard） | 体内只放 hb-screen；不套壳、无浮层 |
 | 手机端（上面任一页面的手机版、企业微信消息） | mobile | mobile；手机版工作台、详情页的内容取舍另读对应页面篇 | 一律 2～3 屏流程，每屏界面类型不同；不套产品壳，用手机宏 |
 | 门户（登录页、门户导航、个人中心） | mobile | mobile | hb-phone 写 nobar，体内先放 hb-ptop ＋ hb-pnav；登录页和个人中心各占一屏 |
@@ -42,7 +42,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 - 按 [references/intake.md](references/intake.md) 追问；皮肤按 [references/skin/routing.md](references/skin/routing.md) 选。
 - 完成标准：题库问空、终稿"决定与默认"列没有"待问"、用户对终稿回了确认。**初稿被认可不算确认；三条不齐，不进入步骤 2。**
-- huoban-solution-ppt 传来需求单终稿时（画布营销类、皮肤已定、决定与默认已填实），跳过定盘子、初稿和逐图提问，只保留终稿这一道"确认"闸门。片段写 `<hb-page size="slide">` 用演示尺寸，围绕这一页的讲点画成完整的一页，尺寸与比例见 references/canvas/marketing.md 第 1、2 节。输出到它指定的 `配图/` 目录，每张都导出 PNG。
+- huoban-solution-ppt 传来需求单终稿时（画布营销类、皮肤已定、决定与默认已填实），跳过定盘子、初稿和逐图提问，只保留终稿这一道"确认"闸门。片段写 `<hb-page size="slide">` 用演示尺寸，围绕这一页的讲点画成完整的一页，尺寸与比例见 references/canvas/marketing.md 第 1、2 节。输出到它指定的 `配图/` 目录，每张都导出 PNG，命令带 `--layers`，一并出底图、浮层单图和 `layers.json`，演示稿点图放大用（见 [references/canvas/export.md](references/canvas/export.md)）。
 
 ### 2. 写骨架片段
 
@@ -67,7 +67,7 @@ python3 <skill>/scripts/extract_templates.py <skill>/assets/c2-table-form.html -
 
 - 组件选取与数量按页面原则文档；数据按 anti-sameness 编：带零头、有非理想态、行数不取整、同批图版式错开。
 - 图表写 `hb-bar`／`hb-line`／`hb-donut`／`hb-area`／`hb-hbar`／`hb-biaxial`／`hb-funnel`／`hb-scatter`／`hb-map`，坐标由脚本算；地图不画国界，用网点阵占位或客户提供的地图图片。
-- 表单编辑页和弹窗详情走手写外壳：片段最外层是 c1 的 `.stage`，`.stage` 必须写死 height；本图补充样式另写 `page.css`，步骤 3 用 `--extra-style` 传入。
+- 记录详情弹窗走手写外壳：片段最外层是 c1 的 `.stage`，`.stage` 必须写死 height；本图补充样式另写 `page.css`，步骤 3 用 `--extra-style` 传入。表单编辑页用 `hb-form` 宏。
 - **出图前必查**：下面几条是展开时最常报错、导致整张返工的，写片段时就照做：
   - 图标名先对 `assets/icons.svg`（`grep -o 'id="i-[^"]*"' <skill>/assets/icons.svg` 列出全部），不在里面的名字会报错。
   - `<hb-tools>` 里只有内置工具（字段、分组、筛选、排序、冻结等，报错信息会列全）有默认图标；其余写成「名:图标名」。
@@ -147,7 +147,7 @@ python3 <skill>/scripts/export.py "{客户或项目名}/"*.html --png        # �
 
 | 约束 | 内容 |
 | --- | --- |
-| 不自造组件 | 只画登记表里有的组件；`registry.py --list workbench`（kind 值或中文页面类型；表单编辑页不走登记表，按 c2 模板）看该页可用组件与采集状态 |
+| 不自造组件 | 只画登记表里有的组件；`registry.py --list workbench`（kind 值或中文页面类型）看该页可用组件与采集状态 |
 | 未核与仿写要告知 | 登记表标"未核"的形态先告知用户，确认后按注释就近仿写；标"仿写"的在交付说明里注明；名录外的不画 |
 | 结构与皮肤分离 | 改色只动皮肤 token，不改结构和骨架样式里的尺寸 |
 | 哪些尺寸照实测 | 组件内部尺寸（顶栏 56、侧栏 248、行高 35、标签 20、按钮 32/24）照真实产品，改了就不像 |

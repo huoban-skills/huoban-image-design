@@ -102,18 +102,57 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 }
 .stage.auto .mk-float.at-l { right: auto; left: -60px; }
 
-/* 浮层放手机单屏：手机壳自己就是框，不套窗口框；两档尺寸都按 0.8 倍显示（300 宽），高度按内容撑 */
-.stage.auto .mk-float-phone .phone { zoom: .8; margin: 0; height: auto; box-shadow: 0 14px 36px rgba(0, 0, 0, .16); }
+/* 浮层放手机单屏：完整一屏真机（375×812，0.98 倍）——12px 黑色边框、圆角 54、灵动岛、9:41 状态栏、投影；
+   不套窗口框，宽度按真机，两档尺寸相同。屏里内容按 812 高排满，超出部分被屏底切断 */
+.stage.auto .mk-float.mk-float-phone { width: auto; padding: 0 6px; }
+.stage.auto .mk-float-phone .phone {
+  height: 812px; zoom: .98; position: relative; overflow: hidden; margin: 0;
+  border-radius: 54px; border: 12px solid #15171C; padding-top: 44px; background: #F5F6F8;
+  box-shadow: 0 0 0 2px #4A4E57, 0 0 0 3px #1E2026, 0 40px 70px -28px rgba(15, 18, 34, .55);
+}
+.stage.auto .mk-float-phone .phone::before {     /* 灵动岛 */
+  content: ""; position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+  width: 108px; height: 30px; border-radius: 20px; background: #0B0C0F; z-index: 20;
+}
+.stage.auto .mk-float-phone .phone::after {      /* 状态栏时间 */
+  content: "9:41"; position: absolute; top: 13px; left: 34px; z-index: 20;
+  font: 600 15px/24px -apple-system, "PingFang SC", sans-serif; color: #111;
+}
+.stage.auto .mk-float-phone .phone .m-topbar { background: transparent; }
+.stage.auto .mk-float-phone .phone .m-statusbar, .stage.auto .mk-float-phone .phone .sbar { display: none; }
+
+/* 浮层放交互界面（营销画布）：点开的界面本身就是一个带投影的白窗，去掉遮罩、不套窗口框，按静态窗口摆在浮层位；
+   大弹窗（数据选择页、批量增删改、表单编辑页）宽度跟浮层走，小窗（确认弹窗、参数填写页、扫码器、嵌入的网页）保持实测宽度 */
+.stage.auto .mk-float-dlg.mid { width: auto; }
+.stage.auto .mk-float.mk-float-dlg.mid:not(.at-l) { right: -80px; }   /* 小窗整块压在底图上，只探出 80 */
+.stage.auto .float-dlg > .dlg-print .pv-main { padding: 24px; }
+.stage.auto .float-dlg > .dlg-print .pv-paper { zoom: .72; }          /* 浮层里纸张缩到能整幅露出来 */
+.stage.auto .float-dlg { zoom: .8; }
+.stage.auto.slide .float-dlg { zoom: 1; }
+.stage.auto .float-dlg > .dlg, .stage.auto .float-dlg > .form-modal {
+  position: relative; inset: auto; left: auto; top: auto; transform: none; z-index: auto;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 24px 48px -12px rgba(15, 18, 34, .28);
+}
+.stage.auto .float-dlg > .dlg.wide { width: 100%; height: auto; }   /* 浮层里不跟视口高，按内容撑 */
+.stage.auto .float-dlg .dlg-bd { flex: none; }
+.stage.auto .float-dlg > .form-modal { width: 100%; border-radius: 12px; }
+.stage.auto .float-dlg > .dlg-print { position: relative; inset: auto; height: 620px; border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 24px 48px -12px rgba(15, 18, 34, .28); }
 
 .stage.auto.product .window { border-radius: 0; border: 0; }
-/* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。窗口 1400 宽（整图 1600：1440 视口的图片位 1041 宽时主体字 8.5px），浮层内容不缩小，详情页边距收窄 */
-/* 整图恒 1600：底图无浮层时铺满 1600，有浮层时 1400 给浮层留探出空间 */
-.stage.auto.slide { width: 1600px; }
-.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1600px; }
-.stage.auto.slide.has-float { width: 1600px; }
-.stage.auto.slide.float-r .window, .stage.auto.slide.float-r .item-page { width: 1400px; }
-.stage.auto.slide.float-l .window, .stage.auto.slide.float-l .item-page { width: 1540px; }
-.stage.auto.slide.float-l.float-r .window, .stage.auto.slide.float-l.float-r .item-page { width: 1340px; }
+/* 演示尺寸（size="slide"）：放进 PPT 这类窄位置。整图恒 1600，底图窗口一律 1520 宽（1440 视口的图片位 1041 宽时主体字 8.5px），浮层内容不缩小，详情页边距收窄。
+   底图位置按浮层定：没有浮层居中（左右各 40）；只有右下浮层靠左，浮层从右侧探出 80；只有左下浮层靠右，浮层从左侧探出 80；
+   左右都有时左右各留 40，两个浮层各探出 40。每页窗口一样大，翻页时不跳 */
+.stage.auto.slide, .stage.auto.slide.has-float { width: 1600px; padding-left: 40px; padding-right: 40px; }
+.stage.auto.slide.float-r { padding-left: 0; padding-right: 80px; }
+.stage.auto.slide.float-l { padding-left: 80px; padding-right: 0; }
+.stage.auto.slide.float-l.float-r { padding-left: 40px; padding-right: 40px; }
+.stage.auto.slide .window, .stage.auto.slide .item-page { width: 1520px; }
+.stage.auto.slide .mk-float { right: -80px; }
+.stage.auto.slide .mk-float.at-l { right: auto; left: -80px; }
+.stage.auto.slide.float-l.float-r .mk-float { right: -40px; }
+.stage.auto.slide.float-l.float-r .mk-float.at-l { right: auto; left: -40px; }
+.stage.auto.slide.float-l.float-r .mk-float.mk-float-dlg.mid:not(.at-l) { right: -40px; }
 .stage.auto.slide .item-page-canvas { padding: 32px 48px; }
 .stage.auto.slide .float-screen > * { zoom: 1; }   /* 演示尺寸窗口更窄，再缩 0.8 只剩 6.9px，低于浮层底线，所以不缩 */
 .stage.auto.slide .kanban-columns { gap: 16px; }          /* 演示尺寸：看板各列均分宽度，全部列都露出来 */
@@ -618,16 +657,16 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 /* 数据选择页工具栏：左「已选 N 条｜只看已选 开关」，右 筛选／排序／冻结／行高＋搜索框 180 */
 .dlg-tools { flex: none; color: var(--ink-85); gap: 0; }
 .dlg-tools .picked em { font-style: normal; color: var(--primary); margin: 0 2px; }
-.dlg .sep { width: 1px; height: 14px; background: rgba(0,0,0,.12); margin: 0 16px; flex: none; }
+.dlg .sep, .sub-editor .sep { width: 1px; height: 14px; background: rgba(0,0,0,.12); margin: 0 16px; flex: none; }
 .dlg-tools .sw { width: 24px; height: 16px; border-radius: 100px; background: rgba(0,0,0,.25); margin-left: 8px; position: relative; flex: none; }
 .dlg-tools .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
 .dlg-tools .search { width: 180px; margin-left: 4px; }
-.dlg .grid th.pick, .dlg .grid td.pick { width: 75px; text-align: center; padding: 0; color: var(--ink-45); border-right: 2px solid rgba(0,0,0,.08); }
-.dlg .grid th .req { margin-left: auto; float: right; }
-.dlg .grid .cb.on { background: var(--primary); border-color: var(--primary); position: relative; }
-.dlg .grid .cb.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.dlg .grid th.pick, .dlg .grid td.pick, .sub-editor .grid th.pick, .sub-editor .grid td.pick { width: 75px; text-align: center; padding: 0; color: var(--ink-45); border-right: 2px solid rgba(0,0,0,.08); }
+.dlg .grid th .req, .sub-editor .grid th .req { margin-left: auto; float: right; }
+.grid .cb.on { background: var(--primary); border-color: var(--primary); position: relative; }
+.grid .cb.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .dlg .grid tr.sel td { background: rgba(0,0,0,.04); }
-.dlg .grid tr.ghost td { background: rgba(0,0,0,.02); }
+.dlg .grid tr.ghost td, .sub-editor .grid tr.ghost td { background: rgba(0,0,0,.02); }
 .dlg-count { flex: none; height: 40px; display: flex; align-items: center; border-top: 1px solid rgba(0,0,0,.08); font-size: 12px; color: var(--ink-45); }
 .dlg-count span { width: 75px; text-align: center; align-self: stretch; display: inline-flex; align-items: center; justify-content: center; border-right: 2px solid rgba(0,0,0,.08); }
 .dlg .view-pager { flex: none; height: 49px; padding: 0 8px; border-top: 1px solid rgba(0,0,0,.08); color: var(--ink-65); }
@@ -693,6 +732,47 @@ body.fullbleed .window { border-radius: 0; box-shadow: none; }
 .pv-paper table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
 .pv-paper th { height: 24px; background: rgba(0,0,0,.08); text-align: left; font-weight: 500; padding: 0 8px; }
 .pv-paper td { height: 24px; padding: 0 8px; }
+
+/* ── 八之三 表单编辑页的字段区与子表（hb-form／hb-subtable）──
+   字段区一到四列等分，列间距 16、行距 4（字段行 69＝标签 24＋值框 32＋内距）；分组、子表、关联展开、多行文本、图片独占一行。
+   子表（sub_table_editor，2026-10-12 实测）：外框 1px 细边圆角 6；页签行 40，页签字 12 主色带下划线；信息行与表格同批量增删改页面；各列 140 宽 */
+.fm-grid { display: grid; gap: 4px 16px; }
+.fm-grid.cols-1 { grid-template-columns: 1fr; }
+.fm-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.fm-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.fm-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.fm-grid > .fm-full, .fm-grid > .field.full, .fm-grid > .field-explain { grid-column: 1 / -1; }
+.fm-grid .field { padding-bottom: 9px; }
+.fm-grid .f-input { display: flex; align-items: center; }
+.fm-grid .f-input.ph, .fm-grid .f-textarea.ph, .fm-grid .iv.ph { color: var(--ink-25); }
+.fm-grid .f-textarea { min-height: 56px; }
+.fm-grid .field.err .f-input, .fm-grid .field.err .f-input-affix, .fm-grid .field.err .f-value { background: rgb(255, 247, 247); }   /* 校验出错只把值框底变浅红，不加红边 */
+.f-input-affix .iv { flex: 1; min-width: 0; padding: 5px 10px; min-height: 30px; display: flex; align-items: center; color: var(--ink-85); }
+.f-input-affix.num .iv { justify-content: flex-end; }
+.fm-grid .ph-img { width: 88px; height: 62px; display: flex; align-items: center; justify-content: center; color: var(--ink-25); }
+.fm-grid .ph-img svg { width: 20px; height: 20px; }
+.fm-grid > .dlg-tip { grid-column: 1 / -1; }
+.form-modal > .dlg-tip { flex: none; }
+.sub-editor { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--card-bg); margin: 4px 0 12px; }
+.sub-tabs { height: 40px; display: flex; align-items: flex-end; gap: 20px; padding: 0 16px; border-bottom: 1px solid rgba(0,0,0,.08); }
+.sub-tabs .on { font-size: 12px; color: var(--primary); padding-bottom: 10px; box-shadow: inset 0 -2px 0 var(--primary); }
+.sub-editor .dlg-info { height: 47px; }
+.sub-editor .grid { overflow: hidden; }
+.sub-editor .grid table { width: auto; }
+.sub-editor .grid th:not(.pick), .sub-editor .grid td:not(.pick) { width: 140px; min-width: 140px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+
+/* 网格的图片列（:img，仿写）：32 高缩略图，圆角 4 */
+.cell-img { width: 32px; height: 26px; border-radius: 4px; background: var(--field-bg); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; vertical-align: middle; color: var(--ink-25); }
+.cell-img img { width: 100%; height: 100%; object-fit: cover; }
+.cell-img svg { width: 14px; height: 14px; }
+
+/* 勾选行之后的批量操作条（hb-tools picked，仿写）：替换工具栏原位，左侧「已选择 N / 总数 条」「选择全部」，接主按钮和带图标的批量操作，右端关闭 */
+.view-tools.picked-bar { gap: 6px; color: var(--ink-65); }
+.picked-bar .picked { color: var(--ink-85); margin-right: 6px; }
+.picked-bar .all { color: var(--primary); margin-right: 8px; }
+.picked-bar .b.solid { height: 32px; }
+.picked-bar .x { margin-left: auto; color: var(--ink-45); display: inline-flex; }
+.picked-bar .x svg { width: 16px; height: 16px; }
 
 /* ── 九 卡片视图 ── */
 .view-cards.ops { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 16px; }
