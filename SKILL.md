@@ -42,7 +42,7 @@ description: 生成伙伴云系统界面示意图，画面忠于伙伴云真实�
 
 - 按 [references/intake.md](references/intake.md) 追问；皮肤按 [references/skin/routing.md](references/skin/routing.md) 选。
 - 完成标准：题库问空、终稿"决定与默认"列没有"待问"、用户对终稿回了确认。**初稿被认可不算确认；三条不齐，不进入步骤 2。**
-- huoban-solution-ppt 传来需求单终稿时（画布营销类、皮肤已定、决定与默认已填实），跳过定盘子、初稿和逐图提问，只保留终稿这一道"确认"闸门。片段写 `<hb-page size="slide">` 用演示尺寸，围绕这一页的讲点画成完整的一页，尺寸与比例见 references/canvas/marketing.md 第 1、2 节。输出到它指定的 `配图/` 目录，每张都导出 PNG，命令带 `--layers`，一并出底图、浮层单图和 `layers.json`，演示稿点图放大用（见 [references/canvas/export.md](references/canvas/export.md)）。
+- huoban-solution-ppt 传来需求单终稿时（画布营销类、皮肤已定、决定与默认已填实），跳过定盘子、初稿和逐图提问，只保留终稿这一道"确认"闸门。片段写 `<hb-page size="slide">` 用演示尺寸，围绕这一页的讲点画成完整的一页，尺寸与比例见 references/canvas/marketing.md 第 1、2 节。输出到它指定的 `配图/` 目录，每张都导出 PNG，导出命令按它的派单（带 `--layers`，一并出底图、浮层单图和 `layers.json`，见 [references/canvas/export.md](references/canvas/export.md)）。
 
 ### 2. 写骨架片段
 
